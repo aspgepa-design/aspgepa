@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --aspge-blue: #0075bf;
+      --aspge-green: #229954;
+      --aspge-red: #c00000;
+      --aspge-dark: #333;
+      --bg-gray: #f0f2f5;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      padding: 0; 
+      margin: 0;
+      background-color: var(--bg-gray); 
+      color: var(--aspge-dark); 
+    }
+
+    /* Cabeçalho Estilizado */
+    .header-banner {
+      background: linear-gradient(135deg, var(--aspge-blue) 0%, #004a8d 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom: 5px solid var(--aspge-green);
+    }
+
+    .logo-container {
+      background: white;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .logo-container img {
+      width: 85%;
+      height: auto;
+    }
+
+    .container { 
+      max-width: 800px; 
+      margin: -30px auto 50px; 
+      background: white; 
+      padding: 40px; 
+      border-radius: 12px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    }
+
+    h2 { 
+      color: var(--aspge-blue); 
+      text-align: center; 
+      margin-top: 0;
+      margin-bottom: 30px; 
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 20px; 
+    }
+
+    .campo { margin-bottom: 5px; }
+    .campo.full { grid-column: span 2; }
+
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-size: 13px; 
+      font-weight: 600; 
+      color: #555;
+      text-transform: uppercase;
+    }
+
+    input, select { 
+      width: 100%; 
+      padding: 12px; 
+      border: 2px solid #e1e1e1; 
+      border-radius: 8px; 
+      box-sizing: border-box; 
+      transition: all 0.3s;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--aspge-blue);
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 117, 191, 0.2);
+    }
+
+    button { 
+      background-color: var(--aspge-green); 
+      color: white; 
+      padding: 16px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      width: 100%; 
+      font-size: 18px; 
+      font-weight: bold;
+      margin-top: 30px; 
+      transition: background 0.3s, transform 0.2s;
+      text-transform: uppercase;
+      box-shadow: 0 4px 6px rgba(34, 153, 84, 0.3);
+    }
+
+    button:hover { 
+      background-color: #1e8449; 
+      transform: translateY(-2px);
+    }
+
+    button:active { transform: translateY(0); }
+
+    button:disabled { 
+      background-color: #ccc; 
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    #status { 
+      margin-top: 25px; 
+      text-align: center; 
+      font-weight: bold; 
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .campo.full { grid-column: span 1; }
+      .container { padding: 20px; margin: -20px 10px 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-banner">
+    <div class="logo-container">
+      <!-- Substitua o src pelo link da imagem se for hospedar, 
+           ou deixe assim se o script for injetar a imagem -->
+      <img src="https://drive.google.com/thumbnail?id=1-iaEyYHTTmxL-pi_EFZzA9mYR75dVV0K&sz=w200" alt="Logo ASPGE">
+    </div>
+    <p style="margin: 0; font-weight: 600; font-size: 18px;">ASPGE-PA</p>
+    <p style="margin: 5px 0 0; opacity: 0.8; font-size: 14px;">Associação dos Servidores da Procuradoria Geral do Estado</p>
+  </div>
+
+  <div class="container">
+    <h2>Ficha de Inscrição de Associado</h2>
+    
+    <form id="formInscricao">
+      <div class="grid">
+        <div class="campo full">
+          <label>Nome Completo</label>
+          <input type="text" name="nome" placeholder="Digite seu nome completo" required>
+        </div>
+        
+        <div class="campo">
+          <label>Cargo</label>
+          <input type="text" name="cargo" placeholder="Ex: Técnico de TI" required>
+        </div>
+        
+        <div class="campo">
+          <label>Setor de Lotação</label>
+          <input type="text" name="setor" placeholder="Ex: GTEC" required>
+        </div>
+        
+        <div class="campo">
+          <label>CPF</label>
+          <input type="text" name="cpf" id="cpf" maxlength="14" placeholder="000.000.000-00" required>
+        </div>
+        
+        <div class="campo">
+          <label>Telefone (WhatsApp)</label>
+          <input type="text" name="telefone" id="tel" maxlength="15" placeholder="(91) 98888-8888" required>
+        </div>
+        
+        <div class="campo">
+          <label>Data de Nascimento</label>
+          <input type="text" name="nascimento" id="nasc" placeholder="DD/MM/AAAA" maxlength="10" required>
+        </div>
+        
+        <div class="campo">
+          <label>Estado Civil</label>
+          <select name="estadoCivil">
+            <option value="Solteiro(a)">Solteiro(a)</option>
+            <option value="Casado(a)">Casado(a)</option>
+            <option value="Divorciado(a)">Divorciado(a)</option>
+            <option value="Viúvo(a)">Viúvo(a)</option>
+            <option value="União Estável">União Estável</option>
+          </select>
+        </div>
+        
+        <div class="campo">
+          <label>RG</label>
+          <input type="text" name="rg" required>
+        </div>
+        
+        <div class="campo">
+          <label>Órgão Emissor</label>
+          <input type="text" name="orgao" placeholder="Ex: SSP/PA" required>
+        </div>
+        
+        <div class="campo full">
+          <label>Email Pessoal/Institucional</label>
+          <input type="email" name="email" placeholder="seuemail@pge.pa.gov.br" required>
+        </div>
+        
+        <div class="campo full">
+          <label>Endereço Residencial</label>
+          <input type="text" name="endereco" placeholder="Rua, Número, apto..." required>
+        </div>
+        
+        <div class="campo">
+          <label>Bairro</label>
+          <input type="text" name="bairro" required>
+        </div>
+        
+        <div class="campo">
+          <label>CEP</label>
+          <input type="text" name="cep" id="cep" maxlength="9" placeholder="00000-000" required>
+        </div>
+      </div>
+
+      <button type="submit" id="btn">Finalizar Inscrição</button>
+    </form>
+    
+    <div id="status"></div>
+    <p class="footer-text">© 2026 ASPGE-PA - Diretoria Executiva</p>
+  </div>
+
+  <script>
+    // MÁSCARAS
+    const aplicarMascara = (id, maskFunc) => {
+      document.getElementById(id).addEventListener('input', e => e.target.value = maskFunc(e.target.value));
+    };
+
+    const mCPF = v => v.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    const mTel = v => v.replace(/\D/g,'').replace(/^(\d{2})(\d)/g,'($1) $2').replace(/(\d)(\d{4})$/,'$1-$2');
+    const mCEP = v => v.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2');
+    const mData = v => v.replace(/\D/g,'').replace(/(\d{2})(\d)/,'$1/$2').replace(/(\d{2})(\d)/,'$1/$2');
+
+    aplicarMascara('cpf', mCPF);
+    aplicarMascara('tel', mTel);
+    aplicarMascara('cep', mCEP);
+    aplicarMascara('nasc', mData);
+
+    // ENVIO
+    document.getElementById('formInscricao').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn');
+      const status = document.getElementById('status');
+      
+      btn.disabled = true;
+      status.style.backgroundColor = "#e8f4fd";
+      status.style.color = "#004a8d";
+      status.innerText = "Enviando dados para a Diretoria...";
+
+      const dados = Object.fromEntries(new FormData(this));
+
+      google.script.run
+        .withSuccessHandler(res => {
+          if(res.includes("Sucesso")) {
+            status.style.backgroundColor = "#d4edda";
+            status.style.color = "#155724";
+            status.innerHTML = `<strong>✅ Sucesso!</strong> Sua ficha foi enviada e será processada pela equipe administrativa.`;
+            document.getElementById('formInscricao').reset();
+          } else {
+            status.style.backgroundColor = "#f8d7da";
+            status.style.color = "#721c24";
+            status.innerText = res;
+          }
+          btn.disabled = false;
+        })
+        .salvarInscricao(dados); // Certifique-se que o nome da função no .gs é salvarInscricao
+    });
+  </script>
+</body>
+</html>
