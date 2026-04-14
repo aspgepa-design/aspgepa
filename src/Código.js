@@ -8,6 +8,13 @@ function doGet(e) {
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   
+  if (pagina === 'carteirinha') {
+    return HtmlService.createTemplateFromFile('Carteirinha')
+      .evaluate()
+      .setTitle('Carteirinha de Associado - ASPGE-PA')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
+  
   if (pagina === 'inscricao') {
     return HtmlService.createTemplateFromFile('Formulario')
       .evaluate()
