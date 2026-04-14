@@ -160,10 +160,7 @@
 
     .photo-frame {
       position: absolute;
-      left: 6.4mm;
-      top: 15.9mm;
-      width: 25mm;
-      height: 27mm;
+      /* posição e tamanho definidos via JavaScript */
       overflow: hidden;
       cursor: move;
       border: 1px solid rgba(0,117,191,0.3);
@@ -199,11 +196,7 @@
       user-select: none;
     }
 
-    #cardNome     { left: 45%; top: 14%;   font-size: 1.8mm; max-width: 48%; overflow: hidden; text-overflow: ellipsis; }
-    #cardMatricula{ left: 50%; top: 25%;   font-size: 1.7mm; }
-    #cardCargo    { left: 43%; top: 31%;   font-size: 1.6mm; max-width: 50%; overflow: hidden; text-overflow: ellipsis; }
-    #cardEmissao  { left: 40%; top: 39%;   font-size: 1.5mm; }
-    #cardValidade { left: 60%; top: 39%;   font-size: 1.5mm; }
+    /* Posições dos campos definidas via JavaScript */
 
     /* ---- Painel de Controles ---- */
     .controls-panel {
@@ -345,6 +338,59 @@
       font-size: 12px;
       color: #888;
     }
+
+    /* ========== CONTROLES DE AJUSTE ========== */
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .ctrl-row label {
+      min-width: 60px;
+      font-size: 11px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    .ctrl-row input[type="range"] {
+      flex: 1;
+      padding: 0;
+      border: none;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #dee2e6;
+      border-radius: 3px;
+    }
+    .ctrl-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--aspge-blue);
+      cursor: pointer;
+    }
+    .ctrl-row input[type="range"]:focus {
+      box-shadow: none;
+    }
+    .ctrl-val {
+      min-width: 45px;
+      text-align: right;
+      font-size: 11px;
+      color: #666;
+      font-family: monospace;
+    }
+    .ctrl-row input[type="color"] {
+      width: 36px; height: 28px;
+      padding: 1px; border: 1px solid #dee2e6;
+      border-radius: 4px; cursor: pointer;
+    }
+    .ctrl-row select {
+      width: auto; min-width: 90px;
+      padding: 4px 8px; font-size: 12px;
+    }
+    .campo-highlight {
+      outline: 2px dashed #ff6600 !important;
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body>
@@ -447,6 +493,77 @@
             </div>
           </div>
 
+          <!-- Enquadramento da Foto no Cartão -->
+          <div class="control-group">
+            <h3>Enquadramento da Foto</h3>
+            <p style="font-size:12px;color:#666;margin:0 0 10px;">Ajuste posição e tamanho do enquadramento na carteirinha.</p>
+            <div class="ctrl-row">
+              <label>X (esq.)</label>
+              <input type="range" min="0" max="100" step="0.5" id="frameLeft" value="7.5" oninput="atualizarFrame()">
+              <span class="ctrl-val" id="frameLeftVal">7.5%</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Y (topo)</label>
+              <input type="range" min="0" max="100" step="0.5" id="frameTop" value="14.2" oninput="atualizarFrame()">
+              <span class="ctrl-val" id="frameTopVal">14.2%</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Largura</label>
+              <input type="range" min="3" max="80" step="0.5" id="frameWidth" value="29.4" oninput="atualizarFrame()">
+              <span class="ctrl-val" id="frameWidthVal">29.4%</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Altura</label>
+              <input type="range" min="3" max="80" step="0.5" id="frameHeight" value="24.1" oninput="atualizarFrame()">
+              <span class="ctrl-val" id="frameHeightVal">24.1%</span>
+            </div>
+          </div>
+
+          <!-- Ajuste dos Campos de Texto -->
+          <div class="control-group">
+            <h3>Ajuste dos Campos</h3>
+            <p style="font-size:12px;color:#666;margin:0 0 10px;">Selecione um campo e ajuste posição, tamanho, peso e cor.</p>
+            <div style="margin-bottom:10px">
+              <label>Campo</label>
+              <select id="campoSelecionado" onchange="selecionarCampo(this.value)">
+                <option value="cardNome">Nome</option>
+                <option value="cardMatricula">Matrícula</option>
+                <option value="cardCargo">Cargo</option>
+                <option value="cardEmissao">Emissão</option>
+                <option value="cardValidade">Validade</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label>X (esq.)</label>
+              <input type="range" min="0" max="100" step="0.5" id="campoLeft" oninput="atualizarCampo()">
+              <span class="ctrl-val" id="campoLeftVal">0%</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Y (topo)</label>
+              <input type="range" min="0" max="100" step="0.5" id="campoTop" oninput="atualizarCampo()">
+              <span class="ctrl-val" id="campoTopVal">0%</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Tamanho</label>
+              <input type="range" min="0.5" max="6" step="0.1" id="campoSize" oninput="atualizarCampo()">
+              <span class="ctrl-val" id="campoSizeVal">0mm</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Peso</label>
+              <select id="campoBold" onchange="atualizarCampo()">
+                <option value="400">Normal</option>
+                <option value="600">Semi</option>
+                <option value="700" selected>Negrito</option>
+                <option value="900">Extra</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label>Cor</label>
+              <input type="color" id="campoCor" value="#1a1a1a" oninput="atualizarCampo()">
+              <span class="ctrl-val" id="campoCorVal">#1a1a1a</span>
+            </div>
+          </div>
+
           <!-- Dados do Associado -->
           <div class="control-group">
             <h3>Dados do Associado</h3>
@@ -509,6 +626,18 @@
     var fotoX = 0, fotoY = 0, fotoZoom = 1;
     var dragging = false, dragStartX = 0, dragStartY = 0, dragOriginX = 0, dragOriginY = 0;
 
+    // Config do enquadramento da foto (em % do cartão)
+    var frameConfig = { left: 7.5, top: 14.2, width: 29.4, height: 24.1 };
+
+    // Config dos campos de texto sobrepostos
+    var camposConfig = {
+      cardNome:      { left: 45, top: 14,  fontSize: 1.8, color: '#1a1a1a', fontWeight: 700 },
+      cardMatricula: { left: 50, top: 25,  fontSize: 1.7, color: '#1a1a1a', fontWeight: 700 },
+      cardCargo:     { left: 43, top: 31,  fontSize: 1.6, color: '#1a1a1a', fontWeight: 700 },
+      cardEmissao:   { left: 40, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 },
+      cardValidade:  { left: 60, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 }
+    };
+
     /* ==========================================================
        MÁSCARAS
        ========================================================== */
@@ -561,6 +690,12 @@
 
       // Atualizar textos sobrepostos no cartão
       atualizarCardTextos();
+
+      // Aplicar posições do enquadramento e campos
+      aplicarFrameConfig();
+      sincronizarFrameControles();
+      aplicarTodosCamposConfig();
+      selecionarCampo('cardNome');
 
       // Vincular inputs à atualização ao vivo
       ['dNome','dMatricula','dCargo'].forEach(function(id){
@@ -745,6 +880,116 @@
     function getEventPos(e){
       if(e.touches && e.touches.length > 0) return {x: e.touches[0].clientX, y: e.touches[0].clientY};
       return {x: e.clientX, y: e.clientY};
+    }
+
+    /* ==========================================================
+       ENQUADRAMENTO DA FOTO - POSIÇÃO E TAMANHO
+       ========================================================== */
+    function aplicarFrameConfig(){
+      var frame = document.getElementById('photoFrame');
+      frame.style.left = frameConfig.left + '%';
+      frame.style.top = frameConfig.top + '%';
+      frame.style.width = frameConfig.width + '%';
+      frame.style.height = frameConfig.height + '%';
+    }
+
+    function atualizarFrame(){
+      frameConfig.left  = parseFloat(document.getElementById('frameLeft').value);
+      frameConfig.top   = parseFloat(document.getElementById('frameTop').value);
+      frameConfig.width = parseFloat(document.getElementById('frameWidth').value);
+      frameConfig.height= parseFloat(document.getElementById('frameHeight').value);
+
+      document.getElementById('frameLeftVal').textContent   = frameConfig.left.toFixed(1) + '%';
+      document.getElementById('frameTopVal').textContent    = frameConfig.top.toFixed(1) + '%';
+      document.getElementById('frameWidthVal').textContent  = frameConfig.width.toFixed(1) + '%';
+      document.getElementById('frameHeightVal').textContent = frameConfig.height.toFixed(1) + '%';
+
+      aplicarFrameConfig();
+
+      // Re-ajustar foto se carregada
+      var img = document.getElementById('photoImg');
+      if(img.style.display !== 'none' && img.naturalWidth){
+        var frame = document.getElementById('photoFrame');
+        fotoZoom = Math.max(frame.offsetWidth / img.naturalWidth, frame.offsetHeight / img.naturalHeight);
+        centralizarFoto();
+        aplicarTransform();
+        document.getElementById('zoomSlider').value = fotoZoom;
+        document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
+      }
+    }
+
+    function sincronizarFrameControles(){
+      document.getElementById('frameLeft').value  = frameConfig.left;
+      document.getElementById('frameTop').value   = frameConfig.top;
+      document.getElementById('frameWidth').value  = frameConfig.width;
+      document.getElementById('frameHeight').value = frameConfig.height;
+      document.getElementById('frameLeftVal').textContent   = frameConfig.left.toFixed(1) + '%';
+      document.getElementById('frameTopVal').textContent    = frameConfig.top.toFixed(1) + '%';
+      document.getElementById('frameWidthVal').textContent  = frameConfig.width.toFixed(1) + '%';
+      document.getElementById('frameHeightVal').textContent = frameConfig.height.toFixed(1) + '%';
+    }
+
+    /* ==========================================================
+       CAMPOS DE TEXTO - POSIÇÃO, TAMANHO, COR
+       ========================================================== */
+    function aplicarCampoConfig(id){
+      var cfg = camposConfig[id];
+      var el = document.getElementById(id);
+      if(!el || !cfg) return;
+      el.style.left = cfg.left + '%';
+      el.style.top  = cfg.top + '%';
+      el.style.fontSize   = cfg.fontSize + 'mm';
+      el.style.color      = cfg.color;
+      el.style.fontWeight = cfg.fontWeight;
+    }
+
+    function aplicarTodosCamposConfig(){
+      for(var id in camposConfig){ aplicarCampoConfig(id); }
+    }
+
+    function selecionarCampo(id){
+      var cfg = camposConfig[id];
+      if(!cfg) return;
+
+      document.getElementById('campoLeft').value = cfg.left;
+      document.getElementById('campoTop').value  = cfg.top;
+      document.getElementById('campoSize').value = cfg.fontSize;
+      document.getElementById('campoCor').value  = cfg.color;
+      document.getElementById('campoBold').value = cfg.fontWeight;
+
+      document.getElementById('campoLeftVal').textContent = cfg.left.toFixed(1) + '%';
+      document.getElementById('campoTopVal').textContent  = cfg.top.toFixed(1) + '%';
+      document.getElementById('campoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
+      document.getElementById('campoCorVal').textContent  = cfg.color;
+
+      // Destacar campo selecionado no cartão
+      var overlays = document.querySelectorAll('.card-overlay-text');
+      for(var i = 0; i < overlays.length; i++){
+        if(overlays[i].id === id){
+          overlays[i].classList.add('campo-highlight');
+        } else {
+          overlays[i].classList.remove('campo-highlight');
+        }
+      }
+    }
+
+    function atualizarCampo(){
+      var id = document.getElementById('campoSelecionado').value;
+      var cfg = camposConfig[id];
+      if(!cfg) return;
+
+      cfg.left      = parseFloat(document.getElementById('campoLeft').value);
+      cfg.top       = parseFloat(document.getElementById('campoTop').value);
+      cfg.fontSize  = parseFloat(document.getElementById('campoSize').value);
+      cfg.color     = document.getElementById('campoCor').value;
+      cfg.fontWeight= parseInt(document.getElementById('campoBold').value);
+
+      document.getElementById('campoLeftVal').textContent = cfg.left.toFixed(1) + '%';
+      document.getElementById('campoTopVal').textContent  = cfg.top.toFixed(1) + '%';
+      document.getElementById('campoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
+      document.getElementById('campoCorVal').textContent  = cfg.color;
+
+      aplicarCampoConfig(id);
     }
 
     /* ==========================================================
