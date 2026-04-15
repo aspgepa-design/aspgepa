@@ -633,8 +633,45 @@
       </div>
     </div>
 
+    <!-- ====== SEÇÃO EXPORTAR PDF (Diretor Sociocultural) ====== -->
+    <div id="secExportPdf" style="display:none;margin-top:30px;">
+      <h2 style="font-size:18px;margin-bottom:4px;">📄 Exportar Carteirinhas para PDF</h2>
+      <p class="subtitulo">Selecione os associados e gere um PDF com qualidade para impressão em gráfica.</p>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+        <input type="text" id="exportBusca" placeholder="Buscar por nome ou CPF..." style="flex:1;min-width:200px;padding:10px;border:2px solid #e1e1e1;border-radius:8px;font-size:14px;" oninput="filtrarListaExport()">
+        <button class="btn btn-blue" onclick="selecionarTodosExport(true)" style="padding:8px 14px;font-size:12px;">Selecionar Todos</button>
+        <button class="btn" onclick="selecionarTodosExport(false)" style="padding:8px 14px;font-size:12px;background:#6b7280;color:#fff;">Limpar</button>
+      </div>
+
+      <div id="exportListaAssociados" style="max-height:320px;overflow-y:auto;border:1px solid #e9ecef;border-radius:10px;margin-bottom:16px;background:#fafafa;">
+        <div style="text-align:center;padding:24px;color:#999;">Carregando associados...</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <button class="btn btn-green" id="btnExportPdf" onclick="exportarPdf()" style="padding:14px 32px;font-size:15px;">
+          📄 Gerar PDF para Impressão
+        </button>
+        <span id="exportSelecionados" style="font-size:13px;color:#666;">0 selecionados</span>
+        <div id="exportProgresso" style="display:none;flex:1;min-width:200px;">
+          <div style="background:#e5e7eb;border-radius:8px;height:8px;overflow:hidden;">
+            <div id="exportBarraProgresso" style="height:100%;background:var(--aspge-green);border-radius:8px;transition:width 0.3s;width:0%"></div>
+          </div>
+          <span id="exportProgressoTexto" style="font-size:11px;color:#666;margin-top:4px;display:block;"></span>
+        </div>
+      </div>
+      <div id="msgExport" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Div oculto para renderização do PDF -->
+    <div id="pdfRenderArea" style="position:fixed;left:-9999px;top:0;"></div>
+
     <p class="footer-text">&copy; 2026 ASPGE-PA &mdash; Diretoria Executiva</p>
   </div>
+
+  <!-- Libs para geração de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
     /* ==========================================================
@@ -722,6 +759,8 @@
         document.getElementById('secEnquadramento').style.display = 'block';
         document.getElementById('secCamposTexto').style.display = 'block';
         document.getElementById('btnSalvarLayout').style.display = 'block';
+        document.getElementById('secExportPdf').style.display = 'block';
+        carregarListaExport();
       }
 
       // Carregar config salva do layout (para todos)
@@ -1144,6 +1183,267 @@
       if(!txt){ el.innerHTML = ''; el.className = ''; return; }
       el.className = 'msg msg-' + (tipo === 'ok' ? 'ok' : tipo === 'erro' ? 'erro' : 'info');
       el.textContent = txt;
+    }
+
+    /* ==========================================================
+       EXPORTAR CARTEIRINHAS PARA PDF
+       ========================================================== */
+    var listaExportAssociados = [];
+
+    function carregarListaExport(){
+      google.script.run
+        .withSuccessHandler(function(lista){
+          listaExportAssociados = lista || [];
+          renderListaExport(listaExportAssociados);
+        })
+        .listarAssociadosResumido();
+    }
+
+    function renderListaExport(lista){
+      var el = document.getElementById('exportListaAssociados');
+      if(!lista.length){
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Nenhum associado encontrado.</div>';
+        return;
+      }
+      var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
+      html += '<thead><tr style="background:#f3f4f6;position:sticky;top:0;z-index:1;">';
+      html += '<th style="padding:10px 12px;text-align:left;width:36px;"><input type="checkbox" id="exportCheckAll" onchange="selecionarTodosExport(this.checked)"></th>';
+      html += '<th style="padding:10px 12px;text-align:left;">Nome</th>';
+      html += '<th style="padding:10px 12px;text-align:left;">CPF</th>';
+      html += '<th style="padding:10px 12px;text-align:left;">Cargo</th>';
+      html += '<th style="padding:10px 12px;text-align:center;width:40px;">📷</th>';
+      html += '</tr></thead><tbody>';
+      for(var i = 0; i < lista.length; i++){
+        var a = lista[i];
+        html += '<tr class="export-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" style="border-bottom:1px solid #f3f4f6;">';
+        html += '<td style="padding:8px 12px;"><input type="checkbox" class="export-check" value="' + a.cpf + '" onchange="atualizarContadorExport()"></td>';
+        html += '<td style="padding:8px 12px;font-weight:600;">' + a.nome + '</td>';
+        html += '<td style="padding:8px 12px;color:#666;">' + a.cpf + '</td>';
+        html += '<td style="padding:8px 12px;color:#666;">' + (a.cargo||'—') + '</td>';
+        html += '<td style="padding:8px 12px;text-align:center;">' + (a.temFoto ? '✅' : '❌') + '</td>';
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+      el.innerHTML = html;
+      atualizarContadorExport();
+    }
+
+    function filtrarListaExport(){
+      var busca = (document.getElementById('exportBusca').value || '').toLowerCase().trim();
+      var rows = document.querySelectorAll('.export-row');
+      for(var i = 0; i < rows.length; i++){
+        var nome = rows[i].getAttribute('data-nome') || '';
+        var cpf = rows[i].getAttribute('data-cpf') || '';
+        rows[i].style.display = (!busca || nome.indexOf(busca) !== -1 || cpf.indexOf(busca) !== -1) ? '' : 'none';
+      }
+    }
+
+    function selecionarTodosExport(checked){
+      var checks = document.querySelectorAll('.export-check');
+      for(var i = 0; i < checks.length; i++){
+        var row = checks[i].closest('.export-row');
+        if(row && row.style.display !== 'none') checks[i].checked = checked;
+      }
+      var checkAll = document.getElementById('exportCheckAll');
+      if(checkAll) checkAll.checked = checked;
+      atualizarContadorExport();
+    }
+
+    function atualizarContadorExport(){
+      var checks = document.querySelectorAll('.export-check:checked');
+      document.getElementById('exportSelecionados').textContent = checks.length + ' selecionado' + (checks.length !== 1 ? 's' : '');
+    }
+
+    function obterCpfsSelecionados(){
+      var checks = document.querySelectorAll('.export-check:checked');
+      var cpfs = [];
+      for(var i = 0; i < checks.length; i++) cpfs.push(checks[i].value);
+      return cpfs;
+    }
+
+    function exportarPdf(){
+      var cpfs = obterCpfsSelecionados();
+      if(!cpfs.length){ showMsg('msgExport','Selecione pelo menos um associado.','erro'); return; }
+
+      var btn = document.getElementById('btnExportPdf');
+      btn.disabled = true;
+      document.getElementById('exportProgresso').style.display = 'block';
+      document.getElementById('exportBarraProgresso').style.width = '0%';
+      document.getElementById('exportProgressoTexto').textContent = 'Buscando dados dos associados...';
+      showMsg('msgExport','Preparando exportação de ' + cpfs.length + ' carteirinha(s)...','info');
+
+      google.script.run
+        .withSuccessHandler(function(r){
+          if(r.erro){ btn.disabled = false; showMsg('msgExport', r.erro, 'erro'); return; }
+          gerarPdfComDados(r.carteirinhas);
+        })
+        .withFailureHandler(function(err){
+          btn.disabled = false;
+          document.getElementById('exportProgresso').style.display = 'none';
+          showMsg('msgExport','Erro: ' + err.message, 'erro');
+        })
+        .obterDadosExportCarteirinhas(cpfAssociado, cpfs);
+    }
+
+    function gerarPdfComDados(carteirinhas){
+      // Carregar config do layout salvo
+      google.script.run
+        .withSuccessHandler(function(r){
+          var fc = { left: frameConfig.left, top: frameConfig.top, width: frameConfig.width, height: frameConfig.height };
+          var cc = {};
+          for(var id in camposConfig){ cc[id] = { left: camposConfig[id].left, top: camposConfig[id].top, fontSize: camposConfig[id].fontSize, color: camposConfig[id].color, fontWeight: camposConfig[id].fontWeight }; }
+
+          if(r && r.config){
+            try {
+              var cfg = JSON.parse(r.config);
+              if(cfg.frame) fc = cfg.frame;
+              if(cfg.campos) cc = cfg.campos;
+            } catch(e){}
+          }
+          renderizarCarteirinhasPdf(carteirinhas, fc, cc);
+        })
+        .carregarConfigCarteirinha();
+    }
+
+    function renderizarCarteirinhasPdf(carteirinhas, fc, cc){
+      var area = document.getElementById('pdfRenderArea');
+      // Dimensões em px (85mm × 112.22mm a 300 DPI ≈ escala 3.15x de 96dpi)
+      var cardW = 321; // 85mm em px @96dpi
+      var cardH = 424; // 112.22mm em px @96dpi
+      var scale = 3.15; // para 300 DPI
+      var templateUrl = 'https://drive.google.com/thumbnail?id=1eFQxX1NLXY-0Im2C74hAcAHOmzxMUcX-&sz=w1200';
+
+      var hoje = new Date();
+      var validade = new Date(hoje);
+      validade.setFullYear(validade.getFullYear() + 4);
+      var emissaoStr = formatarData(hoje);
+      var validadeStr = formatarData(validade);
+
+      var totalCards = carteirinhas.length;
+      var canvasArray = [];
+      var processados = 0;
+
+      function processarProxima(){
+        if(processados >= totalCards){
+          montarPdf(canvasArray);
+          return;
+        }
+
+        var pct = Math.round((processados / totalCards) * 80);
+        document.getElementById('exportBarraProgresso').style.width = pct + '%';
+        document.getElementById('exportProgressoTexto').textContent = 'Renderizando ' + (processados + 1) + ' de ' + totalCards + '...';
+
+        var c = carteirinhas[processados];
+        var d = c.dados;
+
+        // Construir HTML da carteirinha
+        var div = document.createElement('div');
+        div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5;';
+
+        // Template bg
+        var bgImg = document.createElement('img');
+        bgImg.crossOrigin = 'anonymous';
+        bgImg.style.cssText = 'width:100%;height:100%;display:block;';
+        bgImg.src = templateUrl;
+        div.appendChild(bgImg);
+
+        // Foto
+        if(c.fotoBase64){
+          var fotoFrame = document.createElement('div');
+          fotoFrame.style.cssText = 'position:absolute;left:' + fc.left + '%;top:' + fc.top + '%;width:' + fc.width + '%;height:' + fc.height + '%;overflow:hidden;';
+          var fImg = document.createElement('img');
+          fImg.src = c.fotoBase64;
+          fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          fotoFrame.appendChild(fImg);
+          div.appendChild(fotoFrame);
+        }
+
+        // Campos de texto
+        var campos = {
+          cardNome: d.nomeCompleto || '',
+          cardMatricula: d.matricula || '',
+          cardCargo: d.cargo || '',
+          cardEmissao: emissaoStr,
+          cardValidade: validadeStr
+        };
+        for(var id in campos){
+          var cfg = cc[id];
+          if(!cfg) continue;
+          var span = document.createElement('span');
+          span.style.cssText = 'position:absolute;left:' + cfg.left + '%;top:' + cfg.top + '%;font-size:' + cfg.fontSize + 'mm;color:' + cfg.color + ';font-weight:' + cfg.fontWeight + ';font-family:Arial,Helvetica,sans-serif;white-space:nowrap;';
+          span.textContent = campos[id];
+          div.appendChild(span);
+        }
+
+        area.appendChild(div);
+
+        // Esperar imagens carregarem
+        var imgs = div.querySelectorAll('img');
+        var imgCount = imgs.length;
+        var imgLoaded = 0;
+        function onImgReady(){
+          imgLoaded++;
+          if(imgLoaded >= imgCount) capturar();
+        }
+        function capturar(){
+          html2canvas(div, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: null })
+            .then(function(canvas){
+              canvasArray.push(canvas);
+              area.removeChild(div);
+              processados++;
+              processarProxima();
+            })
+            .catch(function(){
+              // fallback sem imagem
+              canvasArray.push(null);
+              area.removeChild(div);
+              processados++;
+              processarProxima();
+            });
+        }
+
+        if(imgCount === 0){ capturar(); return; }
+        for(var k = 0; k < imgs.length; k++){
+          if(imgs[k].complete) { onImgReady(); } else {
+            imgs[k].onload = onImgReady;
+            imgs[k].onerror = onImgReady;
+          }
+        }
+      }
+
+      processarProxima();
+    }
+
+    function montarPdf(canvasArray){
+      document.getElementById('exportBarraProgresso').style.width = '90%';
+      document.getElementById('exportProgressoTexto').textContent = 'Gerando PDF...';
+
+      try {
+        var jsPDF = window.jspdf.jsPDF;
+        // Página com tamanho exato da carteirinha: 85mm × 112.22mm
+        var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [85, 112.22] });
+
+        var primeiro = true;
+        for(var i = 0; i < canvasArray.length; i++){
+          if(!canvasArray[i]) continue;
+          if(!primeiro) pdf.addPage([85, 112.22], 'portrait');
+          primeiro = false;
+          var imgData = canvasArray[i].toDataURL('image/jpeg', 0.95);
+          pdf.addImage(imgData, 'JPEG', 0, 0, 85, 112.22);
+        }
+
+        document.getElementById('exportBarraProgresso').style.width = '100%';
+        document.getElementById('exportProgressoTexto').textContent = 'Concluído!';
+
+        var dataStr = formatarData(new Date()).replace(/\//g, '-');
+        pdf.save('Carteirinhas_ASPGE_' + dataStr + '.pdf');
+
+        showMsg('msgExport', 'PDF gerado com sucesso! ' + canvasArray.filter(function(c){return c;}).length + ' carteirinha(s).', 'ok');
+      } catch(e){
+        showMsg('msgExport', 'Erro ao gerar PDF: ' + e.message, 'erro');
+      }
+
+      document.getElementById('btnExportPdf').disabled = false;
     }
   </script>
 </body>

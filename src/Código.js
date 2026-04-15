@@ -637,6 +637,81 @@ function listarTodosAssociados() {
 }
 
 // ==============================================================================
+// EXPORTAÇÃO DE CARTEIRINHAS (PDF)
+// ==============================================================================
+
+/**
+ * Retorna dados de múltiplos associados com fotos em base64 para geração de PDF.
+ * Somente Diretor Sociocultural pode usar.
+ */
+function obterDadosExportCarteirinhas(cpfSolicitante, cpfList) {
+  // Verificar permissão
+  var assoc = buscarAssociadoPorCpf(cpfSolicitante);
+  if (assoc.erro) return { erro: 'Usuário não encontrado.' };
+  var perfil = (assoc.dados.perfil || '').toLowerCase();
+  if (perfil.indexOf('sociocultural') === -1) {
+    return { erro: 'Apenas o Diretor Sociocultural pode exportar carteirinhas.' };
+  }
+
+  var resultados = [];
+  for (var i = 0; i < cpfList.length; i++) {
+    var r = buscarAssociadoPorCpf(cpfList[i]);
+    if (r.erro) continue;
+
+    var fotoBase64 = null;
+    var fotoUrl = r.dados.fotoCarteirinhaUrl || r.dados.fotoUrl || '';
+
+    if (fotoUrl.trim()) {
+      try {
+        var match = fotoUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (!match) match = fotoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+          var file = DriveApp.getFileById(match[1]);
+          var blob = file.getBlob();
+          fotoBase64 = 'data:' + blob.getContentType() + ';base64,' + Utilities.base64Encode(blob.getBytes());
+        }
+      } catch (e) { /* foto não disponível */ }
+    }
+
+    resultados.push({
+      dados: r.dados,
+      fotoBase64: fotoBase64
+    });
+  }
+  return { sucesso: true, carteirinhas: resultados };
+}
+
+/**
+ * Retorna lista simples de associados (nome + CPF) para seleção na exportação.
+ */
+function listarAssociadosResumido() {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Associados');
+    if (!aba) return [];
+
+    var dados = aba.getDataRange().getValues();
+    var lista = [];
+    for (var i = 1; i < dados.length; i++) {
+      var nome = String(dados[i][2] || '').trim();
+      if (!nome) continue;
+      var cpf = String(dados[i][14] || '').trim();
+      if (!cpf || cpf.replace(/\D/g, '').length < 11) continue;
+      lista.push({
+        nome: nome,
+        cpf: cpf,
+        cargo: String(dados[i][13] || ''),
+        temFoto: !!(String(dados[i][18] || '').trim() || String(dados[i][17] || '').trim())
+      });
+    }
+    lista.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
+    return lista;
+  } catch (e) {
+    return [];
+  }
+}
+
+// ==============================================================================
 // SETUP INICIAL - EXECUTAR UMA VEZ para criar abas e pastas no Drive
 // ==============================================================================
 
