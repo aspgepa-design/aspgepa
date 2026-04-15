@@ -2367,8 +2367,10 @@ function filtrarAssociados() {
     var whatsBtn = '';
     if (a.whatsapp && a.whatsapp.trim()) {
       var num = a.whatsapp.replace(/\D/g, '');
-      if (num.length <= 11) num = '55' + num;
-      whatsBtn = '<a href="https://wa.me/' + num + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn btn-sm" style="background:#25d366;color:#fff;border:none;padding:4px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px" title="WhatsApp: ' + a.whatsapp + '">💬 Zap</a>';
+      if (num.length >= 10) {
+        if (num.length <= 11) num = '55' + num;
+        whatsBtn = '<a href="https://wa.me/' + num + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn btn-sm" style="background:#25d366;color:#fff;border:none;padding:4px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px" title="WhatsApp: ' + a.whatsapp + '">💬 Zap</a>';
+      }
     }
 
     html += '<div class="assoc-row" onclick="abrirModalAssoc(' + i + ')" data-idx="' + i + '">' +
