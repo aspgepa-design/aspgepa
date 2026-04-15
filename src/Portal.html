@@ -1712,10 +1712,17 @@ function crtRenderPdf(carteirinhas, fc, cc, templateBase64) {
     function ready() { il++; if (il >= ic) capturar(); }
     function capturar() {
       if (pdfFotoEl && pdfFotoCfg) {
-        pdfFotoEl.style.width = (pdfFotoEl.naturalWidth * pdfFotoCfg.zoom) + 'px';
-        pdfFotoEl.style.height = (pdfFotoEl.naturalHeight * pdfFotoCfg.zoom) + 'px';
-        pdfFotoEl.style.left = (pdfFotoCfg.x || 0) + 'px';
-        pdfFotoEl.style.top = (pdfFotoCfg.y || 0) + 'px';
+        var pdfFrameW = cardW * fc.width / 100;
+        var pdfFrameH = cardH * fc.height / 100;
+        var savedW = pdfFotoCfg.frameW || pdfFrameW;
+        var savedH = pdfFotoCfg.frameH || pdfFrameH;
+        var ratioW = pdfFrameW / savedW;
+        var ratioH = pdfFrameH / savedH;
+        var scaledZoom = pdfFotoCfg.zoom * ratioW;
+        pdfFotoEl.style.width = (pdfFotoEl.naturalWidth * scaledZoom) + 'px';
+        pdfFotoEl.style.height = (pdfFotoEl.naturalHeight * scaledZoom) + 'px';
+        pdfFotoEl.style.left = ((pdfFotoCfg.x || 0) * ratioW) + 'px';
+        pdfFotoEl.style.top = ((pdfFotoCfg.y || 0) * ratioH) + 'px';
       }
       html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
         .then(function(canvas) { arr.push(canvas); area.removeChild(div); proc++; proxima(); })
