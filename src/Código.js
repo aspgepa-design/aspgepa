@@ -749,7 +749,7 @@ function obterDadosExportCarteirinhas(cpfSolicitante, cpfList) {
   // Template da carteirinha em base64 (evita CORS)
   var templateBase64 = null;
   try {
-    var templateFile = DriveApp.getFileById('1eFQxX1NLXY-0Im2C74hAcAHOmzxMUcX-');
+    var templateFile = DriveApp.getFileById('1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB');
     var templateBlob = templateFile.getBlob();
     templateBase64 = 'data:' + templateBlob.getContentType() + ';base64,' + Utilities.base64Encode(templateBlob.getBytes());
   } catch (e) { /* template não disponível */ }
