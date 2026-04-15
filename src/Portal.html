@@ -589,19 +589,136 @@ tbody tr:hover{background:#f9fafb}
           </div>
         </div>
 
-        <!-- ===== VIEW: GESTÃO (Diretor placeholders) ===== -->
+        <!-- ===== VIEW: GERIR EVENTOS ===== -->
         <div id="view-eventos_adm" class="view">
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#9ca3af">
-            <div style="font-size:40px;margin-bottom:16px;opacity:.3">⚙️</div>
-            <p style="font-style:italic">Painel de Gestão de Eventos</p>
-            <p style="font-size:11px;margin-top:8px">Nesta área, o Diretor Cultural cadastra eventos e notícias.</p>
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gerir Eventos</h2>
+              <p style="font-size:13px;color:#6b7280">Cadastre, edite, oculte ou exclua eventos da associação.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalEvento()">+ Novo Evento</button>
+          </header>
+          <div class="card">
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="eventosAdmTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- ===== MODAL: EVENTO ===== -->
+        <div class="modal-assoc-overlay" id="modalEvento" style="display:none">
+          <div class="modal-assoc" style="max-width:540px">
+            <div class="modal-assoc-header">
+              <h3 id="modalEventoTitulo">📅 Novo Evento</h3>
+              <button onclick="document.getElementById('modalEvento').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af;padding:4px">✕</button>
+            </div>
+            <div class="modal-assoc-body" style="padding:24px">
+              <input type="hidden" id="evtLinha">
+              <div style="display:grid;gap:16px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div>
+                    <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Data</label>
+                    <input type="date" id="evtData" class="login-input" style="margin-bottom:0">
+                  </div>
+                  <div>
+                    <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Horário</label>
+                    <input type="time" id="evtHorario" class="login-input" style="margin-bottom:0">
+                  </div>
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Título</label>
+                  <input type="text" id="evtTitulo" class="login-input" placeholder="Nome do evento" style="margin-bottom:0">
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Local</label>
+                  <input type="text" id="evtLocal" class="login-input" placeholder="Local do evento" style="margin-bottom:0">
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Descrição</label>
+                  <textarea id="evtDescricao" class="login-input" rows="3" placeholder="Descrição do evento" style="margin-bottom:0;resize:vertical"></textarea>
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:0">
+                    <input type="checkbox" id="evtVisivel" checked> Visível para associados
+                  </label>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:24px">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('modalEvento').style.display='none'">Cancelar</button>
+                <button class="btn btn-primary btn-sm" onclick="salvarEventoForm()">Salvar</button>
+              </div>
+              <div id="evtStatus" style="font-size:12px;margin-top:12px;min-height:20px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: GERIR CONVÊNIOS ===== -->
         <div id="view-convenios_adm" class="view">
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#9ca3af">
-            <div style="font-size:40px;margin-bottom:16px;opacity:.3">⚙️</div>
-            <p style="font-style:italic">Painel de Gestão de Convênios</p>
-            <p style="font-size:11px;margin-top:8px">Nesta área, o Diretor Cultural gerencia parceiros e convênios.</p>
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gerir Convênios</h2>
+              <p style="font-size:13px;color:#6b7280">Cadastre, edite, oculte ou exclua convênios e parcerias.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalConvenio()">+ Novo Convênio</button>
+          </header>
+          <div class="card">
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="conveniosAdmTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MODAL: CONVÊNIO ===== -->
+        <div class="modal-assoc-overlay" id="modalConvenio" style="display:none">
+          <div class="modal-assoc" style="max-width:540px">
+            <div class="modal-assoc-header">
+              <h3 id="modalConvenioTitulo">🤝 Novo Convênio</h3>
+              <button onclick="document.getElementById('modalConvenio').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af;padding:4px">✕</button>
+            </div>
+            <div class="modal-assoc-body" style="padding:24px">
+              <input type="hidden" id="convLinha">
+              <div style="display:grid;gap:16px">
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Nome do Parceiro</label>
+                  <input type="text" id="convNome" class="login-input" placeholder="Nome da empresa/parceiro" style="margin-bottom:0">
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Descrição do Benefício</label>
+                  <textarea id="convDesc" class="login-input" rows="3" placeholder="Descreva o desconto ou benefício" style="margin-bottom:0;resize:vertical"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div>
+                    <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Categoria</label>
+                    <select id="convCat" class="login-input" style="margin-bottom:0">
+                      <option value="Saúde">Saúde</option>
+                      <option value="Educação">Educação</option>
+                      <option value="Lazer">Lazer</option>
+                      <option value="Alimentação">Alimentação</option>
+                      <option value="Serviços">Serviços</option>
+                      <option value="Outros">Outros</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Link / Site</label>
+                    <input type="text" id="convLink" class="login-input" placeholder="https://..." style="margin-bottom:0">
+                  </div>
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:0">
+                    <input type="checkbox" id="convVisivel" checked> Visível para associados
+                  </label>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:24px">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('modalConvenio').style.display='none'">Cancelar</button>
+                <button class="btn btn-primary btn-sm" onclick="salvarConvenioForm()">Salvar</button>
+              </div>
+              <div id="convStatus" style="font-size:12px;margin-top:12px;min-height:20px"></div>
+            </div>
           </div>
         </div>
 
@@ -846,22 +963,29 @@ var ICONS = {
 // ===== NAVIGATION CONFIG =====
 function getNav(role) {
   var nav = [
-    { id: 'inicio', label: 'Início', roles: ['associado','tesoureiro','diretor'] },
-    { id: 'transparencia', label: 'Transparência', roles: ['associado','tesoureiro','diretor'] },
-    { id: 'convenios', label: 'Convênios', roles: ['associado','tesoureiro','diretor'] },
-    { id: 'votacoes', label: 'Votações', roles: ['associado','tesoureiro','diretor'] },
-    { id: 'atualizacao', label: 'Meu Cadastro', roles: ['associado','tesoureiro','diretor'] }
+    { id: 'inicio', label: 'Início', roles: ['associado','tesoureiro','diretor','presidente'] },
+    { id: 'transparencia', label: 'Transparência', roles: ['associado','tesoureiro','diretor','presidente'] },
+    { id: 'convenios', label: 'Convênios', roles: ['associado','tesoureiro','diretor','presidente'] },
+    { id: 'votacoes', label: 'Votações', roles: ['associado','tesoureiro','diretor','presidente'] },
+    { id: 'atualizacao', label: 'Meu Cadastro', roles: ['associado','tesoureiro','diretor','presidente'] }
   ];
   if (role === 'tesoureiro') {
     nav.push({ id: 'financeiro', label: 'Financeiro', roles: ['tesoureiro'] });
   }
-  if (role === 'tesoureiro' || role === 'diretor') {
-    nav.push({ id: 'associados_adm', label: 'Associados', roles: ['tesoureiro','diretor'] });
+  if (role === 'tesoureiro' || role === 'diretor' || role === 'presidente') {
+    nav.push({ id: 'associados_adm', label: 'Associados', roles: ['tesoureiro','diretor','presidente'] });
   }
-  if (role === 'diretor') {
+  // Diretor Sociocultural: eventos
+  var perfil = (usuarioAtual && usuarioAtual.dados && usuarioAtual.dados.status || '').toLowerCase();
+  if (perfil.indexOf('sociocultural') !== -1) {
     nav.push({ id: 'eventos_adm', label: 'Gerir Eventos', roles: ['diretor'] });
-    nav.push({ id: 'convenios_adm', label: 'Gerir Convênios', roles: ['diretor'] });
-    nav.push({ id: 'gestoes_adm', label: 'Gestões', roles: ['diretor'] });
+  }
+  // Presidente e Diretor Sociocultural: convênios
+  if (role === 'presidente' || perfil.indexOf('sociocultural') !== -1) {
+    nav.push({ id: 'convenios_adm', label: 'Gerir Convênios', roles: ['diretor','presidente'] });
+  }
+  if (role === 'diretor' || role === 'presidente') {
+    nav.push({ id: 'gestoes_adm', label: 'Gestões', roles: ['diretor','presidente'] });
   }
   return nav;
 }
@@ -1001,11 +1125,19 @@ function carregarDadosAsync() {
   google.script.run.withSuccessHandler(renderEventos).obterEventos();
   // Carregar associados se for diretoria
   var role = usuarioAtual && usuarioAtual.dados && usuarioAtual.dados.role;
-  if (role === 'tesoureiro' || role === 'diretor') {
+  if (role === 'tesoureiro' || role === 'diretor' || role === 'presidente') {
     carregarAssociados();
   }
-  if (role === 'diretor') {
+  if (role === 'diretor' || role === 'presidente') {
     carregarGestoes();
+  }
+  // Carregar admin de eventos/convênios
+  var perfil = (usuarioAtual && usuarioAtual.dados && usuarioAtual.dados.status || '').toLowerCase();
+  if (perfil.indexOf('sociocultural') !== -1) {
+    carregarEventosAdm();
+  }
+  if (role === 'presidente' || perfil.indexOf('sociocultural') !== -1) {
+    carregarConveniosAdm();
   }
   // Foto e documentos
   if (usuarioAtual && usuarioAtual.dados.cpf) {
@@ -1088,6 +1220,205 @@ function renderVotacoes(data) {
       '</div></div></div>';
   }
   document.getElementById('votacoesList').innerHTML = html;
+}
+
+// ===== GERIR EVENTOS =====
+function carregarEventosAdm() {
+  google.script.run.withSuccessHandler(renderEventosAdm).obterEventos(true);
+}
+
+function renderEventosAdm(data) {
+  var el = document.getElementById('eventosAdmTabela');
+  if (!data || !data.length) {
+    el.innerHTML = '<p style="color:#9ca3af;padding:16px">Nenhum evento cadastrado.</p>';
+    return;
+  }
+  var html = '<table><thead><tr><th>Data</th><th>Título</th><th>Local</th><th>Horário</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var ev = data[i];
+    html += '<tr style="' + (!ev.visivel ? 'opacity:.5' : '') + '">';
+    html += '<td style="color:#6b7280;white-space:nowrap">' + ev.data + '</td>';
+    html += '<td style="font-weight:600">' + ev.titulo + '</td>';
+    html += '<td style="color:#6b7280">' + ev.local + '</td>';
+    html += '<td style="color:#6b7280">' + ev.horario + '</td>';
+    html += '<td>' + (ev.visivel ? '<span class="badge badge-green">Visível</span>' : '<span class="badge badge-gray">Oculto</span>') + '</td>';
+    html += '<td style="text-align:right;white-space:nowrap">';
+    html += '<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="editarEvento(' + ev.linha + ',\'' + escaparStr(ev.data) + '\',\'' + escaparStr(ev.titulo) + '\',\'' + escaparStr(ev.local) + '\',\'' + escaparStr(ev.horario) + '\',\'' + escaparStr(ev.descricao) + '\',' + ev.visivel + ')">✏️</button> ';
+    html += '<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="toggleVisEvento(' + ev.linha + ')">' + (ev.visivel ? '👁️' : '👁️‍🗨️') + '</button> ';
+    html += '<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px;color:#dc2626;border-color:#fca5a5" onclick="confirmarExcluirEvento(' + ev.linha + ')">🗑</button>';
+    html += '</td></tr>';
+  }
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function escaparStr(s) {
+  return (s || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
+function abrirModalEvento() {
+  document.getElementById('modalEventoTitulo').textContent = '📅 Novo Evento';
+  document.getElementById('evtLinha').value = '';
+  document.getElementById('evtData').value = '';
+  document.getElementById('evtHorario').value = '';
+  document.getElementById('evtTitulo').value = '';
+  document.getElementById('evtLocal').value = '';
+  document.getElementById('evtDescricao').value = '';
+  document.getElementById('evtVisivel').checked = true;
+  document.getElementById('evtStatus').textContent = '';
+  document.getElementById('modalEvento').style.display = 'flex';
+}
+
+function editarEvento(linha, data, titulo, local, horario, descricao, visivel) {
+  document.getElementById('modalEventoTitulo').textContent = '📅 Editar Evento';
+  document.getElementById('evtLinha').value = linha;
+  // Converter dd/MM/yyyy para yyyy-MM-dd
+  var p = data.split('/');
+  document.getElementById('evtData').value = p.length === 3 ? (p[2] + '-' + p[1] + '-' + p[0]) : '';
+  document.getElementById('evtHorario').value = horario || '';
+  document.getElementById('evtTitulo').value = titulo || '';
+  document.getElementById('evtLocal').value = local || '';
+  document.getElementById('evtDescricao').value = descricao || '';
+  document.getElementById('evtVisivel').checked = visivel;
+  document.getElementById('evtStatus').textContent = '';
+  document.getElementById('modalEvento').style.display = 'flex';
+}
+
+function salvarEventoForm() {
+  var titulo = document.getElementById('evtTitulo').value.trim();
+  var dataVal = document.getElementById('evtData').value;
+  if (!titulo) { document.getElementById('evtStatus').innerHTML = '<span style="color:#dc2626">Informe o título.</span>'; return; }
+  if (!dataVal) { document.getElementById('evtStatus').innerHTML = '<span style="color:#dc2626">Informe a data.</span>'; return; }
+  // Converter yyyy-MM-dd para dd/MM/yyyy
+  var dp = dataVal.split('-');
+  var dataFormatada = dp[2] + '/' + dp[1] + '/' + dp[0];
+  var linha = document.getElementById('evtLinha').value;
+  var dados = {
+    linha: linha ? parseInt(linha) : null,
+    data: dataFormatada,
+    titulo: titulo,
+    local: document.getElementById('evtLocal').value.trim(),
+    horario: document.getElementById('evtHorario').value.trim(),
+    descricao: document.getElementById('evtDescricao').value.trim(),
+    visivel: document.getElementById('evtVisivel').checked
+  };
+  document.getElementById('evtStatus').innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { document.getElementById('evtStatus').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    document.getElementById('modalEvento').style.display = 'none';
+    carregarEventosAdm();
+    google.script.run.withSuccessHandler(renderEventos).obterEventos();
+  }).salvarEvento(dados);
+}
+
+function toggleVisEvento(linha) {
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { alert(r.erro); return; }
+    carregarEventosAdm();
+    google.script.run.withSuccessHandler(renderEventos).obterEventos();
+  }).alternarVisibilidadeEvento(linha);
+}
+
+function confirmarExcluirEvento(linha) {
+  if (!confirm('Excluir este evento permanentemente?')) return;
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { alert(r.erro); return; }
+    carregarEventosAdm();
+    google.script.run.withSuccessHandler(renderEventos).obterEventos();
+  }).excluirEvento(linha);
+}
+
+// ===== GERIR CONVÊNIOS =====
+function carregarConveniosAdm() {
+  google.script.run.withSuccessHandler(renderConveniosAdm).obterConvenios(true);
+}
+
+function renderConveniosAdm(data) {
+  var el = document.getElementById('conveniosAdmTabela');
+  if (!data || !data.length) {
+    el.innerHTML = '<p style="color:#9ca3af;padding:16px">Nenhum convênio cadastrado.</p>';
+    return;
+  }
+  var catColors = { 'Saúde': 'badge-green', 'Educação': 'badge-blue', 'Lazer': 'badge-yellow', 'Alimentação': 'badge-red', 'Serviços': 'badge-gray' };
+  var html = '<table><thead><tr><th>Parceiro</th><th>Categoria</th><th>Descrição</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var c = data[i];
+    var badgeCls = catColors[c.cat] || 'badge-gray';
+    html += '<tr style="' + (!c.visivel ? 'opacity:.5' : '') + '">';
+    html += '<td style="font-weight:600">' + c.nome + '</td>';
+    html += '<td><span class="badge ' + badgeCls + '">' + c.cat + '</span></td>';
+    html += '<td style="color:#6b7280;font-size:12px;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + c.desc + '</td>';
+    html += '<td>' + (c.visivel ? '<span class="badge badge-green">Visível</span>' : '<span class="badge badge-gray">Oculto</span>') + '</td>';
+    html += '<td style="text-align:right;white-space:nowrap">';
+    html += '<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="editarConvenio(' + c.linha + ',\'' + escaparStr(c.nome) + '\',\'' + escaparStr(c.desc) + '\',\'' + escaparStr(c.cat) + '\',\'' + escaparStr(c.link) + '\',' + c.visivel + ')">✏️</button> ';
+    html += '<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="toggleVisConvenio(' + c.linha + ')">' + (c.visivel ? '👁️' : '👁️‍🗨️') + '</button> ';
+    html += '<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px;color:#dc2626;border-color:#fca5a5" onclick="confirmarExcluirConvenio(' + c.linha + ')">🗑</button>';
+    html += '</td></tr>';
+  }
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function abrirModalConvenio() {
+  document.getElementById('modalConvenioTitulo').textContent = '🤝 Novo Convênio';
+  document.getElementById('convLinha').value = '';
+  document.getElementById('convNome').value = '';
+  document.getElementById('convDesc').value = '';
+  document.getElementById('convCat').value = 'Saúde';
+  document.getElementById('convLink').value = '';
+  document.getElementById('convVisivel').checked = true;
+  document.getElementById('convStatus').textContent = '';
+  document.getElementById('modalConvenio').style.display = 'flex';
+}
+
+function editarConvenio(linha, nome, desc, cat, link, visivel) {
+  document.getElementById('modalConvenioTitulo').textContent = '🤝 Editar Convênio';
+  document.getElementById('convLinha').value = linha;
+  document.getElementById('convNome').value = nome || '';
+  document.getElementById('convDesc').value = desc || '';
+  document.getElementById('convCat').value = cat || 'Saúde';
+  document.getElementById('convLink').value = link || '';
+  document.getElementById('convVisivel').checked = visivel;
+  document.getElementById('convStatus').textContent = '';
+  document.getElementById('modalConvenio').style.display = 'flex';
+}
+
+function salvarConvenioForm() {
+  var nome = document.getElementById('convNome').value.trim();
+  if (!nome) { document.getElementById('convStatus').innerHTML = '<span style="color:#dc2626">Informe o nome do parceiro.</span>'; return; }
+  var linha = document.getElementById('convLinha').value;
+  var dados = {
+    linha: linha ? parseInt(linha) : null,
+    nome: nome,
+    desc: document.getElementById('convDesc').value.trim(),
+    cat: document.getElementById('convCat').value,
+    link: document.getElementById('convLink').value.trim() || '#',
+    visivel: document.getElementById('convVisivel').checked
+  };
+  document.getElementById('convStatus').innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { document.getElementById('convStatus').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    document.getElementById('modalConvenio').style.display = 'none';
+    carregarConveniosAdm();
+    google.script.run.withSuccessHandler(renderConvenios).obterConvenios();
+  }).salvarConvenio(dados);
+}
+
+function toggleVisConvenio(linha) {
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { alert(r.erro); return; }
+    carregarConveniosAdm();
+    google.script.run.withSuccessHandler(renderConvenios).obterConvenios();
+  }).alternarVisibilidadeConvenio(linha);
+}
+
+function confirmarExcluirConvenio(linha) {
+  if (!confirm('Excluir este convênio permanentemente?')) return;
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { alert(r.erro); return; }
+    carregarConveniosAdm();
+    google.script.run.withSuccessHandler(renderConvenios).obterConvenios();
+  }).excluirConvenio(linha);
 }
 
 // ===== GESTÕES =====

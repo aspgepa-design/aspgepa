@@ -44,7 +44,10 @@ function autenticarPorCpf(cpfBusca) {
   var perfilLower = (d.perfil || '').toLowerCase();
   var role = 'associado';
   if (perfilLower.indexOf('tesourei') !== -1) role = 'tesoureiro';
-  else if (perfilLower.indexOf('diretor') !== -1) role = 'diretor';
+  else if (perfilLower.indexOf('presidente') !== -1) role = 'presidente';
+  else if (perfilLower.indexOf('diretor') !== -1 || perfilLower.indexOf('diretora') !== -1) role = 'diretor';
+  else if (perfilLower.indexOf('secretári') !== -1) role = 'diretor';
+  else if (perfilLower.indexOf('conselho') !== -1 || perfilLower.indexOf('suplente') !== -1) role = 'associado';
   
   resultado.dados.role = role;
   resultado.dados.status = (d.perfil || 'Associado');
@@ -256,7 +259,11 @@ function obterFotoAssociado(cpf) {
 /**
  * Retorna eventos da aba "Eventos".
  */
-function obterEventos() {
+/**
+ * Retorna eventos. Coluna F = Visível (TRUE/FALSE). Se não tiver coluna F, assume visível.
+ * @param {boolean} incluirOcultos - se true retorna todos (para admin)
+ */
+function obterEventos(incluirOcultos) {
   try {
     var ss = SpreadsheetApp.openById(PLANILHA_ID);
     var aba = ss.getSheetByName('Eventos');
@@ -264,6 +271,8 @@ function obterEventos() {
       var dados = aba.getDataRange().getValues();
       var lista = [];
       for (var i = 1; i < dados.length; i++) {
+        var visivel = dados[i][5] !== false && String(dados[i][5]).toUpperCase() !== 'FALSE';
+        if (!incluirOcultos && !visivel) continue;
         var dataCell = dados[i][0];
         var dataStr = '';
         if (dataCell instanceof Date) {
@@ -272,17 +281,60 @@ function obterEventos() {
           dataStr = String(dataCell || '');
         }
         lista.push({
+          linha: i + 1,
           data: dataStr,
           titulo: String(dados[i][1] || ''),
           local: String(dados[i][2] || ''),
           horario: String(dados[i][3] || ''),
-          descricao: String(dados[i][4] || '')
+          descricao: String(dados[i][4] || ''),
+          visivel: visivel
         });
       }
       return lista;
     }
   } catch (e) {}
   return [];
+}
+
+function salvarEvento(dados) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Eventos');
+    if (!aba) return { erro: "Aba 'Eventos' não encontrada." };
+    var partes = dados.data.split('/');
+    var dataObj = new Date(partes[2], partes[1] - 1, partes[0]);
+    var visivel = dados.visivel !== false;
+    if (dados.linha) {
+      aba.getRange(dados.linha, 1, 1, 6).setValues([[dataObj, dados.titulo, dados.local, dados.horario, dados.descricao, visivel]]);
+    } else {
+      aba.appendRow([dataObj, dados.titulo, dados.local, dados.horario, dados.descricao, visivel]);
+    }
+    var lr = dados.linha || aba.getLastRow();
+    aba.getRange(lr, 1).setNumberFormat('dd/MM/yyyy');
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+function excluirEvento(linha) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Eventos');
+    if (!aba || linha < 2) return { erro: 'Linha inválida.' };
+    aba.deleteRow(linha);
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+function alternarVisibilidadeEvento(linha) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Eventos');
+    if (!aba || linha < 2) return { erro: 'Linha inválida.' };
+    var atual = aba.getRange(linha, 6).getValue();
+    var novo = !(atual === true || String(atual).toUpperCase() === 'TRUE');
+    aba.getRange(linha, 6).setValue(novo);
+    return { sucesso: true, visivel: novo };
+  } catch (e) { return { erro: e.toString() }; }
 }
 
 /**
@@ -372,28 +424,69 @@ function excluirLancamento(linha) {
 }
 
 /**
- * Retorna convênios. Lê da aba "Convenios" se existir, senão retorna dados exemplo.
+ * Retorna convênios. Coluna E = Visível (TRUE/FALSE).
+ * @param {boolean} incluirOcultos - se true retorna todos (para admin)
  */
-function obterConvenios() {
+function obterConvenios(incluirOcultos) {
   try {
-    var ss = SpreadsheetApp.openById('1Ovqir2J_WaENRJcajgGNxGvD0mvIAuzcAoCDILvgTZ4');
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
     var aba = ss.getSheetByName('Convenios');
     if (aba && aba.getLastRow() > 1) {
       var dados = aba.getDataRange().getValues();
       var lista = [];
       for (var i = 1; i < dados.length; i++) {
+        var visivel = dados[i][4] !== false && String(dados[i][4]).toUpperCase() !== 'FALSE';
+        if (!incluirOcultos && !visivel) continue;
         lista.push({
+          linha: i + 1,
           nome: String(dados[i][0] || ''),
           desc: String(dados[i][1] || ''),
           cat: String(dados[i][2] || ''),
-          link: String(dados[i][3] || '#')
+          link: String(dados[i][3] || '#'),
+          visivel: visivel
         });
       }
       return lista;
     }
   } catch (e) {}
-  
   return [];
+}
+
+function salvarConvenio(dados) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Convenios');
+    if (!aba) return { erro: "Aba 'Convenios' não encontrada." };
+    var visivel = dados.visivel !== false;
+    if (dados.linha) {
+      aba.getRange(dados.linha, 1, 1, 5).setValues([[dados.nome, dados.desc, dados.cat, dados.link, visivel]]);
+    } else {
+      aba.appendRow([dados.nome, dados.desc, dados.cat, dados.link, visivel]);
+    }
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+function excluirConvenio(linha) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Convenios');
+    if (!aba || linha < 2) return { erro: 'Linha inválida.' };
+    aba.deleteRow(linha);
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+function alternarVisibilidadeConvenio(linha) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Convenios');
+    if (!aba || linha < 2) return { erro: 'Linha inválida.' };
+    var atual = aba.getRange(linha, 5).getValue();
+    var novo = !(atual === true || String(atual).toUpperCase() === 'TRUE');
+    aba.getRange(linha, 5).setValue(novo);
+    return { sucesso: true, visivel: novo };
+  } catch (e) { return { erro: e.toString() }; }
 }
 
 /**
