@@ -188,23 +188,32 @@ function salvarUrlFoto(linha, fotoUrl) {
  */
 function uploadFotoCarteirinha(base64Data, mimeType, cpf) {
   try {
-    var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
-    
-    // Criar pasta "Fotos Carteirinha" se não existir
-    var pastasCart = pastaRaiz.getFoldersByName('Fotos Carteirinha');
     var pastaFotos;
-    if (pastasCart.hasNext()) {
-      pastaFotos = pastasCart.next();
-    } else {
-      pastaFotos = pastaRaiz.createFolder('Fotos Carteirinha');
+    try {
+      var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
+      var pastasCart = pastaRaiz.getFoldersByName('Fotos Carteirinha');
+      if (pastasCart.hasNext()) {
+        pastaFotos = pastasCart.next();
+      } else {
+        pastaFotos = pastaRaiz.createFolder('Fotos Carteirinha');
+      }
+    } catch (e) {
+      // Fallback: usar mesma pasta de fotos de associados
+      var pastaRaiz2 = DriveApp.getFolderById(PASTA_RAIZ_ID);
+      pastaFotos = pastaRaiz2.getFoldersByName('Fotos Associados').next();
     }
     
     var cpfLimpo = cpf.replace(/\D/g, '');
     var extensao = mimeType.indexOf('png') !== -1 ? '.png' : '.jpg';
-    var nomeArquivo = cpfLimpo + extensao;
+    var nomeArquivo = 'cart_' + cpfLimpo + extensao;
     
     // Remover foto antiga da carteirinha se existir
-    var existentes = pastaFotos.getFilesByName(cpfLimpo + '.jpg');
+    var existentes = pastaFotos.getFilesByName('cart_' + cpfLimpo + '.jpg');
+    while (existentes.hasNext()) existentes.next().setTrashed(true);
+    existentes = pastaFotos.getFilesByName('cart_' + cpfLimpo + '.png');
+    while (existentes.hasNext()) existentes.next().setTrashed(true);
+    // Remover formato antigo (sem prefixo cart_)
+    existentes = pastaFotos.getFilesByName(cpfLimpo + '.jpg');
     while (existentes.hasNext()) existentes.next().setTrashed(true);
     existentes = pastaFotos.getFilesByName(cpfLimpo + '.png');
     while (existentes.hasNext()) existentes.next().setTrashed(true);
