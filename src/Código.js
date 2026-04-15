@@ -33,6 +33,10 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
+function obterUrlApp() {
+  return ScriptApp.getService().getUrl();
+}
+
 /**
  * Autentica associado pelo CPF e retorna dados completos + perfil/role.
  */
