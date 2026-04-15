@@ -356,59 +356,6 @@
       font-size: 12px;
       color: #888;
     }
-
-    /* ========== CONTROLES DE AJUSTE ========== */
-    .ctrl-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .ctrl-row label {
-      min-width: 60px;
-      font-size: 11px;
-      margin-bottom: 0;
-      flex-shrink: 0;
-    }
-    .ctrl-row input[type="range"] {
-      flex: 1;
-      padding: 0;
-      border: none;
-      height: 6px;
-      -webkit-appearance: none;
-      background: #dee2e6;
-      border-radius: 3px;
-    }
-    .ctrl-row input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--aspge-blue);
-      cursor: pointer;
-    }
-    .ctrl-row input[type="range"]:focus {
-      box-shadow: none;
-    }
-    .ctrl-val {
-      min-width: 45px;
-      text-align: right;
-      font-size: 11px;
-      color: #666;
-      font-family: monospace;
-    }
-    .ctrl-row input[type="color"] {
-      width: 36px; height: 28px;
-      padding: 1px; border: 1px solid #dee2e6;
-      border-radius: 4px; cursor: pointer;
-    }
-    .ctrl-row select {
-      width: auto; min-width: 90px;
-      padding: 4px 8px; font-size: 12px;
-    }
-    .campo-highlight {
-      outline: 2px dashed #ff6600 !important;
-      outline-offset: 2px;
-    }
   </style>
 </head>
 <body>
@@ -513,79 +460,6 @@
             </div>
           </div>
 
-          <!-- Enquadramento da Foto no Cartão (só Diretor Sociocultural) -->
-          <div class="control-group" id="secEnquadramento" style="display:none;">
-            <h3>⚙ Enquadramento da Foto <span style="font-size:10px;color:#dc2626;font-weight:400;text-transform:none;letter-spacing:0">(Diretor Sociocultural)</span></h3>
-            <p style="font-size:12px;color:#666;margin:0 0 10px;">Ajuste posição e tamanho do enquadramento na carteirinha.</p>
-            <div class="ctrl-row">
-              <label>X (esq.)</label>
-              <input type="range" min="0" max="100" step="0.5" id="frameLeft" value="7.5" oninput="atualizarFrame()">
-              <span class="ctrl-val" id="frameLeftVal">7.5%</span>
-            </div>
-            <div class="ctrl-row">
-              <label>Y (topo)</label>
-              <input type="range" min="0" max="100" step="0.5" id="frameTop" value="14.2" oninput="atualizarFrame()">
-              <span class="ctrl-val" id="frameTopVal">14.2%</span>
-            </div>
-            <div class="ctrl-row">
-              <label>Largura</label>
-              <input type="range" min="3" max="80" step="0.5" id="frameWidth" value="29.4" oninput="atualizarFrame()">
-              <span class="ctrl-val" id="frameWidthVal">29.4%</span>
-            </div>
-            <div class="ctrl-row">
-              <label>Altura</label>
-              <input type="range" min="3" max="80" step="0.5" id="frameHeight" value="24.1" oninput="atualizarFrame()">
-              <span class="ctrl-val" id="frameHeightVal">24.1%</span>
-            </div>
-          </div>
-
-          <!-- Ajuste dos Campos de Texto (só Diretor Sociocultural) -->
-          <div class="control-group" id="secCamposTexto" style="display:none;">
-            <h3>⚙ Ajuste dos Campos <span style="font-size:10px;color:#dc2626;font-weight:400;text-transform:none;letter-spacing:0">(Diretor Sociocultural)</span></h3>
-            <p style="font-size:12px;color:#666;margin:0 0 10px;">Selecione um campo e ajuste posição, tamanho, peso e cor.</p>
-            <div style="margin-bottom:10px">
-              <label>Campo</label>
-              <select id="campoSelecionado" onchange="selecionarCampo(this.value)">
-                <option value="cardNome">Nome</option>
-                <option value="cardMatricula">Matrícula</option>
-                <option value="cardCargo">Cargo</option>
-                <option value="cardCpf">CPF</option>
-                <option value="cardRg">RG</option>
-                <option value="cardEmissao">Emissão</option>
-                <option value="cardValidade">Validade</option>
-              </select>
-            </div>
-            <div class="ctrl-row">
-              <label>X (esq.)</label>
-              <input type="range" min="0" max="100" step="0.5" id="campoLeft" oninput="atualizarCampo()">
-              <span class="ctrl-val" id="campoLeftVal">0%</span>
-            </div>
-            <div class="ctrl-row">
-              <label>Y (topo)</label>
-              <input type="range" min="0" max="100" step="0.5" id="campoTop" oninput="atualizarCampo()">
-              <span class="ctrl-val" id="campoTopVal">0%</span>
-            </div>
-            <div class="ctrl-row">
-              <label>Tamanho</label>
-              <input type="range" min="0.5" max="6" step="0.1" id="campoSize" oninput="atualizarCampo()">
-              <span class="ctrl-val" id="campoSizeVal">0mm</span>
-            </div>
-            <div class="ctrl-row">
-              <label>Peso</label>
-              <select id="campoBold" onchange="atualizarCampo()">
-                <option value="400">Normal</option>
-                <option value="600">Semi</option>
-                <option value="700" selected>Negrito</option>
-                <option value="900">Extra</option>
-              </select>
-            </div>
-            <div class="ctrl-row">
-              <label>Cor</label>
-              <input type="color" id="campoCor" value="#1a1a1a" oninput="atualizarCampo()">
-              <span class="ctrl-val" id="campoCorVal">#1a1a1a</span>
-            </div>
-          </div>
-
           <!-- Dados do Associado -->
           <div class="control-group">
             <h3>Dados do Associado</h3>
@@ -621,12 +495,6 @@
             </div>
           </div>
 
-          <!-- Botão Salvar Layout (só Diretor Sociocultural) -->
-          <button class="btn btn-blue" id="btnSalvarLayout" onclick="salvarLayout()" style="display:none;width:100%;padding:12px;font-size:14px;margin-bottom:8px;">
-            💾 Salvar Layout da Carteirinha (para todos)
-          </button>
-          <div id="msgLayout" style="margin-bottom:8px"></div>
-
           <!-- Botão Salvar -->
           <button class="btn btn-green" id="btnSalvar" onclick="salvarDados()" style="width:100%;padding:14px;font-size:16px;">
             Salvar Dados e Foto
@@ -637,45 +505,8 @@
       </div>
     </div>
 
-    <!-- ====== SEÇÃO EXPORTAR PDF (Diretor Sociocultural) ====== -->
-    <div id="secExportPdf" style="display:none;margin-top:30px;">
-      <h2 style="font-size:18px;margin-bottom:4px;">📄 Exportar Carteirinhas para PDF</h2>
-      <p class="subtitulo">Selecione os associados e gere um PDF com qualidade para impressão em gráfica.</p>
-
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-        <input type="text" id="exportBusca" placeholder="Buscar por nome ou CPF..." style="flex:1;min-width:200px;padding:10px;border:2px solid #e1e1e1;border-radius:8px;font-size:14px;" oninput="filtrarListaExport()">
-        <button class="btn btn-blue" onclick="selecionarTodosExport(true)" style="padding:8px 14px;font-size:12px;">Selecionar Todos</button>
-        <button class="btn" onclick="selecionarTodosExport(false)" style="padding:8px 14px;font-size:12px;background:#6b7280;color:#fff;">Limpar</button>
-      </div>
-
-      <div id="exportListaAssociados" style="max-height:320px;overflow-y:auto;border:1px solid #e9ecef;border-radius:10px;margin-bottom:16px;background:#fafafa;">
-        <div style="text-align:center;padding:24px;color:#999;">Carregando associados...</div>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <button class="btn btn-green" id="btnExportPdf" onclick="exportarPdf()" style="padding:14px 32px;font-size:15px;">
-          📄 Gerar PDF para Impressão
-        </button>
-        <span id="exportSelecionados" style="font-size:13px;color:#666;">0 selecionados</span>
-        <div id="exportProgresso" style="display:none;flex:1;min-width:200px;">
-          <div style="background:#e5e7eb;border-radius:8px;height:8px;overflow:hidden;">
-            <div id="exportBarraProgresso" style="height:100%;background:var(--aspge-green);border-radius:8px;transition:width 0.3s;width:0%"></div>
-          </div>
-          <span id="exportProgressoTexto" style="font-size:11px;color:#666;margin-top:4px;display:block;"></span>
-        </div>
-      </div>
-      <div id="msgExport" style="margin-top:10px;"></div>
-    </div>
-
-    <!-- Div oculto para renderização do PDF -->
-    <div id="pdfRenderArea" style="position:fixed;left:-9999px;top:0;"></div>
-
     <p class="footer-text">&copy; 2026 ASPGE-PA &mdash; Diretoria Executiva</p>
   </div>
-
-  <!-- Libs para geração de PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
     /* ==========================================================
@@ -686,8 +517,6 @@
     var fotoBase64 = null;
     var fotoMimeType = null;
     var fotoAlterada = false;
-    var perfilAssociado = ''; // perfil da planilha
-    var ehDiretorSociocultural = false;
 
     // Posição da foto dentro do frame (em px)
     var fotoX = 0, fotoY = 0, fotoZoom = 1;
@@ -749,8 +578,6 @@
 
     function preencherDados(d){
       cpfAssociado = d.cpf || '';
-      perfilAssociado = (d.perfil || '').toLowerCase();
-      ehDiretorSociocultural = perfilAssociado.indexOf('sociocultural') !== -1;
 
       document.getElementById('dNome').value = d.nomeCompleto || '';
       document.getElementById('dMatricula').value = d.matricula || '';
@@ -759,15 +586,6 @@
       document.getElementById('dRg').value = d.rg || '';
       document.getElementById('dWhatsapp').value = d.whatsapp || '';
       document.getElementById('dEmail').value = d.email || '';
-
-      // Mostrar controles de layout somente para Diretor Sociocultural
-      if(ehDiretorSociocultural){
-        document.getElementById('secEnquadramento').style.display = 'block';
-        document.getElementById('secCamposTexto').style.display = 'block';
-        document.getElementById('btnSalvarLayout').style.display = 'block';
-        document.getElementById('secExportPdf').style.display = 'block';
-        carregarListaExport();
-      }
 
       // Carregar config salva do layout (para todos)
       google.script.run
@@ -785,10 +603,6 @@
           }
           // Aplicar posições (com config carregada ou padrão)
           aplicarFrameConfig();
-          if(ehDiretorSociocultural){
-            sincronizarFrameControles();
-            selecionarCampo('cardNome');
-          }
           aplicarTodosCamposConfig();
           atualizarCardTextos();
         })
@@ -995,42 +809,6 @@
       frame.style.height = frameConfig.height + '%';
     }
 
-    function atualizarFrame(){
-      frameConfig.left  = parseFloat(document.getElementById('frameLeft').value);
-      frameConfig.top   = parseFloat(document.getElementById('frameTop').value);
-      frameConfig.width = parseFloat(document.getElementById('frameWidth').value);
-      frameConfig.height= parseFloat(document.getElementById('frameHeight').value);
-
-      document.getElementById('frameLeftVal').textContent   = frameConfig.left.toFixed(1) + '%';
-      document.getElementById('frameTopVal').textContent    = frameConfig.top.toFixed(1) + '%';
-      document.getElementById('frameWidthVal').textContent  = frameConfig.width.toFixed(1) + '%';
-      document.getElementById('frameHeightVal').textContent = frameConfig.height.toFixed(1) + '%';
-
-      aplicarFrameConfig();
-
-      // Re-ajustar foto se carregada
-      var img = document.getElementById('photoImg');
-      if(img.style.display !== 'none' && img.naturalWidth){
-        var frame = document.getElementById('photoFrame');
-        fotoZoom = Math.max(frame.offsetWidth / img.naturalWidth, frame.offsetHeight / img.naturalHeight);
-        centralizarFoto();
-        aplicarTransform();
-        document.getElementById('zoomSlider').value = fotoZoom;
-        document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
-      }
-    }
-
-    function sincronizarFrameControles(){
-      document.getElementById('frameLeft').value  = frameConfig.left;
-      document.getElementById('frameTop').value   = frameConfig.top;
-      document.getElementById('frameWidth').value  = frameConfig.width;
-      document.getElementById('frameHeight').value = frameConfig.height;
-      document.getElementById('frameLeftVal').textContent   = frameConfig.left.toFixed(1) + '%';
-      document.getElementById('frameTopVal').textContent    = frameConfig.top.toFixed(1) + '%';
-      document.getElementById('frameWidthVal').textContent  = frameConfig.width.toFixed(1) + '%';
-      document.getElementById('frameHeightVal').textContent = frameConfig.height.toFixed(1) + '%';
-    }
-
     /* ==========================================================
        CAMPOS DE TEXTO - POSIÇÃO, TAMANHO, COR
        ========================================================== */
@@ -1047,84 +825,6 @@
 
     function aplicarTodosCamposConfig(){
       for(var id in camposConfig){ aplicarCampoConfig(id); }
-    }
-
-    function selecionarCampo(id){
-      var cfg = camposConfig[id];
-      if(!cfg) return;
-
-      document.getElementById('campoLeft').value = cfg.left;
-      document.getElementById('campoTop').value  = cfg.top;
-      document.getElementById('campoSize').value = cfg.fontSize;
-      document.getElementById('campoCor').value  = cfg.color;
-      document.getElementById('campoBold').value = cfg.fontWeight;
-
-      document.getElementById('campoLeftVal').textContent = cfg.left.toFixed(1) + '%';
-      document.getElementById('campoTopVal').textContent  = cfg.top.toFixed(1) + '%';
-      document.getElementById('campoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
-      document.getElementById('campoCorVal').textContent  = cfg.color;
-
-      // Destacar campo selecionado no cartão
-      var overlays = document.querySelectorAll('.card-overlay-text');
-      for(var i = 0; i < overlays.length; i++){
-        if(overlays[i].id === id){
-          overlays[i].classList.add('campo-highlight');
-        } else {
-          overlays[i].classList.remove('campo-highlight');
-        }
-      }
-    }
-
-    function atualizarCampo(){
-      var id = document.getElementById('campoSelecionado').value;
-      var cfg = camposConfig[id];
-      if(!cfg) return;
-
-      cfg.left      = parseFloat(document.getElementById('campoLeft').value);
-      cfg.top       = parseFloat(document.getElementById('campoTop').value);
-      cfg.fontSize  = parseFloat(document.getElementById('campoSize').value);
-      cfg.color     = document.getElementById('campoCor').value;
-      cfg.fontWeight= parseInt(document.getElementById('campoBold').value);
-
-      document.getElementById('campoLeftVal').textContent = cfg.left.toFixed(1) + '%';
-      document.getElementById('campoTopVal').textContent  = cfg.top.toFixed(1) + '%';
-      document.getElementById('campoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
-      document.getElementById('campoCorVal').textContent  = cfg.color;
-
-      aplicarCampoConfig(id);
-    }
-
-    /* ==========================================================
-       SALVAR LAYOUT (Diretor Sociocultural)
-       ========================================================== */
-    function salvarLayout(){
-      if(!ehDiretorSociocultural){
-        showMsg('msgLayout','Sem permissão.','erro');
-        return;
-      }
-      var btn = document.getElementById('btnSalvarLayout');
-      btn.disabled = true;
-      showMsg('msgLayout','Salvando layout...','info');
-
-      var configJson = JSON.stringify({
-        frame: frameConfig,
-        campos: camposConfig
-      });
-
-      google.script.run
-        .withSuccessHandler(function(r){
-          btn.disabled = false;
-          if(r.erro){
-            showMsg('msgLayout', r.erro, 'erro');
-          } else {
-            showMsg('msgLayout','Layout salvo com sucesso! Todos os associados verão esta configuração.','ok');
-          }
-        })
-        .withFailureHandler(function(err){
-          btn.disabled = false;
-          showMsg('msgLayout','Erro: ' + err.message, 'erro');
-        })
-        .salvarConfigCarteirinha(cpfAssociado, configJson);
     }
 
     /* ==========================================================
@@ -1191,285 +891,6 @@
       if(!txt){ el.innerHTML = ''; el.className = ''; return; }
       el.className = 'msg msg-' + (tipo === 'ok' ? 'ok' : tipo === 'erro' ? 'erro' : 'info');
       el.textContent = txt;
-    }
-
-    /* ==========================================================
-       EXPORTAR CARTEIRINHAS PARA PDF
-       ========================================================== */
-    var listaExportAssociados = [];
-
-    function carregarListaExport(){
-      google.script.run
-        .withSuccessHandler(function(lista){
-          listaExportAssociados = lista || [];
-          renderListaExport(listaExportAssociados);
-        })
-        .listarAssociadosResumido();
-    }
-
-    function renderListaExport(lista){
-      var el = document.getElementById('exportListaAssociados');
-      if(!lista.length){
-        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Nenhum associado encontrado.</div>';
-        return;
-      }
-      var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
-      html += '<thead><tr style="background:#f3f4f6;position:sticky;top:0;z-index:1;">';
-      html += '<th style="padding:10px 12px;text-align:left;width:36px;"><input type="checkbox" id="exportCheckAll" onchange="selecionarTodosExport(this.checked)"></th>';
-      html += '<th style="padding:10px 12px;text-align:left;">Nome</th>';
-      html += '<th style="padding:10px 12px;text-align:left;">CPF</th>';
-      html += '<th style="padding:10px 12px;text-align:left;">Cargo</th>';
-      html += '<th style="padding:10px 12px;text-align:center;width:40px;">📷</th>';
-      html += '</tr></thead><tbody>';
-      for(var i = 0; i < lista.length; i++){
-        var a = lista[i];
-        html += '<tr class="export-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" style="border-bottom:1px solid #f3f4f6;">';
-        html += '<td style="padding:8px 12px;"><input type="checkbox" class="export-check" value="' + a.cpf + '" onchange="atualizarContadorExport()"></td>';
-        html += '<td style="padding:8px 12px;font-weight:600;">' + a.nome + '</td>';
-        html += '<td style="padding:8px 12px;color:#666;">' + a.cpf + '</td>';
-        html += '<td style="padding:8px 12px;color:#666;">' + (a.cargo||'—') + '</td>';
-        html += '<td style="padding:8px 12px;text-align:center;">' + (a.temFoto ? '✅' : '❌') + '</td>';
-        html += '</tr>';
-      }
-      html += '</tbody></table>';
-      el.innerHTML = html;
-      atualizarContadorExport();
-    }
-
-    function filtrarListaExport(){
-      var busca = (document.getElementById('exportBusca').value || '').toLowerCase().trim();
-      var rows = document.querySelectorAll('.export-row');
-      for(var i = 0; i < rows.length; i++){
-        var nome = rows[i].getAttribute('data-nome') || '';
-        var cpf = rows[i].getAttribute('data-cpf') || '';
-        rows[i].style.display = (!busca || nome.indexOf(busca) !== -1 || cpf.indexOf(busca) !== -1) ? '' : 'none';
-      }
-    }
-
-    function selecionarTodosExport(checked){
-      var checks = document.querySelectorAll('.export-check');
-      for(var i = 0; i < checks.length; i++){
-        var row = checks[i].closest('.export-row');
-        if(row && row.style.display !== 'none') checks[i].checked = checked;
-      }
-      var checkAll = document.getElementById('exportCheckAll');
-      if(checkAll) checkAll.checked = checked;
-      atualizarContadorExport();
-    }
-
-    function atualizarContadorExport(){
-      var checks = document.querySelectorAll('.export-check:checked');
-      document.getElementById('exportSelecionados').textContent = checks.length + ' selecionado' + (checks.length !== 1 ? 's' : '');
-    }
-
-    function obterCpfsSelecionados(){
-      var checks = document.querySelectorAll('.export-check:checked');
-      var cpfs = [];
-      for(var i = 0; i < checks.length; i++) cpfs.push(checks[i].value);
-      return cpfs;
-    }
-
-    function exportarPdf(){
-      var cpfs = obterCpfsSelecionados();
-      if(!cpfs.length){ showMsg('msgExport','Selecione pelo menos um associado.','erro'); return; }
-
-      var btn = document.getElementById('btnExportPdf');
-      btn.disabled = true;
-      document.getElementById('exportProgresso').style.display = 'block';
-      document.getElementById('exportBarraProgresso').style.width = '0%';
-      document.getElementById('exportProgressoTexto').textContent = 'Buscando dados dos associados...';
-      showMsg('msgExport','Preparando exportação de ' + cpfs.length + ' carteirinha(s)...','info');
-
-      google.script.run
-        .withSuccessHandler(function(r){
-          if(r.erro){ btn.disabled = false; showMsg('msgExport', r.erro, 'erro'); return; }
-          gerarPdfComDados(r.carteirinhas, r.templateBase64);
-        })
-        .withFailureHandler(function(err){
-          btn.disabled = false;
-          document.getElementById('exportProgresso').style.display = 'none';
-          showMsg('msgExport','Erro: ' + err.message, 'erro');
-        })
-        .obterDadosExportCarteirinhas(cpfAssociado, cpfs);
-    }
-
-    function gerarPdfComDados(carteirinhas, templateBase64){
-      // Carregar config do layout salvo
-      google.script.run
-        .withSuccessHandler(function(r){
-          var fc = { left: frameConfig.left, top: frameConfig.top, width: frameConfig.width, height: frameConfig.height };
-          var cc = {};
-          for(var id in camposConfig){ cc[id] = { left: camposConfig[id].left, top: camposConfig[id].top, fontSize: camposConfig[id].fontSize, color: camposConfig[id].color, fontWeight: camposConfig[id].fontWeight }; }
-
-          if(r && r.config){
-            try {
-              var cfg = JSON.parse(r.config);
-              if(cfg.frame) fc = cfg.frame;
-              if(cfg.campos) cc = cfg.campos;
-            } catch(e){}
-          }
-          renderizarCarteirinhasPdf(carteirinhas, fc, cc, templateBase64);
-        })
-        .carregarConfigCarteirinha();
-    }
-
-    function renderizarCarteirinhasPdf(carteirinhas, fc, cc, templateBase64){
-      var area = document.getElementById('pdfRenderArea');
-      // Dimensões em px (85mm × 112.22mm a 300 DPI ≈ escala 3.15x de 96dpi)
-      var cardW = 321; // 85mm em px @96dpi
-      var cardH = 424; // 112.22mm em px @96dpi
-      var scale = 3.15; // para 300 DPI
-
-      var hoje = new Date();
-      var validade = new Date(hoje);
-      validade.setFullYear(validade.getFullYear() + 4);
-      var emissaoStr = formatarData(hoje);
-      var validadeStr = formatarData(validade);
-
-      var totalCards = carteirinhas.length;
-      var canvasArray = [];
-      var processados = 0;
-
-      function processarProxima(){
-        if(processados >= totalCards){
-          montarPdf(canvasArray);
-          return;
-        }
-
-        var pct = Math.round((processados / totalCards) * 80);
-        document.getElementById('exportBarraProgresso').style.width = pct + '%';
-        document.getElementById('exportProgressoTexto').textContent = 'Renderizando ' + (processados + 1) + ' de ' + totalCards + '...';
-
-        var c = carteirinhas[processados];
-        var d = c.dados;
-
-        // Construir HTML da carteirinha
-        var div = document.createElement('div');
-        div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5;';
-
-        // Template bg (usa base64 para evitar CORS)
-        var bgImg = document.createElement('img');
-        bgImg.style.cssText = 'width:100%;height:100%;display:block;';
-        bgImg.src = templateBase64 || '';
-        div.appendChild(bgImg);
-
-        // Foto
-        if(c.fotoBase64){
-          var fotoFrame = document.createElement('div');
-          fotoFrame.style.cssText = 'position:absolute;left:' + fc.left + '%;top:' + fc.top + '%;width:' + fc.width + '%;height:' + fc.height + '%;overflow:hidden;';
-          var fImg = document.createElement('img');
-          fImg.src = c.fotoBase64;
-          fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-          fotoFrame.appendChild(fImg);
-          div.appendChild(fotoFrame);
-        }
-
-        // Campos de texto
-        var campos = {
-          cardNome: d.nomeCompleto || '',
-          cardMatricula: d.matricula || '',
-          cardCargo: d.cargo || '',
-          cardCpf: d.cpf || '',
-          cardRg: d.rg || '',
-          cardEmissao: emissaoStr,
-          cardValidade: validadeStr
-        };
-        for(var id in campos){
-          var cfg = cc[id];
-          if(!cfg) continue;
-          var span = document.createElement('span');
-          span.style.cssText = 'position:absolute;left:' + cfg.left + '%;top:' + cfg.top + '%;font-size:' + cfg.fontSize + 'mm;color:' + cfg.color + ';font-weight:' + cfg.fontWeight + ';font-family:Arial,Helvetica,sans-serif;white-space:nowrap;';
-          span.textContent = campos[id];
-          div.appendChild(span);
-        }
-
-        area.appendChild(div);
-
-        // Esperar imagens carregarem
-        var imgs = div.querySelectorAll('img');
-        var imgCount = imgs.length;
-        var imgLoaded = 0;
-        function onImgReady(){
-          imgLoaded++;
-          if(imgLoaded >= imgCount) capturar();
-        }
-        function capturar(){
-          html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
-            .then(function(canvas){
-              canvasArray.push(canvas);
-              area.removeChild(div);
-              processados++;
-              processarProxima();
-            })
-            .catch(function(){
-              // fallback sem imagem
-              canvasArray.push(null);
-              area.removeChild(div);
-              processados++;
-              processarProxima();
-            });
-        }
-
-        if(imgCount === 0){ capturar(); return; }
-        for(var k = 0; k < imgs.length; k++){
-          if(imgs[k].complete) { onImgReady(); } else {
-            imgs[k].onload = onImgReady;
-            imgs[k].onerror = onImgReady;
-          }
-        }
-      }
-
-      processarProxima();
-    }
-
-    function montarPdf(canvasArray){
-      document.getElementById('exportBarraProgresso').style.width = '90%';
-      document.getElementById('exportProgressoTexto').textContent = 'Gerando PDF...';
-
-      try {
-        var jsPDF = window.jspdf.jsPDF;
-        // A4 portrait: 210 × 297 mm
-        var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        var pageW = 210, pageH = 297;
-        var cardW = 85, cardH = 112.22;
-        var cols = 2, rows = 2; // 2×2 = 4 carteirinhas por folha A4
-        var gapX = 10, gapY = 10;
-        var marginX = (pageW - cols * cardW - (cols - 1) * gapX) / 2; // ~15mm
-        var marginY = (pageH - rows * cardH - (rows - 1) * gapY) / 2; // ~31.28mm
-        var perPage = cols * rows;
-
-        // Filtrar nulos
-        var validos = canvasArray.filter(function(c){ return c; });
-        var totalPages = Math.ceil(validos.length / perPage);
-
-        for(var i = 0; i < validos.length; i++){
-          var pageIdx = Math.floor(i / perPage);
-          var posIdx = i % perPage;
-          if(i > 0 && posIdx === 0) pdf.addPage('a4', 'portrait');
-          var col = posIdx % cols;
-          var row = Math.floor(posIdx / cols);
-          var x = marginX + col * (cardW + gapX);
-          var y = marginY + row * (cardH + gapY);
-          var imgData = validos[i].toDataURL('image/jpeg', 0.95);
-          pdf.addImage(imgData, 'JPEG', x, y, cardW, cardH);
-          // Borda de corte fina
-          pdf.setDrawColor(200);
-          pdf.setLineWidth(0.2);
-          pdf.rect(x, y, cardW, cardH);
-        }
-
-        document.getElementById('exportBarraProgresso').style.width = '100%';
-        document.getElementById('exportProgressoTexto').textContent = 'Concluído!';
-
-        var dataStr = formatarData(new Date()).replace(/\//g, '-');
-        pdf.save('Carteirinhas_ASPGE_' + dataStr + '.pdf');
-
-        showMsg('msgExport', 'PDF gerado com sucesso! ' + validos.length + ' carteirinha(s) em ' + totalPages + ' página(s) A4.', 'ok');
-      } catch(e){
-        showMsg('msgExport', 'Erro ao gerar PDF: ' + e.message, 'erro');
-      }
-
-      document.getElementById('btnExportPdf').disabled = false;
     }
   </script>
 </body>

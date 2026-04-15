@@ -256,6 +256,14 @@ tbody tr:hover{background:#f9fafb}
   .votacao-inner .btn{width:100%}
   .dashboard-grid{grid-template-columns:1fr !important}
 }
+/* Carteirinha config */
+.crt-overlay{position:absolute;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-weight:700;white-space:nowrap;pointer-events:none;user-select:none}
+.crt-ctrl{display:flex;align-items:center;gap:6px}.crt-ctrl label{min-width:32px;font-size:11px;font-weight:600;color:#555;margin:0;text-transform:uppercase}
+.crt-ctrl input[type="range"]{flex:1;padding:0;border:none;height:5px;-webkit-appearance:none;background:#dee2e6;border-radius:3px}
+.crt-ctrl input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#0075bf;cursor:pointer}
+.crt-ctrl input[type="range"]:focus{box-shadow:none}
+.crt-val{min-width:40px;text-align:right;font-size:10px;color:#6b7280;font-family:monospace}
+.crt-campo-hl{outline:2px dashed #ff6600!important;outline-offset:2px}
 </style>
 </head>
 <body>
@@ -726,18 +734,103 @@ tbody tr:hover{background:#f9fafb}
         <div id="view-carteirinhas_adm" class="view">
           <header style="margin-bottom:24px">
             <h2 style="font-size:22px;font-weight:900;color:#1f2937">Emissão de Carteirinhas</h2>
-            <p style="font-size:13px;color:#6b7280">Acesse o editor de carteirinhas para emitir, ajustar layout e exportar em lote para PDF (impressão A4 com 4 carteirinhas por folha).</p>
+            <p style="font-size:13px;color:#6b7280">Configure o layout, ajuste campos e exporte carteirinhas em lote para PDF A4.</p>
           </header>
+
+          <!-- PREVIEW + CONTROLES DE LAYOUT -->
+          <div class="card" style="margin-bottom:24px">
+            <div class="card-header"><h3>⚙ Configuração do Layout</h3></div>
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start">
+                <!-- Preview Card -->
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div id="crtPreview" style="position:relative;width:85mm;height:112.22mm;overflow:hidden;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);background:#f5f5f5;flex-shrink:0">
+                    <img id="crtBg" src="https://drive.google.com/thumbnail?id=1eFQxX1NLXY-0Im2C74hAcAHOmzxMUcX-&sz=w1007" style="width:100%;height:100%;display:block" draggable="false">
+                    <div id="crtPhotoFrame" style="position:absolute;overflow:hidden;background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">
+                      <span style="font-size:24px;opacity:0.5">📷</span>
+                    </div>
+                    <span class="crt-overlay" id="crtNome">NOME DO ASSOCIADO</span>
+                    <span class="crt-overlay" id="crtMatricula">12345678</span>
+                    <span class="crt-overlay" id="crtCargo">Cargo</span>
+                    <span class="crt-overlay" id="crtCpf">000.000.000-00</span>
+                    <span class="crt-overlay" id="crtRg">0000000</span>
+                    <span class="crt-overlay" id="crtEmissao">15/04/2026</span>
+                    <span class="crt-overlay" id="crtValidade">15/04/2030</span>
+                  </div>
+                  <p style="font-size:11px;color:#9ca3af;margin-top:6px">85 × 112,22 mm</p>
+                </div>
+                <!-- Controles -->
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <!-- Enquadramento da Foto -->
+                  <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px">
+                    <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Enquadramento da Foto</h4>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.5" id="crtFrameLeft" value="7.5" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameLeftVal">7.5%</span></div>
+                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.5" id="crtFrameTop" value="14.2" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameTopVal">14.2%</span></div>
+                      <div class="crt-ctrl"><label>Larg.</label><input type="range" min="3" max="80" step="0.5" id="crtFrameW" value="29.4" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameWVal">29.4%</span></div>
+                      <div class="crt-ctrl"><label>Alt.</label><input type="range" min="3" max="80" step="0.5" id="crtFrameH" value="24.1" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameHVal">24.1%</span></div>
+                    </div>
+                  </div>
+                  <!-- Campos de Texto -->
+                  <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px">
+                    <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Campos de Texto</h4>
+                    <div style="margin-bottom:8px">
+                      <select id="crtCampoSel" onchange="crtSelecionarCampo(this.value)" style="width:100%;padding:6px 10px;border:1px solid #dee2e6;border-radius:6px;font-size:13px">
+                        <option value="crtNome">Nome</option>
+                        <option value="crtMatricula">Matrícula</option>
+                        <option value="crtCargo">Cargo</option>
+                        <option value="crtCpf">CPF</option>
+                        <option value="crtRg">RG</option>
+                        <option value="crtEmissao">Emissão</option>
+                        <option value="crtValidade">Validade</option>
+                      </select>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.5" id="crtCampoX" oninput="crtAtualizarCampo()"><span class="crt-val" id="crtCampoXVal">0%</span></div>
+                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.5" id="crtCampoY" oninput="crtAtualizarCampo()"><span class="crt-val" id="crtCampoYVal">0%</span></div>
+                      <div class="crt-ctrl"><label>Tam.</label><input type="range" min="0.5" max="6" step="0.1" id="crtCampoSize" oninput="crtAtualizarCampo()"><span class="crt-val" id="crtCampoSizeVal">0mm</span></div>
+                      <div class="crt-ctrl"><label>Peso</label><select id="crtCampoBold" onchange="crtAtualizarCampo()" style="width:100%;padding:4px;border:1px solid #dee2e6;border-radius:4px;font-size:12px"><option value="400">Normal</option><option value="600">Semi</option><option value="700" selected>Negrito</option><option value="900">Extra</option></select></div>
+                    </div>
+                    <div class="crt-ctrl" style="margin-top:8px"><label>Cor</label><input type="color" id="crtCampoCor" value="#1a1a1a" oninput="crtAtualizarCampo()" style="width:36px;height:26px;padding:1px;border:1px solid #dee2e6;border-radius:4px;cursor:pointer"><span class="crt-val" id="crtCampoCorVal">#1a1a1a</span></div>
+                  </div>
+                  <!-- Botão Salvar Layout -->
+                  <button class="btn btn-primary" onclick="crtSalvarLayout()" id="crtBtnSalvar" style="width:100%;padding:10px">💾 Salvar Layout (para todos)</button>
+                  <div id="crtMsgLayout" style="font-size:12px;min-height:20px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPORTAR PDF -->
           <div class="card">
-            <div class="card-body" style="text-align:center;padding:40px 24px">
-              <div style="font-size:56px;margin-bottom:16px">🪪</div>
-              <h3 style="font-size:18px;font-weight:700;color:#1f2937;margin:0 0 8px">Editor de Carteirinhas</h3>
-              <p style="color:#6b7280;font-size:14px;max-width:480px;margin:0 auto 24px">No editor você pode: buscar associados pelo CPF, ajustar a foto e campos da carteirinha, salvar o layout padrão para todos, e exportar carteirinhas em lote para PDF em formato A4.</p>
-              <button class="btn btn-primary" onclick="abrirCarteirinhas()" style="padding:12px 32px;font-size:15px">Abrir Editor de Carteirinhas</button>
-              <div id="msgCarteirinhaUrl" style="margin-top:12px;font-size:12px;color:#6b7280"></div>
+            <div class="card-header"><h3>📄 Exportar Carteirinhas para PDF</h3></div>
+            <div class="card-body">
+              <p style="font-size:13px;color:#6b7280;margin:0 0 12px">Selecione os associados e gere um PDF A4 com 4 carteirinhas por folha.</p>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+                <input type="text" id="crtBusca" placeholder="Buscar por nome ou CPF..." style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px" oninput="crtFiltrar()">
+                <button class="btn btn-primary btn-sm" onclick="crtSelTodos(true)">Selecionar Todos</button>
+                <button class="btn btn-outline btn-sm" onclick="crtSelTodos(false)">Limpar</button>
+              </div>
+              <div id="crtLista" style="max-height:320px;overflow-y:auto;border:1px solid #e9ecef;border-radius:8px;margin-bottom:16px;background:#fafafa">
+                <div style="text-align:center;padding:24px;color:#9ca3af">Carregando associados...</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <button class="btn btn-primary" id="crtBtnPdf" onclick="crtExportarPdf()" style="padding:12px 28px;font-size:14px">📄 Gerar PDF para Impressão</button>
+                <span id="crtSelecionados" style="font-size:13px;color:#6b7280">0 selecionados</span>
+                <div id="crtProgresso" style="display:none;flex:1;min-width:200px">
+                  <div style="background:#e5e7eb;border-radius:8px;height:8px;overflow:hidden">
+                    <div id="crtBarra" style="height:100%;background:#16a34a;border-radius:8px;transition:width .3s;width:0%"></div>
+                  </div>
+                  <span id="crtProgTexto" style="font-size:11px;color:#6b7280;margin-top:4px;display:block"></span>
+                </div>
+              </div>
+              <div id="crtMsgExport" style="margin-top:10px;font-size:13px;min-height:20px"></div>
             </div>
           </div>
         </div>
+
+        <!-- Div oculto para renderização PDF -->
+        <div id="crtPdfArea" style="position:fixed;left:-9999px;top:0"></div>
 
         <!-- ===== VIEW: GESTÕES ===== -->
         <div id="view-gestoes_adm" class="view">
@@ -958,6 +1051,9 @@ tbody tr:hover{background:#f9fafb}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 // ===== STATE =====
 var usuarioAtual = null;
@@ -1154,6 +1250,8 @@ function carregarDadosAsync() {
   var perfil = (usuarioAtual && usuarioAtual.dados && usuarioAtual.dados.status || '').toLowerCase();
   if (perfil.indexOf('sociocultural') !== -1) {
     carregarEventosAdm();
+    crtCarregarConfig();
+    crtCarregarLista();
   }
   if (role === 'presidente' || perfil.indexOf('sociocultural') !== -1) {
     carregarConveniosAdm();
@@ -1241,22 +1339,254 @@ function renderVotacoes(data) {
   document.getElementById('votacoesList').innerHTML = html;
 }
 
-// ===== GERIR EVENTOS =====
-// ===== CARTEIRINHAS =====
-function abrirCarteirinhas() {
-  var msg = document.getElementById('msgCarteirinhaUrl');
-  msg.textContent = 'Abrindo editor...';
-  google.script.run.withSuccessHandler(function(url) {
-    if (url) {
-      window.open(url + '?p=carteirinha', '_blank');
-      msg.textContent = 'Editor aberto em nova aba.';
-    } else {
-      msg.innerHTML = '<span style="color:#dc2626">Não foi possível obter a URL.</span>';
+// ===== CARTEIRINHAS: CONFIG + EXPORT =====
+var crtFrameConfig = { left: 7.5, top: 14.2, width: 29.4, height: 24.1 };
+var crtCamposConfig = {
+  crtNome:      { left: 45, top: 14,  fontSize: 1.8, color: '#1a1a1a', fontWeight: 700 },
+  crtMatricula: { left: 50, top: 25,  fontSize: 1.7, color: '#1a1a1a', fontWeight: 700 },
+  crtCargo:     { left: 43, top: 31,  fontSize: 1.6, color: '#1a1a1a', fontWeight: 700 },
+  crtCpf:       { left: 40, top: 45,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700 },
+  crtRg:        { left: 40, top: 51,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700 },
+  crtEmissao:   { left: 40, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 },
+  crtValidade:  { left: 60, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 }
+};
+// Mapeamento de IDs do preview → IDs do config salvo (para compat com Carteirinha.html)
+var crtKeyMap = { crtNome:'cardNome', crtMatricula:'cardMatricula', crtCargo:'cardCargo', crtCpf:'cardCpf', crtRg:'cardRg', crtEmissao:'cardEmissao', crtValidade:'cardValidade' };
+var crtKeyMapInv = {}; for(var k in crtKeyMap) crtKeyMapInv[crtKeyMap[k]] = k;
+
+function crtCarregarConfig() {
+  google.script.run.withSuccessHandler(function(r) {
+    if (r && r.config) {
+      try {
+        var cfg = JSON.parse(r.config);
+        if (cfg.frame) crtFrameConfig = cfg.frame;
+        if (cfg.campos) {
+          for (var savedId in cfg.campos) {
+            var localId = crtKeyMapInv[savedId];
+            if (localId && crtCamposConfig[localId]) crtCamposConfig[localId] = cfg.campos[savedId];
+          }
+        }
+      } catch(e){}
     }
-  }).withFailureHandler(function(e) {
-    msg.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
-  }).obterUrlApp();
+    crtAplicarFrame();
+    crtSincronizarFrameUI();
+    crtAplicarTodosCampos();
+    crtSelecionarCampo('crtNome');
+  }).carregarConfigCarteirinha();
 }
+
+function crtAplicarFrame() {
+  var f = document.getElementById('crtPhotoFrame');
+  f.style.left = crtFrameConfig.left + '%';
+  f.style.top = crtFrameConfig.top + '%';
+  f.style.width = crtFrameConfig.width + '%';
+  f.style.height = crtFrameConfig.height + '%';
+}
+function crtSincronizarFrameUI() {
+  document.getElementById('crtFrameLeft').value = crtFrameConfig.left;
+  document.getElementById('crtFrameTop').value = crtFrameConfig.top;
+  document.getElementById('crtFrameW').value = crtFrameConfig.width;
+  document.getElementById('crtFrameH').value = crtFrameConfig.height;
+  document.getElementById('crtFrameLeftVal').textContent = crtFrameConfig.left.toFixed(1) + '%';
+  document.getElementById('crtFrameTopVal').textContent = crtFrameConfig.top.toFixed(1) + '%';
+  document.getElementById('crtFrameWVal').textContent = crtFrameConfig.width.toFixed(1) + '%';
+  document.getElementById('crtFrameHVal').textContent = crtFrameConfig.height.toFixed(1) + '%';
+}
+function crtAtualizarFrame() {
+  crtFrameConfig.left = parseFloat(document.getElementById('crtFrameLeft').value);
+  crtFrameConfig.top = parseFloat(document.getElementById('crtFrameTop').value);
+  crtFrameConfig.width = parseFloat(document.getElementById('crtFrameW').value);
+  crtFrameConfig.height = parseFloat(document.getElementById('crtFrameH').value);
+  document.getElementById('crtFrameLeftVal').textContent = crtFrameConfig.left.toFixed(1) + '%';
+  document.getElementById('crtFrameTopVal').textContent = crtFrameConfig.top.toFixed(1) + '%';
+  document.getElementById('crtFrameWVal').textContent = crtFrameConfig.width.toFixed(1) + '%';
+  document.getElementById('crtFrameHVal').textContent = crtFrameConfig.height.toFixed(1) + '%';
+  crtAplicarFrame();
+}
+function crtAplicarCampoConfig(id) {
+  var cfg = crtCamposConfig[id]; var el = document.getElementById(id);
+  if (!el || !cfg) return;
+  el.style.left = cfg.left + '%'; el.style.top = cfg.top + '%';
+  el.style.fontSize = cfg.fontSize + 'mm'; el.style.color = cfg.color; el.style.fontWeight = cfg.fontWeight;
+}
+function crtAplicarTodosCampos() { for (var id in crtCamposConfig) crtAplicarCampoConfig(id); }
+function crtSelecionarCampo(id) {
+  var cfg = crtCamposConfig[id]; if (!cfg) return;
+  document.getElementById('crtCampoX').value = cfg.left;
+  document.getElementById('crtCampoY').value = cfg.top;
+  document.getElementById('crtCampoSize').value = cfg.fontSize;
+  document.getElementById('crtCampoCor').value = cfg.color;
+  document.getElementById('crtCampoBold').value = cfg.fontWeight;
+  document.getElementById('crtCampoXVal').textContent = cfg.left.toFixed(1) + '%';
+  document.getElementById('crtCampoYVal').textContent = cfg.top.toFixed(1) + '%';
+  document.getElementById('crtCampoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
+  document.getElementById('crtCampoCorVal').textContent = cfg.color;
+  var overlays = document.querySelectorAll('.crt-overlay');
+  for (var i = 0; i < overlays.length; i++) overlays[i].classList.toggle('crt-campo-hl', overlays[i].id === id);
+}
+function crtAtualizarCampo() {
+  var id = document.getElementById('crtCampoSel').value;
+  var cfg = crtCamposConfig[id]; if (!cfg) return;
+  cfg.left = parseFloat(document.getElementById('crtCampoX').value);
+  cfg.top = parseFloat(document.getElementById('crtCampoY').value);
+  cfg.fontSize = parseFloat(document.getElementById('crtCampoSize').value);
+  cfg.color = document.getElementById('crtCampoCor').value;
+  cfg.fontWeight = parseInt(document.getElementById('crtCampoBold').value);
+  document.getElementById('crtCampoXVal').textContent = cfg.left.toFixed(1) + '%';
+  document.getElementById('crtCampoYVal').textContent = cfg.top.toFixed(1) + '%';
+  document.getElementById('crtCampoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
+  document.getElementById('crtCampoCorVal').textContent = cfg.color;
+  crtAplicarCampoConfig(id);
+}
+function crtSalvarLayout() {
+  var btn = document.getElementById('crtBtnSalvar'); btn.disabled = true;
+  var el = document.getElementById('crtMsgLayout'); el.innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  // Converter IDs locais → IDs salvos
+  var savedCampos = {};
+  for (var localId in crtCamposConfig) { savedCampos[crtKeyMap[localId] || localId] = crtCamposConfig[localId]; }
+  var configJson = JSON.stringify({ frame: crtFrameConfig, campos: savedCampos });
+  google.script.run.withSuccessHandler(function(r) {
+    btn.disabled = false;
+    if (r.erro) { el.innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; }
+    else { el.innerHTML = '<span style="color:#16a34a">Layout salvo com sucesso!</span>'; }
+  }).withFailureHandler(function(e) {
+    btn.disabled = false; el.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+  }).salvarConfigCarteirinha(usuarioAtual.dados.cpf, configJson);
+}
+
+// --- Export PDF ---
+var crtListaAssoc = [];
+function crtCarregarLista() {
+  google.script.run.withSuccessHandler(function(lista) {
+    crtListaAssoc = lista || []; crtRenderLista(crtListaAssoc);
+  }).listarAssociadosResumido();
+}
+function crtRenderLista(lista) {
+  var el = document.getElementById('crtLista');
+  if (!lista.length) { el.innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af">Nenhum associado.</div>'; return; }
+  var h = '<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="background:#f3f4f6;position:sticky;top:0;z-index:1">';
+  h += '<th style="padding:8px 12px;text-align:left;width:36px"><input type="checkbox" id="crtCheckAll" onchange="crtSelTodos(this.checked)"></th>';
+  h += '<th style="padding:8px 12px;text-align:left">Nome</th><th style="padding:8px 12px;text-align:left">CPF</th>';
+  h += '<th style="padding:8px 12px;text-align:left">Cargo</th><th style="padding:8px 12px;text-align:center;width:36px">📷</th></tr></thead><tbody>';
+  for (var i = 0; i < lista.length; i++) {
+    var a = lista[i];
+    h += '<tr class="crt-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" style="border-bottom:1px solid #f3f4f6">';
+    h += '<td style="padding:6px 12px"><input type="checkbox" class="crt-check" value="' + a.cpf + '" onchange="crtContador()"></td>';
+    h += '<td style="padding:6px 12px;font-weight:600">' + a.nome + '</td>';
+    h += '<td style="padding:6px 12px;color:#6b7280">' + a.cpf + '</td>';
+    h += '<td style="padding:6px 12px;color:#6b7280">' + (a.cargo||'—') + '</td>';
+    h += '<td style="padding:6px 12px;text-align:center">' + (a.temFoto ? '✅' : '❌') + '</td></tr>';
+  }
+  h += '</tbody></table>'; el.innerHTML = h; crtContador();
+}
+function crtFiltrar() {
+  var b = (document.getElementById('crtBusca').value || '').toLowerCase().trim();
+  var rows = document.querySelectorAll('.crt-row');
+  for (var i = 0; i < rows.length; i++) {
+    var n = rows[i].getAttribute('data-nome')||'', c = rows[i].getAttribute('data-cpf')||'';
+    rows[i].style.display = (!b || n.indexOf(b) !== -1 || c.indexOf(b) !== -1) ? '' : 'none';
+  }
+}
+function crtSelTodos(checked) {
+  var cks = document.querySelectorAll('.crt-check');
+  for (var i = 0; i < cks.length; i++) { var r = cks[i].closest('.crt-row'); if (r && r.style.display !== 'none') cks[i].checked = checked; }
+  var ca = document.getElementById('crtCheckAll'); if (ca) ca.checked = checked; crtContador();
+}
+function crtContador() {
+  var n = document.querySelectorAll('.crt-check:checked').length;
+  document.getElementById('crtSelecionados').textContent = n + ' selecionado' + (n !== 1 ? 's' : '');
+}
+function crtExportarPdf() {
+  var cks = document.querySelectorAll('.crt-check:checked'); var cpfs = [];
+  for (var i = 0; i < cks.length; i++) cpfs.push(cks[i].value);
+  if (!cpfs.length) { document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Selecione pelo menos um associado.</span>'; return; }
+  var btn = document.getElementById('crtBtnPdf'); btn.disabled = true;
+  document.getElementById('crtProgresso').style.display = 'block';
+  document.getElementById('crtBarra').style.width = '0%';
+  document.getElementById('crtProgTexto').textContent = 'Buscando dados...';
+  document.getElementById('crtMsgExport').innerHTML = '<span style="color:#2563eb">Preparando ' + cpfs.length + ' carteirinha(s)...</span>';
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { btn.disabled = false; document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    crtGerarPdf(r.carteirinhas, r.templateBase64);
+  }).withFailureHandler(function(e) {
+    btn.disabled = false; document.getElementById('crtProgresso').style.display = 'none';
+    document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+  }).obterDadosExportCarteirinhas(usuarioAtual.dados.cpf, cpfs);
+}
+function crtGerarPdf(carteirinhas, templateBase64) {
+  // Usar config atual (já carregada)
+  var fc = { left: crtFrameConfig.left, top: crtFrameConfig.top, width: crtFrameConfig.width, height: crtFrameConfig.height };
+  var cc = {};
+  for (var localId in crtCamposConfig) { cc[crtKeyMap[localId] || localId] = crtCamposConfig[localId]; }
+  crtRenderPdf(carteirinhas, fc, cc, templateBase64);
+}
+function crtFormatarData(d) { return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear(); }
+function crtRenderPdf(carteirinhas, fc, cc, templateBase64) {
+  var area = document.getElementById('crtPdfArea');
+  var cardW = 321, cardH = 424, scale = 3.15;
+  var hoje = new Date(), val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+  var emStr = crtFormatarData(hoje), valStr = crtFormatarData(val);
+  var total = carteirinhas.length, arr = [], proc = 0;
+  function proxima() {
+    if (proc >= total) { crtMontarPdf(arr); return; }
+    document.getElementById('crtBarra').style.width = Math.round((proc/total)*80) + '%';
+    document.getElementById('crtProgTexto').textContent = 'Renderizando ' + (proc+1) + ' de ' + total + '...';
+    var c = carteirinhas[proc], d = c.dados;
+    var div = document.createElement('div');
+    div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5';
+    var bg = document.createElement('img'); bg.style.cssText = 'width:100%;height:100%;display:block'; bg.src = templateBase64 || '';
+    div.appendChild(bg);
+    if (c.fotoBase64) {
+      var ff = document.createElement('div');
+      ff.style.cssText = 'position:absolute;left:'+fc.left+'%;top:'+fc.top+'%;width:'+fc.width+'%;height:'+fc.height+'%;overflow:hidden';
+      var fi = document.createElement('img'); fi.src = c.fotoBase64; fi.style.cssText = 'width:100%;height:100%;object-fit:cover';
+      ff.appendChild(fi); div.appendChild(ff);
+    }
+    var campos = { cardNome:d.nomeCompleto||'', cardMatricula:d.matricula||'', cardCargo:d.cargo||'', cardCpf:d.cpf||'', cardRg:d.rg||'', cardEmissao:emStr, cardValidade:valStr };
+    for (var id in campos) { var cfg = cc[id]; if (!cfg) continue;
+      var s = document.createElement('span');
+      s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:nowrap';
+      s.textContent = campos[id]; div.appendChild(s);
+    }
+    area.appendChild(div);
+    var imgs = div.querySelectorAll('img'), ic = imgs.length, il = 0;
+    function ready() { il++; if (il >= ic) capturar(); }
+    function capturar() {
+      html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
+        .then(function(canvas) { arr.push(canvas); area.removeChild(div); proc++; proxima(); })
+        .catch(function() { arr.push(null); area.removeChild(div); proc++; proxima(); });
+    }
+    if (ic === 0) { capturar(); return; }
+    for (var k = 0; k < imgs.length; k++) { if (imgs[k].complete) ready(); else { imgs[k].onload = ready; imgs[k].onerror = ready; } }
+  }
+  proxima();
+}
+function crtMontarPdf(arr) {
+  document.getElementById('crtBarra').style.width = '90%';
+  document.getElementById('crtProgTexto').textContent = 'Gerando PDF...';
+  try {
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    var cW=85, cH=112.22, cols=2, rows=2, gapX=10, gapY=10;
+    var mX=(210-cols*cW-(cols-1)*gapX)/2, mY=(297-rows*cH-(rows-1)*gapY)/2, pp=cols*rows;
+    var validos = arr.filter(function(c){return c});
+    var tp = Math.ceil(validos.length/pp);
+    for (var i=0;i<validos.length;i++) {
+      var pi = i%pp; if (i>0 && pi===0) pdf.addPage('a4','portrait');
+      var col=pi%cols, row=Math.floor(pi/cols);
+      var x=mX+col*(cW+gapX), y=mY+row*(cH+gapY);
+      pdf.addImage(validos[i].toDataURL('image/jpeg',0.95),'JPEG',x,y,cW,cH);
+      pdf.setDrawColor(200); pdf.setLineWidth(0.2); pdf.rect(x,y,cW,cH);
+    }
+    document.getElementById('crtBarra').style.width = '100%';
+    document.getElementById('crtProgTexto').textContent = 'Concluído!';
+    pdf.save('Carteirinhas_ASPGE_' + crtFormatarData(new Date()).replace(/\//g,'-') + '.pdf');
+    document.getElementById('crtMsgExport').innerHTML = '<span style="color:#16a34a">PDF gerado! ' + validos.length + ' carteirinha(s) em ' + tp + ' página(s) A4.</span>';
+  } catch(e) { document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+  document.getElementById('crtBtnPdf').disabled = false;
+}
+
+// ===== GERIR EVENTOS =====
 
 // ===== GERIR EVENTOS =====
 function carregarEventosAdm() {
