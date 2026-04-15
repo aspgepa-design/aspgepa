@@ -619,7 +619,8 @@ function buscarAssociadoPorCpf(cpfBusca) {
           rg: String(dados[i][15] || ''),             // P - RG
           expeditor: String(dados[i][16] || ''),       // Q - Expeditor
           fotoUrl: String(dados[i][17] || ''),            // R - Foto Perfil
-          fotoCarteirinhaUrl: String(dados[i][18] || '')  // S - Foto Carteirinha
+          fotoCarteirinhaUrl: String(dados[i][18] || ''),  // S - Foto Carteirinha
+          fotoConfig: String(dados[i][19] || '')              // T - Config posição foto carteirinha
         }
       };
     }
@@ -695,6 +696,7 @@ function atualizarAssociado(linha, dados) {
     if (dados.expeditor) aba.getRange(linha, 17).setValue(dados.expeditor); // Q - Expeditor
     if (dados.fotoUrl) aba.getRange(linha, 18).setValue(dados.fotoUrl);     // R - Foto Perfil
     if (dados.fotoCarteirinhaUrl) aba.getRange(linha, 19).setValue(dados.fotoCarteirinhaUrl); // S - Foto Carteirinha
+    if (dados.fotoConfig) aba.getRange(linha, 20).setValue(dados.fotoConfig); // T - Config posição foto carteirinha
     
     return "Sucesso! Seus dados foram atualizados.";
   } catch (e) {

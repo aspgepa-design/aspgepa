@@ -533,6 +533,7 @@
 
     // Posição da foto dentro do frame (em px)
     var fotoX = 0, fotoY = 0, fotoZoom = 1;
+    var savedFotoConfig = null;
     var dragging = false, dragStartX = 0, dragStartY = 0, dragOriginX = 0, dragOriginY = 0;
 
     // Config do enquadramento da foto (em % do cartão)
@@ -623,6 +624,10 @@
           aplicarFrameConfig();
           aplicarTodosCamposConfig();
           atualizarCardTextos();
+          // Carregar config de posição da foto se existir
+          if(d.fotoConfig){
+            try { savedFotoConfig = JSON.parse(d.fotoConfig); } catch(e){ savedFotoConfig = null; }
+          }
           // Carregar foto APÓS frame ter dimensões corretas
           if(fotoParaCarregar){
             carregarFotoExistente(fotoParaCarregar);
@@ -722,9 +727,16 @@
       frame.classList.remove('empty');
 
       img.onload = function(){
-        var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
-        fotoZoom = Math.max(frameW / img.naturalWidth, frameH / img.naturalHeight);
-        centralizarFoto();
+        if(savedFotoConfig){
+          fotoX = savedFotoConfig.x || 0;
+          fotoY = savedFotoConfig.y || 0;
+          fotoZoom = savedFotoConfig.zoom || 1;
+          savedFotoConfig = null;
+        } else {
+          var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+          fotoZoom = Math.max(frameW / img.naturalWidth, frameH / img.naturalHeight);
+          centralizarFoto();
+        }
         aplicarTransform();
         document.getElementById('zoomSlider').value = fotoZoom;
         document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
@@ -870,13 +882,15 @@
     }
 
     function salvarCampos(novaFotoUrl){
+      var frame = document.getElementById('photoFrame');
       var dados = {
         whatsapp: document.getElementById('dWhatsapp').value,
         email: document.getElementById('dEmail').value,
         matricula: document.getElementById('dMatricula').value,
         cargo: document.getElementById('dCargo').value,
         cpf: document.getElementById('dCpf').value,
-        rg: document.getElementById('dRg').value
+        rg: document.getElementById('dRg').value,
+        fotoConfig: JSON.stringify({ x: fotoX, y: fotoY, zoom: fotoZoom, frameW: frame.offsetWidth, frameH: frame.offsetHeight })
       };
       if(novaFotoUrl) dados.fotoCarteirinhaUrl = novaFotoUrl;
 
