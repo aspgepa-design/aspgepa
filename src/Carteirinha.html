@@ -1420,16 +1420,34 @@
 
       try {
         var jsPDF = window.jspdf.jsPDF;
-        // Página com tamanho exato da carteirinha: 85mm × 112.22mm
-        var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [85, 112.22] });
+        // A4 portrait: 210 × 297 mm
+        var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        var pageW = 210, pageH = 297;
+        var cardW = 85, cardH = 112.22;
+        var cols = 2, rows = 2; // 2×2 = 4 carteirinhas por folha A4
+        var gapX = 10, gapY = 10;
+        var marginX = (pageW - cols * cardW - (cols - 1) * gapX) / 2; // ~15mm
+        var marginY = (pageH - rows * cardH - (rows - 1) * gapY) / 2; // ~31.28mm
+        var perPage = cols * rows;
 
-        var primeiro = true;
-        for(var i = 0; i < canvasArray.length; i++){
-          if(!canvasArray[i]) continue;
-          if(!primeiro) pdf.addPage([85, 112.22], 'portrait');
-          primeiro = false;
-          var imgData = canvasArray[i].toDataURL('image/jpeg', 0.95);
-          pdf.addImage(imgData, 'JPEG', 0, 0, 85, 112.22);
+        // Filtrar nulos
+        var validos = canvasArray.filter(function(c){ return c; });
+        var totalPages = Math.ceil(validos.length / perPage);
+
+        for(var i = 0; i < validos.length; i++){
+          var pageIdx = Math.floor(i / perPage);
+          var posIdx = i % perPage;
+          if(i > 0 && posIdx === 0) pdf.addPage('a4', 'portrait');
+          var col = posIdx % cols;
+          var row = Math.floor(posIdx / cols);
+          var x = marginX + col * (cardW + gapX);
+          var y = marginY + row * (cardH + gapY);
+          var imgData = validos[i].toDataURL('image/jpeg', 0.95);
+          pdf.addImage(imgData, 'JPEG', x, y, cardW, cardH);
+          // Borda de corte fina
+          pdf.setDrawColor(200);
+          pdf.setLineWidth(0.2);
+          pdf.rect(x, y, cardW, cardH);
         }
 
         document.getElementById('exportBarraProgresso').style.width = '100%';
@@ -1438,7 +1456,7 @@
         var dataStr = formatarData(new Date()).replace(/\//g, '-');
         pdf.save('Carteirinhas_ASPGE_' + dataStr + '.pdf');
 
-        showMsg('msgExport', 'PDF gerado com sucesso! ' + canvasArray.filter(function(c){return c;}).length + ' carteirinha(s).', 'ok');
+        showMsg('msgExport', 'PDF gerado com sucesso! ' + validos.length + ' carteirinha(s) em ' + totalPages + ' página(s) A4.', 'ok');
       } catch(e){
         showMsg('msgExport', 'Erro ao gerar PDF: ' + e.message, 'erro');
       }
