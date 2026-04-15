@@ -493,9 +493,9 @@
             </div>
           </div>
 
-          <!-- Enquadramento da Foto no Cartão -->
-          <div class="control-group">
-            <h3>Enquadramento da Foto</h3>
+          <!-- Enquadramento da Foto no Cartão (só Diretor Sociocultural) -->
+          <div class="control-group" id="secEnquadramento" style="display:none;">
+            <h3>⚙ Enquadramento da Foto <span style="font-size:10px;color:#dc2626;font-weight:400;text-transform:none;letter-spacing:0">(Diretor Sociocultural)</span></h3>
             <p style="font-size:12px;color:#666;margin:0 0 10px;">Ajuste posição e tamanho do enquadramento na carteirinha.</p>
             <div class="ctrl-row">
               <label>X (esq.)</label>
@@ -519,9 +519,9 @@
             </div>
           </div>
 
-          <!-- Ajuste dos Campos de Texto -->
-          <div class="control-group">
-            <h3>Ajuste dos Campos</h3>
+          <!-- Ajuste dos Campos de Texto (só Diretor Sociocultural) -->
+          <div class="control-group" id="secCamposTexto" style="display:none;">
+            <h3>⚙ Ajuste dos Campos <span style="font-size:10px;color:#dc2626;font-weight:400;text-transform:none;letter-spacing:0">(Diretor Sociocultural)</span></h3>
             <p style="font-size:12px;color:#666;margin:0 0 10px;">Selecione um campo e ajuste posição, tamanho, peso e cor.</p>
             <div style="margin-bottom:10px">
               <label>Campo</label>
@@ -599,6 +599,12 @@
             </div>
           </div>
 
+          <!-- Botão Salvar Layout (só Diretor Sociocultural) -->
+          <button class="btn btn-blue" id="btnSalvarLayout" onclick="salvarLayout()" style="display:none;width:100%;padding:12px;font-size:14px;margin-bottom:8px;">
+            💾 Salvar Layout da Carteirinha (para todos)
+          </button>
+          <div id="msgLayout" style="margin-bottom:8px"></div>
+
           <!-- Botão Salvar -->
           <button class="btn btn-green" id="btnSalvar" onclick="salvarDados()" style="width:100%;padding:14px;font-size:16px;">
             Salvar Dados e Foto
@@ -621,6 +627,8 @@
     var fotoBase64 = null;
     var fotoMimeType = null;
     var fotoAlterada = false;
+    var perfilAssociado = ''; // perfil da planilha
+    var ehDiretorSociocultural = false;
 
     // Posição da foto dentro do frame (em px)
     var fotoX = 0, fotoY = 0, fotoZoom = 1;
@@ -680,6 +688,9 @@
 
     function preencherDados(d){
       cpfAssociado = d.cpf || '';
+      perfilAssociado = (d.perfil || '').toLowerCase();
+      ehDiretorSociocultural = perfilAssociado.indexOf('sociocultural') !== -1;
+
       document.getElementById('dNome').value = d.nomeCompleto || '';
       document.getElementById('dMatricula').value = d.matricula || '';
       document.getElementById('dCargo').value = d.cargo || '';
@@ -688,14 +699,37 @@
       document.getElementById('dWhatsapp').value = d.whatsapp || '';
       document.getElementById('dEmail').value = d.email || '';
 
-      // Atualizar textos sobrepostos no cartão
-      atualizarCardTextos();
+      // Mostrar controles de layout somente para Diretor Sociocultural
+      if(ehDiretorSociocultural){
+        document.getElementById('secEnquadramento').style.display = 'block';
+        document.getElementById('secCamposTexto').style.display = 'block';
+        document.getElementById('btnSalvarLayout').style.display = 'block';
+      }
 
-      // Aplicar posições do enquadramento e campos
-      aplicarFrameConfig();
-      sincronizarFrameControles();
-      aplicarTodosCamposConfig();
-      selecionarCampo('cardNome');
+      // Carregar config salva do layout (para todos)
+      google.script.run
+        .withSuccessHandler(function(r){
+          if(r && r.config){
+            try {
+              var cfg = JSON.parse(r.config);
+              if(cfg.frame) frameConfig = cfg.frame;
+              if(cfg.campos){
+                for(var id in cfg.campos){
+                  if(camposConfig[id]) camposConfig[id] = cfg.campos[id];
+                }
+              }
+            } catch(e){}
+          }
+          // Aplicar posições (com config carregada ou padrão)
+          aplicarFrameConfig();
+          if(ehDiretorSociocultural){
+            sincronizarFrameControles();
+            selecionarCampo('cardNome');
+          }
+          aplicarTodosCamposConfig();
+          atualizarCardTextos();
+        })
+        .carregarConfigCarteirinha();
 
       // Vincular inputs à atualização ao vivo
       ['dNome','dMatricula','dCargo'].forEach(function(id){
@@ -990,6 +1024,39 @@
       document.getElementById('campoCorVal').textContent  = cfg.color;
 
       aplicarCampoConfig(id);
+    }
+
+    /* ==========================================================
+       SALVAR LAYOUT (Diretor Sociocultural)
+       ========================================================== */
+    function salvarLayout(){
+      if(!ehDiretorSociocultural){
+        showMsg('msgLayout','Sem permissão.','erro');
+        return;
+      }
+      var btn = document.getElementById('btnSalvarLayout');
+      btn.disabled = true;
+      showMsg('msgLayout','Salvando layout...','info');
+
+      var configJson = JSON.stringify({
+        frame: frameConfig,
+        campos: camposConfig
+      });
+
+      google.script.run
+        .withSuccessHandler(function(r){
+          btn.disabled = false;
+          if(r.erro){
+            showMsg('msgLayout', r.erro, 'erro');
+          } else {
+            showMsg('msgLayout','Layout salvo com sucesso! Todos os associados verão esta configuração.','ok');
+          }
+        })
+        .withFailureHandler(function(err){
+          btn.disabled = false;
+          showMsg('msgLayout','Erro: ' + err.message, 'erro');
+        })
+        .salvarConfigCarteirinha(cpfAssociado, configJson);
     }
 
     /* ==========================================================

@@ -585,6 +585,72 @@ function listarTodosAssociados() {
 // SETUP INICIAL - EXECUTAR UMA VEZ para criar abas e pastas no Drive
 // ==============================================================================
 
+// ==============================================================================
+// CONFIGURAÇÃO DO LAYOUT DA CARTEIRINHA
+// ==============================================================================
+
+/**
+ * Salva a configuração de layout da carteirinha na aba "ConfigCarteirinha".
+ * Somente o Diretor Sociocultural pode salvar.
+ */
+function salvarConfigCarteirinha(cpfSolicitante, configJson) {
+  // Verificar permissão
+  var assoc = buscarAssociadoPorCpf(cpfSolicitante);
+  if (assoc.erro) return { erro: 'Usuário não encontrado.' };
+  var perfil = (assoc.dados.perfil || '').toLowerCase();
+  if (perfil.indexOf('sociocultural') === -1) {
+    return { erro: 'Apenas o Diretor Sociocultural pode alterar o layout da carteirinha.' };
+  }
+
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('ConfigCarteirinha');
+    if (!aba) {
+      aba = ss.insertSheet('ConfigCarteirinha');
+      aba.getRange('A1:B1').setValues([['Chave', 'Valor']]);
+      aba.getRange('A1:B1').setFontWeight('bold');
+    }
+
+    // Salvar JSON na célula A2/B2
+    var dados = aba.getDataRange().getValues();
+    var linhaConfig = -1;
+    for (var i = 1; i < dados.length; i++) {
+      if (dados[i][0] === 'layoutCarteirinha') { linhaConfig = i + 1; break; }
+    }
+    if (linhaConfig > 0) {
+      aba.getRange(linhaConfig, 2).setValue(configJson);
+    } else {
+      aba.appendRow(['layoutCarteirinha', configJson]);
+    }
+
+    return { sucesso: true };
+  } catch (e) {
+    return { erro: 'Erro ao salvar: ' + e.toString() };
+  }
+}
+
+/**
+ * Carrega a configuração de layout da carteirinha.
+ * Acessível a todos.
+ */
+function carregarConfigCarteirinha() {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('ConfigCarteirinha');
+    if (!aba) return { config: null };
+
+    var dados = aba.getDataRange().getValues();
+    for (var i = 1; i < dados.length; i++) {
+      if (dados[i][0] === 'layoutCarteirinha') {
+        return { config: dados[i][1] };
+      }
+    }
+    return { config: null };
+  } catch (e) {
+    return { config: null };
+  }
+}
+
 /**
  * Cria as abas necessárias na planilha e as pastas no Google Drive.
  * Execute manualmente pelo editor Apps Script ou via clasp run.
