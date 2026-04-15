@@ -262,7 +262,8 @@ tbody tr:hover{background:#f9fafb}
 .crt-ctrl input[type="range"]{flex:1;padding:0;border:none;height:5px;-webkit-appearance:none;background:#dee2e6;border-radius:3px}
 .crt-ctrl input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#0075bf;cursor:pointer}
 .crt-ctrl input[type="range"]:focus{box-shadow:none}
-.crt-val{min-width:40px;text-align:right;font-size:10px;color:#6b7280;font-family:monospace}
+.crt-val{width:58px;padding:2px 4px;border:1px solid #dee2e6;border-radius:4px;font-size:11px;color:#374151;font-family:monospace;text-align:center;background:#fff}
+.crt-val:focus{border-color:#0075bf;outline:none;box-shadow:0 0 0 2px rgba(0,117,191,.15)}
 .crt-campo-hl{outline:2px dashed #ff6600!important;outline-offset:2px}
 </style>
 </head>
@@ -744,10 +745,18 @@ tbody tr:hover{background:#f9fafb}
               <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start">
                 <!-- Preview Card -->
                 <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:85mm;margin-bottom:8px">
+                    <label style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;display:block;margin-bottom:4px">Pré-visualizar Associado</label>
+                    <div style="display:flex;gap:6px">
+                      <select id="crtPreviewSel" style="flex:1;padding:5px 8px;border:1px solid #dee2e6;border-radius:6px;font-size:12px"><option value="">— Dados de exemplo —</option></select>
+                      <button class="btn btn-outline btn-sm" onclick="crtCarregarPreview()" style="padding:4px 10px;font-size:11px">👁 Ver</button>
+                    </div>
+                  </div>
                   <div id="crtPreview" style="position:relative;width:85mm;height:112.22mm;overflow:hidden;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);background:#f5f5f5;flex-shrink:0">
                     <img id="crtBg" src="https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007" style="width:100%;height:100%;display:block" draggable="false">
                     <div id="crtPhotoFrame" style="position:absolute;overflow:hidden;background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">
-                      <span style="font-size:24px;opacity:0.5">📷</span>
+                      <span id="crtPhotoPlaceholder" style="font-size:24px;opacity:0.5">📷</span>
+                      <img id="crtPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none">
                     </div>
                     <span class="crt-overlay" id="crtNome">NOME DO ASSOCIADO</span>
                     <span class="crt-overlay" id="crtMatricula">12345678</span>
@@ -765,10 +774,10 @@ tbody tr:hover{background:#f9fafb}
                   <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px">
                     <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Enquadramento da Foto</h4>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.5" id="crtFrameLeft" value="7.5" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameLeftVal">7.5%</span></div>
-                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.5" id="crtFrameTop" value="14.2" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameTopVal">14.2%</span></div>
-                      <div class="crt-ctrl"><label>Larg.</label><input type="range" min="3" max="80" step="0.5" id="crtFrameW" value="29.4" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameWVal">29.4%</span></div>
-                      <div class="crt-ctrl"><label>Alt.</label><input type="range" min="3" max="80" step="0.5" id="crtFrameH" value="24.1" oninput="crtAtualizarFrame()"><span class="crt-val" id="crtFrameHVal">24.1%</span></div>
+                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.5" id="crtFrameLeft" value="7.5" oninput="crtSyncFromRange('crtFrameLeft','crtFrameLeftVal','%');crtAtualizarFrame()"><input type="number" class="crt-val" id="crtFrameLeftVal" value="7.5" min="0" max="100" step="0.1" onchange="crtSyncFromNum('crtFrameLeftVal','crtFrameLeft');crtAtualizarFrame()"></div>
+                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.5" id="crtFrameTop" value="14.2" oninput="crtSyncFromRange('crtFrameTop','crtFrameTopVal','%');crtAtualizarFrame()"><input type="number" class="crt-val" id="crtFrameTopVal" value="14.2" min="0" max="100" step="0.1" onchange="crtSyncFromNum('crtFrameTopVal','crtFrameTop');crtAtualizarFrame()"></div>
+                      <div class="crt-ctrl"><label>Larg.</label><input type="range" min="3" max="80" step="0.5" id="crtFrameW" value="29.4" oninput="crtSyncFromRange('crtFrameW','crtFrameWVal','%');crtAtualizarFrame()"><input type="number" class="crt-val" id="crtFrameWVal" value="29.4" min="3" max="80" step="0.1" onchange="crtSyncFromNum('crtFrameWVal','crtFrameW');crtAtualizarFrame()"></div>
+                      <div class="crt-ctrl"><label>Alt.</label><input type="range" min="3" max="80" step="0.5" id="crtFrameH" value="24.1" oninput="crtSyncFromRange('crtFrameH','crtFrameHVal','%');crtAtualizarFrame()"><input type="number" class="crt-val" id="crtFrameHVal" value="24.1" min="3" max="80" step="0.1" onchange="crtSyncFromNum('crtFrameHVal','crtFrameH');crtAtualizarFrame()"></div>
                     </div>
                   </div>
                   <!-- Campos de Texto -->
@@ -786,12 +795,12 @@ tbody tr:hover{background:#f9fafb}
                       </select>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.5" id="crtCampoX" oninput="crtAtualizarCampo()"><span class="crt-val" id="crtCampoXVal">0%</span></div>
-                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.5" id="crtCampoY" oninput="crtAtualizarCampo()"><span class="crt-val" id="crtCampoYVal">0%</span></div>
-                      <div class="crt-ctrl"><label>Tam.</label><input type="range" min="0.5" max="6" step="0.1" id="crtCampoSize" oninput="crtAtualizarCampo()"><span class="crt-val" id="crtCampoSizeVal">0mm</span></div>
+                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.5" id="crtCampoX" oninput="crtSyncFromRange('crtCampoX','crtCampoXVal','%');crtAtualizarCampo()"><input type="number" class="crt-val" id="crtCampoXVal" value="0" min="0" max="100" step="0.1" onchange="crtSyncFromNum('crtCampoXVal','crtCampoX');crtAtualizarCampo()"></div>
+                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.5" id="crtCampoY" oninput="crtSyncFromRange('crtCampoY','crtCampoYVal','%');crtAtualizarCampo()"><input type="number" class="crt-val" id="crtCampoYVal" value="0" min="0" max="100" step="0.1" onchange="crtSyncFromNum('crtCampoYVal','crtCampoY');crtAtualizarCampo()"></div>
+                      <div class="crt-ctrl"><label>Tam.</label><input type="range" min="0.5" max="6" step="0.1" id="crtCampoSize" oninput="crtSyncFromRange('crtCampoSize','crtCampoSizeVal','mm');crtAtualizarCampo()"><input type="number" class="crt-val" id="crtCampoSizeVal" value="0" min="0.5" max="6" step="0.1" onchange="crtSyncFromNum('crtCampoSizeVal','crtCampoSize');crtAtualizarCampo()"></div>
                       <div class="crt-ctrl"><label>Peso</label><select id="crtCampoBold" onchange="crtAtualizarCampo()" style="width:100%;padding:4px;border:1px solid #dee2e6;border-radius:4px;font-size:12px"><option value="400">Normal</option><option value="600">Semi</option><option value="700" selected>Negrito</option><option value="900">Extra</option></select></div>
                     </div>
-                    <div class="crt-ctrl" style="margin-top:8px"><label>Cor</label><input type="color" id="crtCampoCor" value="#1a1a1a" oninput="crtAtualizarCampo()" style="width:36px;height:26px;padding:1px;border:1px solid #dee2e6;border-radius:4px;cursor:pointer"><span class="crt-val" id="crtCampoCorVal">#1a1a1a</span></div>
+                    <div class="crt-ctrl" style="margin-top:8px"><label>Cor</label><input type="color" id="crtCampoCor" value="#1a1a1a" oninput="crtAtualizarCampo()" style="width:36px;height:26px;padding:1px;border:1px solid #dee2e6;border-radius:4px;cursor:pointer"><input type="text" class="crt-val" id="crtCampoCorVal" value="#1a1a1a" maxlength="7" onchange="document.getElementById('crtCampoCor').value=this.value;crtAtualizarCampo()" style="width:64px"></div>
                   </div>
                   <!-- Botão Salvar Layout -->
                   <button class="btn btn-primary" onclick="crtSalvarLayout()" id="crtBtnSalvar" style="width:100%;padding:10px">💾 Salvar Layout (para todos)</button>
@@ -1354,6 +1363,18 @@ var crtCamposConfig = {
 var crtKeyMap = { crtNome:'cardNome', crtMatricula:'cardMatricula', crtCargo:'cardCargo', crtCpf:'cardCpf', crtRg:'cardRg', crtEmissao:'cardEmissao', crtValidade:'cardValidade' };
 var crtKeyMapInv = {}; for(var k in crtKeyMap) crtKeyMapInv[crtKeyMap[k]] = k;
 
+// Sync helpers: range → number input, number input → range
+function crtSyncFromRange(rangeId, numId) {
+  document.getElementById(numId).value = parseFloat(document.getElementById(rangeId).value).toFixed(1);
+}
+function crtSyncFromNum(numId, rangeId) {
+  var v = parseFloat(document.getElementById(numId).value);
+  if (isNaN(v)) return;
+  var r = document.getElementById(rangeId);
+  v = Math.max(parseFloat(r.min), Math.min(parseFloat(r.max), v));
+  r.value = v; document.getElementById(numId).value = v.toFixed(1);
+}
+
 function crtCarregarConfig() {
   google.script.run.withSuccessHandler(function(r) {
     if (r && r.config) {
@@ -1387,20 +1408,20 @@ function crtSincronizarFrameUI() {
   document.getElementById('crtFrameTop').value = crtFrameConfig.top;
   document.getElementById('crtFrameW').value = crtFrameConfig.width;
   document.getElementById('crtFrameH').value = crtFrameConfig.height;
-  document.getElementById('crtFrameLeftVal').textContent = crtFrameConfig.left.toFixed(1) + '%';
-  document.getElementById('crtFrameTopVal').textContent = crtFrameConfig.top.toFixed(1) + '%';
-  document.getElementById('crtFrameWVal').textContent = crtFrameConfig.width.toFixed(1) + '%';
-  document.getElementById('crtFrameHVal').textContent = crtFrameConfig.height.toFixed(1) + '%';
+  document.getElementById('crtFrameLeftVal').value = crtFrameConfig.left.toFixed(1);
+  document.getElementById('crtFrameTopVal').value = crtFrameConfig.top.toFixed(1);
+  document.getElementById('crtFrameWVal').value = crtFrameConfig.width.toFixed(1);
+  document.getElementById('crtFrameHVal').value = crtFrameConfig.height.toFixed(1);
 }
 function crtAtualizarFrame() {
   crtFrameConfig.left = parseFloat(document.getElementById('crtFrameLeft').value);
   crtFrameConfig.top = parseFloat(document.getElementById('crtFrameTop').value);
   crtFrameConfig.width = parseFloat(document.getElementById('crtFrameW').value);
   crtFrameConfig.height = parseFloat(document.getElementById('crtFrameH').value);
-  document.getElementById('crtFrameLeftVal').textContent = crtFrameConfig.left.toFixed(1) + '%';
-  document.getElementById('crtFrameTopVal').textContent = crtFrameConfig.top.toFixed(1) + '%';
-  document.getElementById('crtFrameWVal').textContent = crtFrameConfig.width.toFixed(1) + '%';
-  document.getElementById('crtFrameHVal').textContent = crtFrameConfig.height.toFixed(1) + '%';
+  document.getElementById('crtFrameLeftVal').value = crtFrameConfig.left.toFixed(1);
+  document.getElementById('crtFrameTopVal').value = crtFrameConfig.top.toFixed(1);
+  document.getElementById('crtFrameWVal').value = crtFrameConfig.width.toFixed(1);
+  document.getElementById('crtFrameHVal').value = crtFrameConfig.height.toFixed(1);
   crtAplicarFrame();
 }
 function crtAplicarCampoConfig(id) {
@@ -1417,10 +1438,10 @@ function crtSelecionarCampo(id) {
   document.getElementById('crtCampoSize').value = cfg.fontSize;
   document.getElementById('crtCampoCor').value = cfg.color;
   document.getElementById('crtCampoBold').value = cfg.fontWeight;
-  document.getElementById('crtCampoXVal').textContent = cfg.left.toFixed(1) + '%';
-  document.getElementById('crtCampoYVal').textContent = cfg.top.toFixed(1) + '%';
-  document.getElementById('crtCampoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
-  document.getElementById('crtCampoCorVal').textContent = cfg.color;
+  document.getElementById('crtCampoXVal').value = cfg.left.toFixed(1);
+  document.getElementById('crtCampoYVal').value = cfg.top.toFixed(1);
+  document.getElementById('crtCampoSizeVal').value = cfg.fontSize.toFixed(1);
+  document.getElementById('crtCampoCorVal').value = cfg.color;
   var overlays = document.querySelectorAll('.crt-overlay');
   for (var i = 0; i < overlays.length; i++) overlays[i].classList.toggle('crt-campo-hl', overlays[i].id === id);
 }
@@ -1432,10 +1453,10 @@ function crtAtualizarCampo() {
   cfg.fontSize = parseFloat(document.getElementById('crtCampoSize').value);
   cfg.color = document.getElementById('crtCampoCor').value;
   cfg.fontWeight = parseInt(document.getElementById('crtCampoBold').value);
-  document.getElementById('crtCampoXVal').textContent = cfg.left.toFixed(1) + '%';
-  document.getElementById('crtCampoYVal').textContent = cfg.top.toFixed(1) + '%';
-  document.getElementById('crtCampoSizeVal').textContent = cfg.fontSize.toFixed(1) + 'mm';
-  document.getElementById('crtCampoCorVal').textContent = cfg.color;
+  document.getElementById('crtCampoXVal').value = cfg.left.toFixed(1);
+  document.getElementById('crtCampoYVal').value = cfg.top.toFixed(1);
+  document.getElementById('crtCampoSizeVal').value = cfg.fontSize.toFixed(1);
+  document.getElementById('crtCampoCorVal').value = cfg.color;
   crtAplicarCampoConfig(id);
 }
 function crtSalvarLayout() {
@@ -1454,11 +1475,68 @@ function crtSalvarLayout() {
   }).salvarConfigCarteirinha(usuarioAtual.dados.cpf, configJson);
 }
 
+// --- Preview associado ---
+function crtPopularPreviewSel() {
+  var sel = document.getElementById('crtPreviewSel');
+  var old = sel.value;
+  sel.innerHTML = '<option value="">— Dados de exemplo —</option>';
+  for (var i = 0; i < crtListaAssoc.length; i++) {
+    var a = crtListaAssoc[i];
+    sel.innerHTML += '<option value="' + a.cpf + '">' + a.nome + ' (' + a.cpf + ')</option>';
+  }
+  if (old) sel.value = old;
+}
+function crtCarregarPreview() {
+  var cpf = document.getElementById('crtPreviewSel').value;
+  if (!cpf) {
+    // Voltar para dados de exemplo
+    document.getElementById('crtNome').textContent = 'NOME DO ASSOCIADO';
+    document.getElementById('crtMatricula').textContent = '12345678';
+    document.getElementById('crtCargo').textContent = 'Cargo';
+    document.getElementById('crtCpf').textContent = '000.000.000-00';
+    document.getElementById('crtRg').textContent = '0000000';
+    var hoje = new Date();
+    document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
+    var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+    document.getElementById('crtValidade').textContent = crtFormatarData(val);
+    document.getElementById('crtPhotoImg').style.display = 'none';
+    document.getElementById('crtPhotoPlaceholder').style.display = '';
+    return;
+  }
+  var btn = document.querySelector('#crtPreviewSel + button');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  google.script.run.withSuccessHandler(function(r) {
+    if (btn) { btn.disabled = false; btn.textContent = '👁 Ver'; }
+    if (r.erro || !r.carteirinhas || !r.carteirinhas.length) return;
+    var c = r.carteirinhas[0]; var d = c.dados;
+    document.getElementById('crtNome').textContent = d.nomeCompleto || '';
+    document.getElementById('crtMatricula').textContent = d.matricula || '';
+    document.getElementById('crtCargo').textContent = d.cargo || '';
+    document.getElementById('crtCpf').textContent = d.cpf || '';
+    document.getElementById('crtRg').textContent = d.rg || '';
+    var hoje = new Date();
+    document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
+    var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+    document.getElementById('crtValidade').textContent = crtFormatarData(val);
+    if (c.fotoBase64) {
+      var img = document.getElementById('crtPhotoImg');
+      img.src = c.fotoBase64;
+      img.style.display = 'block';
+      document.getElementById('crtPhotoPlaceholder').style.display = 'none';
+    } else {
+      document.getElementById('crtPhotoImg').style.display = 'none';
+      document.getElementById('crtPhotoPlaceholder').style.display = '';
+    }
+  }).withFailureHandler(function(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '👁 Ver'; }
+  }).obterDadosExportCarteirinhas(usuarioAtual.dados.cpf, [cpf]);
+}
+
 // --- Export PDF ---
 var crtListaAssoc = [];
 function crtCarregarLista() {
   google.script.run.withSuccessHandler(function(lista) {
-    crtListaAssoc = lista || []; crtRenderLista(crtListaAssoc);
+    crtListaAssoc = lista || []; crtRenderLista(crtListaAssoc); crtPopularPreviewSel();
   }).listarAssociadosResumido();
 }
 function crtRenderLista(lista) {
