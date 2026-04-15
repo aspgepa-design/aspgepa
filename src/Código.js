@@ -73,6 +73,66 @@ var PASTA_RAIZ_ID = '1A-DjVcImoxrX6iL98-dJz4U-nQbHqN8t';
 var PLANILHA_ID = '1Ovqir2J_WaENRJcajgGNxGvD0mvIAuzcAoCDILvgTZ4';
 
 // ==============================================================================
+// SISTEMA DE LOG
+// ==============================================================================
+
+/**
+ * Registra uma ação no log do sistema (aba "Logs").
+ * Cria a aba automaticamente se não existir.
+ */
+function registrarLog(cpf, nome, acao, detalhes) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Logs');
+    if (!aba) {
+      aba = ss.insertSheet('Logs');
+      aba.appendRow(['Data/Hora', 'CPF', 'Nome', 'Ação', 'Detalhes']);
+      aba.getRange(1, 1, 1, 5).setFontWeight('bold');
+      aba.setFrozenRows(1);
+    }
+    aba.appendRow([
+      new Date(),
+      cpf || '',
+      nome || '',
+      acao || '',
+      detalhes || ''
+    ]);
+  } catch (e) {
+    // Log silencioso - não interrompe a operação
+  }
+}
+
+/**
+ * Obtém os últimos registros de log (máx 500).
+ * Retorna do mais recente para o mais antigo.
+ */
+function obterLogs(limite) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Logs');
+    if (!aba) return { logs: [], total: 0 };
+
+    var dados = aba.getDataRange().getValues();
+    var max = limite || 500;
+    var logs = [];
+    var inicio = Math.max(1, dados.length - max);
+
+    for (var i = dados.length - 1; i >= inicio; i--) {
+      logs.push({
+        dataHora: dados[i][0] ? Utilities.formatDate(new Date(dados[i][0]), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss') : '',
+        cpf: String(dados[i][1] || ''),
+        nome: String(dados[i][2] || ''),
+        acao: String(dados[i][3] || ''),
+        detalhes: String(dados[i][4] || '')
+      });
+    }
+    return { logs: logs, total: dados.length - 1 };
+  } catch (e) {
+    return { erro: 'Erro ao obter logs: ' + e.toString() };
+  }
+}
+
+// ==============================================================================
 // GOOGLE DRIVE - UPLOAD DE FOTOS E DOCUMENTOS
 // ==============================================================================
 

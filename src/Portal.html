@@ -882,6 +882,41 @@ tbody tr:hover{background:#f9fafb}
           </div>
         </div>
 
+        <!-- ===== VIEW: LOGS DO SISTEMA ===== -->
+        <div id="view-logs_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Logs do Sistema</h2>
+              <p style="font-size:13px;color:#6b7280">Registro de acessos e ações realizadas no portal.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="carregarLogs()">↻ Atualizar</button>
+          </header>
+
+          <div class="assoc-search" style="margin-bottom:16px">
+            <input type="text" id="logBusca" placeholder="Buscar por nome, CPF ou ação..." oninput="filtrarLogs()">
+            <select id="logFiltroAcao" onchange="filtrarLogs()">
+              <option value="todos">Todas as ações</option>
+              <option value="Login">Login</option>
+              <option value="Logout">Logout</option>
+              <option value="Navegação">Navegação</option>
+              <option value="Atualizou">Atualizações</option>
+              <option value="Editou">Edições</option>
+              <option value="Criou">Criações</option>
+              <option value="Excluiu">Exclusões</option>
+              <option value="Lançamento">Financeiro</option>
+            </select>
+          </div>
+
+          <div class="card">
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="logsTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando logs...</div>
+              </div>
+            </div>
+          </div>
+          <p id="logsTotal" style="font-size:12px;color:#9ca3af;text-align:center;margin-top:12px"></p>
+        </div>
+
         <!-- ===== MODAL: NOVA GESTÃO ===== -->
         <div class="modal-assoc-overlay" id="modalGestao" style="display:none">
           <div class="modal-assoc" style="max-width:480px">
@@ -1073,6 +1108,14 @@ tbody tr:hover{background:#f9fafb}
 var usuarioAtual = null;
 var abAtiva = 'inicio';
 
+// ===== LOG HELPER =====
+function logAcao(acao, detalhes) {
+  if (!usuarioAtual) return;
+  var cpf = usuarioAtual.dados.cpf || '';
+  var nome = usuarioAtual.dados.nomeCompleto || '';
+  google.script.run.registrarLog(cpf, nome, acao, detalhes || '');
+}
+
 // ===== ICONS (SVG inline) =====
 var ICONS = {
   inicio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -1085,6 +1128,7 @@ var ICONS = {
   carteirinhas_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="8" cy="15" r="2"/></svg>',
   gestoes_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   associados_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  logs_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>',
   atualizacao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>'
 };
 
@@ -1115,6 +1159,7 @@ function getNav(role) {
   }
   if (role === 'diretor' || role === 'presidente') {
     nav.push({ id: 'gestoes_adm', label: 'Gestões', roles: ['diretor','presidente'] });
+    nav.push({ id: 'logs_adm', label: 'Logs', roles: ['diretor','presidente'] });
   }
   return nav;
 }
@@ -1150,6 +1195,7 @@ function fazerLogin() {
       btn.disabled = false; btn.textContent = 'Entrar no Portal';
       if (r.erro) { erro.textContent = r.erro; return; }
       usuarioAtual = r;
+      logAcao('Login', 'Perfil: ' + (r.dados.role || 'associado'));
       iniciarApp();
     })
     .withFailureHandler(function(e) {
@@ -1160,6 +1206,7 @@ function fazerLogin() {
 }
 
 function fazerLogout() {
+  logAcao('Logout');
   usuarioAtual = null;
   document.getElementById('appScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
@@ -1220,6 +1267,7 @@ function montarNavegacao(role) {
 }
 
 function navegarPara(tabId) {
+  if (tabId !== 'inicio') logAcao('Navegação', tabId);
   abAtiva = tabId;
   // Esconder todas as views
   var views = document.querySelectorAll('.view');
@@ -1234,8 +1282,10 @@ function navegarPara(tabId) {
   }
   // Header
   var labels = { inicio: 'Início', transparencia: 'Transparência', convenios: 'Convênios', votacoes: 'Votações',
-    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', associados_adm: 'Gestão de Associados', eventos_adm: 'Gerir Eventos', convenios_adm: 'Gerir Convênios', carteirinhas_adm: 'Carteirinhas', gestoes_adm: 'Gestões' };
+    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', associados_adm: 'Gestão de Associados', eventos_adm: 'Gerir Eventos', convenios_adm: 'Gerir Convênios', carteirinhas_adm: 'Carteirinhas', gestoes_adm: 'Gestões', logs_adm: 'Logs do Sistema' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
+  // Auto-carregar dados da aba
+  if (tabId === 'logs_adm' && !todosLogs.length) carregarLogs();
   // Fechar sidebar mobile
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
@@ -1601,6 +1651,7 @@ function crtExportarPdf() {
   document.getElementById('crtBarra').style.width = '0%';
   document.getElementById('crtProgTexto').textContent = 'Buscando dados...';
   document.getElementById('crtMsgExport').innerHTML = '<span style="color:#2563eb">Preparando ' + cpfs.length + ' carteirinha(s)...</span>';
+  logAcao('Exportou Carteirinhas PDF', cpfs.length + ' carteirinha(s)');
   google.script.run.withSuccessHandler(function(r) {
     if (r.erro) { btn.disabled = false; document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
     crtGerarPdf(r.carteirinhas, r.templateBase64);
@@ -1769,6 +1820,7 @@ function salvarEventoForm() {
   document.getElementById('evtStatus').innerHTML = '<span style="color:#2563eb">Salvando...</span>';
   google.script.run.withSuccessHandler(function(r) {
     if (r.erro) { document.getElementById('evtStatus').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    logAcao(dados.linha ? 'Editou Evento' : 'Criou Evento', dados.titulo);
     document.getElementById('modalEvento').style.display = 'none';
     carregarEventosAdm();
     google.script.run.withSuccessHandler(renderEventos).obterEventos();
@@ -1787,6 +1839,7 @@ function confirmarExcluirEvento(linha) {
   if (!confirm('Excluir este evento permanentemente?')) return;
   google.script.run.withSuccessHandler(function(r) {
     if (r.erro) { alert(r.erro); return; }
+    logAcao('Excluiu Evento', 'Linha ' + linha);
     carregarEventosAdm();
     google.script.run.withSuccessHandler(renderEventos).obterEventos();
   }).excluirEvento(linha);
@@ -1862,6 +1915,7 @@ function salvarConvenioForm() {
   document.getElementById('convStatus').innerHTML = '<span style="color:#2563eb">Salvando...</span>';
   google.script.run.withSuccessHandler(function(r) {
     if (r.erro) { document.getElementById('convStatus').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    logAcao(dados.linha ? 'Editou Convênio' : 'Criou Convênio', dados.nome);
     document.getElementById('modalConvenio').style.display = 'none';
     carregarConveniosAdm();
     google.script.run.withSuccessHandler(renderConvenios).obterConvenios();
@@ -1880,6 +1934,7 @@ function confirmarExcluirConvenio(linha) {
   if (!confirm('Excluir este convênio permanentemente?')) return;
   google.script.run.withSuccessHandler(function(r) {
     if (r.erro) { alert(r.erro); return; }
+    logAcao('Excluiu Convênio', 'Linha ' + linha);
     carregarConveniosAdm();
     google.script.run.withSuccessHandler(renderConvenios).obterConvenios();
   }).excluirConvenio(linha);
@@ -1969,6 +2024,7 @@ function criarGestao() {
   google.script.run
     .withSuccessHandler(function(r) {
       if (r.erro) { document.getElementById('gestaoStatus').textContent = r.erro; return; }
+      logAcao('Criou Gestão', nome);
       document.getElementById('modalGestao').style.display = 'none';
       carregarGestoes();
     })
@@ -1980,6 +2036,7 @@ function confirmarAtivarGestao(nome) {
   google.script.run
     .withSuccessHandler(function(r) {
       if (r.erro) { alert('Erro: ' + r.erro); return; }
+      logAcao('Ativou Gestão', nome);
       alert(r.msg);
       // Recarregar a página para refletir as mudanças de perfil
       window.location.reload();
@@ -2077,6 +2134,7 @@ function salvarAtualizacao(e) {
       status.style.color = sucesso ? '#16a34a' : '#dc2626';
       status.textContent = r;
       if (sucesso) {
+        logAcao('Atualizou Cadastro', 'Próprio cadastro');
         // Atualizar dados locais
         usuarioAtual.dados.cpf = dados.cpf;
         usuarioAtual.dados.rg = dados.rg;
@@ -2139,6 +2197,7 @@ function enviarFoto(input) {
     google.script.run
       .withSuccessHandler(function(r) {
         if (r.sucesso) {
+          logAcao('Enviou Foto', 'Foto de perfil');
           document.getElementById('fotoImg').src = r.url;
           document.getElementById('fotoImg').style.display = 'block';
           document.getElementById('fotoPlaceholder').style.display = 'none';
@@ -2265,6 +2324,7 @@ function salvarLanc(e) {
     .withSuccessHandler(function(r) {
       btn.disabled = false; btn.textContent = 'Salvar Lançamento';
       if (r.erro) { erro.textContent = r.erro; return; }
+      logAcao('Lançamento Financeiro', dados.tipo + ': R$ ' + dados.valor + ' - ' + dados.descricao);
       fecharModalLanc();
       // Recarregar financeiro
       google.script.run.withSuccessHandler(renderFinanceiro).obterFinanceiro();
@@ -2281,6 +2341,7 @@ function excluirLanc(linha) {
   google.script.run
     .withSuccessHandler(function(r) {
       if (r.erro) { alert(r.erro); return; }
+      logAcao('Excluiu Lançamento', 'Linha ' + linha);
       google.script.run.withSuccessHandler(renderFinanceiro).obterFinanceiro();
     })
     .withFailureHandler(function() { alert('Erro de conexão.'); })
@@ -2477,6 +2538,7 @@ function salvarEdicaoAssociado(e) {
       status.style.color = sucesso ? '#16a34a' : '#dc2626';
       status.textContent = r;
       if (sucesso) {
+        logAcao('Editou Associado', document.getElementById('editNome').value);
         // Recarregar lista
         carregarAssociados();
         setTimeout(fecharModalAssoc, 1200);
@@ -2496,6 +2558,70 @@ document.addEventListener('keydown', function(e) {
 });
 document.getElementById('modalLanc').addEventListener('click', function(e) { if (e.target === this) fecharModalLanc(); });
 document.getElementById('modalAssoc').addEventListener('click', function(e) { if (e.target === this) fecharModalAssoc(); });
+
+// ===== LOGS DO SISTEMA =====
+var todosLogs = [];
+
+function carregarLogs() {
+  document.getElementById('logsTabela').innerHTML = '<div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando logs...</div>';
+  google.script.run
+    .withSuccessHandler(renderLogs)
+    .withFailureHandler(function() {
+      document.getElementById('logsTabela').innerHTML = '<p style="color:#dc2626;padding:16px">Erro ao carregar logs.</p>';
+    })
+    .obterLogs(500);
+}
+
+function renderLogs(data) {
+  if (!data || data.erro) {
+    document.getElementById('logsTabela').innerHTML = '<p style="color:#dc2626;padding:16px">' + (data ? data.erro : 'Erro.') + '</p>';
+    return;
+  }
+  todosLogs = data.logs || [];
+  document.getElementById('logsTotal').textContent = 'Total de registros: ' + data.total + (data.total > 500 ? ' (exibindo últimos 500)' : '');
+  filtrarLogs();
+}
+
+function filtrarLogs() {
+  var busca = (document.getElementById('logBusca').value || '').toLowerCase().trim();
+  var filtro = document.getElementById('logFiltroAcao').value;
+  var lista = todosLogs.filter(function(l) {
+    if (filtro !== 'todos' && l.acao.indexOf(filtro) === -1) return false;
+    if (busca) {
+      var texto = (l.nome + ' ' + l.cpf + ' ' + l.acao + ' ' + l.detalhes).toLowerCase();
+      return texto.indexOf(busca) !== -1;
+    }
+    return true;
+  });
+
+  if (!lista.length) {
+    document.getElementById('logsTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum registro encontrado.</p>';
+    return;
+  }
+
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html += '<thead><tr style="background:#f9fafb;text-align:left">';
+  html += '<th style="padding:10px 12px;font-weight:700;color:#374151;white-space:nowrap">Data/Hora</th>';
+  html += '<th style="padding:10px 12px;font-weight:700;color:#374151">Usuário</th>';
+  html += '<th style="padding:10px 12px;font-weight:700;color:#374151">Ação</th>';
+  html += '<th style="padding:10px 12px;font-weight:700;color:#374151">Detalhes</th>';
+  html += '</tr></thead><tbody>';
+
+  var cores = { Login: '#16a34a', Logout: '#9ca3af', 'Navegação': '#2563eb', Editou: '#d97706', Criou: '#7c3aed', Excluiu: '#dc2626', 'Lançamento': '#0891b2', Atualizou: '#059669', Enviou: '#8b5cf6', Exportou: '#0d9488', Ativou: '#ea580c' };
+  for (var i = 0; i < Math.min(lista.length, 500); i++) {
+    var l = lista[i];
+    var corAcao = '#6b7280';
+    for (var k in cores) { if (l.acao.indexOf(k) !== -1) { corAcao = cores[k]; break; } }
+    html += '<tr style="border-top:1px solid #f3f4f6">';
+    html += '<td style="padding:8px 12px;white-space:nowrap;color:#6b7280">' + l.dataHora + '</td>';
+    html += '<td style="padding:8px 12px"><strong>' + l.nome + '</strong><br><span style="font-size:11px;color:#9ca3af">' + l.cpf + '</span></td>';
+    html += '<td style="padding:8px 12px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:' + corAcao + '15;color:' + corAcao + '">' + l.acao + '</span></td>';
+    html += '<td style="padding:8px 12px;color:#6b7280;max-width:300px;overflow:hidden;text-overflow:ellipsis">' + (l.detalhes || '-') + '</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('logsTabela').innerHTML = html;
+}
 </script>
 </body>
 </html>
