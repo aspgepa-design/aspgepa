@@ -588,6 +588,10 @@
       document.getElementById('dEmail').value = d.email || '';
 
       // Carregar config salva do layout (para todos)
+      var fotoParaCarregar = (d.fotoCarteirinhaUrl && d.fotoCarteirinhaUrl.trim() !== '')
+        ? d.fotoCarteirinhaUrl
+        : (d.fotoUrl && d.fotoUrl.trim() !== '' ? d.fotoUrl : null);
+
       google.script.run
         .withSuccessHandler(function(r){
           if(r && r.config){
@@ -605,6 +609,10 @@
           aplicarFrameConfig();
           aplicarTodosCamposConfig();
           atualizarCardTextos();
+          // Carregar foto APÓS frame ter dimensões corretas
+          if(fotoParaCarregar){
+            carregarFotoExistente(fotoParaCarregar);
+          }
         })
         .carregarConfigCarteirinha();
 
@@ -612,14 +620,6 @@
       ['dNome','dMatricula','dCargo','dCpf','dRg'].forEach(function(id){
         document.getElementById(id).addEventListener('input', atualizarCardTextos);
       });
-
-      // Carregar foto: priorizar foto específica da carteirinha, senão usar foto do perfil
-      var fotoParaCarregar = (d.fotoCarteirinhaUrl && d.fotoCarteirinhaUrl.trim() !== '')
-        ? d.fotoCarteirinhaUrl
-        : (d.fotoUrl && d.fotoUrl.trim() !== '' ? d.fotoUrl : null);
-      if(fotoParaCarregar){
-        carregarFotoExistente(fotoParaCarregar);
-      }
     }
 
     function atualizarCardTextos(){
