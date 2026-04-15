@@ -459,6 +459,8 @@
             <span class="card-overlay-text" id="cardNome"></span>
             <span class="card-overlay-text" id="cardMatricula"></span>
             <span class="card-overlay-text" id="cardCargo"></span>
+            <span class="card-overlay-text" id="cardCpf"></span>
+            <span class="card-overlay-text" id="cardRg"></span>
             <span class="card-overlay-text" id="cardEmissao"></span>
             <span class="card-overlay-text" id="cardValidade"></span>
           </div>
@@ -547,6 +549,8 @@
                 <option value="cardNome">Nome</option>
                 <option value="cardMatricula">Matrícula</option>
                 <option value="cardCargo">Cargo</option>
+                <option value="cardCpf">CPF</option>
+                <option value="cardRg">RG</option>
                 <option value="cardEmissao">Emissão</option>
                 <option value="cardValidade">Validade</option>
               </select>
@@ -697,6 +701,8 @@
       cardNome:      { left: 45, top: 14,  fontSize: 1.8, color: '#1a1a1a', fontWeight: 700 },
       cardMatricula: { left: 50, top: 25,  fontSize: 1.7, color: '#1a1a1a', fontWeight: 700 },
       cardCargo:     { left: 43, top: 31,  fontSize: 1.6, color: '#1a1a1a', fontWeight: 700 },
+      cardCpf:       { left: 40, top: 45,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700 },
+      cardRg:        { left: 40, top: 51,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700 },
       cardEmissao:   { left: 40, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 },
       cardValidade:  { left: 60, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 }
     };
@@ -789,7 +795,7 @@
         .carregarConfigCarteirinha();
 
       // Vincular inputs à atualização ao vivo
-      ['dNome','dMatricula','dCargo'].forEach(function(id){
+      ['dNome','dMatricula','dCargo','dCpf','dRg'].forEach(function(id){
         document.getElementById(id).addEventListener('input', atualizarCardTextos);
       });
 
@@ -810,6 +816,8 @@
       document.getElementById('cardNome').textContent = document.getElementById('dNome').value || '';
       document.getElementById('cardMatricula').textContent = document.getElementById('dMatricula').value || '';
       document.getElementById('cardCargo').textContent = document.getElementById('dCargo').value || '';
+      document.getElementById('cardCpf').textContent = document.getElementById('dCpf').value || '';
+      document.getElementById('cardRg').textContent = document.getElementById('dRg').value || '';
       document.getElementById('cardEmissao').textContent = formatarData(hoje);
       document.getElementById('cardValidade').textContent = formatarData(validade);
     }
@@ -1363,6 +1371,8 @@
           cardNome: d.nomeCompleto || '',
           cardMatricula: d.matricula || '',
           cardCargo: d.cargo || '',
+          cardCpf: d.cpf || '',
+          cardRg: d.rg || '',
           cardEmissao: emissaoStr,
           cardValidade: validadeStr
         };
