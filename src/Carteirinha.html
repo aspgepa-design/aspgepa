@@ -47,8 +47,6 @@
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      max-height: calc(100vh - 120px);
-      overflow-y: auto;
     }
 
     h2 {
@@ -132,19 +130,29 @@
 
     @media (max-width: 700px) {
       .editor-layout { grid-template-columns: 1fr; }
+      .container { padding: 15px; margin: -15px 8px 30px; }
       .card-preview-wrapper {
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        background: white;
-        padding: 8px 0 12px;
-        margin: 0 -10px;
-        width: calc(100% + 20px);
+        position: relative;
+        top: auto;
+        z-index: auto;
+        background: transparent;
+        padding: 0 0 10px;
+        margin: 0;
+        width: 100%;
       }
       .card-preview {
-        width: 60mm;
-        height: 79.2mm;
+        width: 55mm;
+        height: 72.6mm;
+        margin: 0 auto;
       }
+      .dados-grid { grid-template-columns: 1fr; }
+      .dados-grid .campo-full { grid-column: span 1; }
+      .upload-area { padding: 12px; }
+      .upload-area .icon { font-size: 24px; }
+      .upload-area p { font-size: 12px; margin: 3px 0; }
+      .control-group { padding: 12px; }
+      .pos-btn { width: 32px; height: 32px; font-size: 14px; }
+      .pos-center { width: 32px; height: 32px; font-size: 9px; }
     }
 
     /* ---- Card Preview ---- */
