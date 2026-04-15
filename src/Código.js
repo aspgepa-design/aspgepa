@@ -783,6 +783,35 @@ function obterDadosExportCarteirinhas(cpfSolicitante, cpfList) {
 }
 
 /**
+ * Preview rápido de um associado para a configuração de carteirinhas.
+ * Retorna dados + fotoBase64 de um único CPF sem checagem de permissão pesada.
+ */
+function obterPreviewCarteirinha(cpf) {
+  try {
+    var r = buscarAssociadoPorCpf(cpf);
+    if (r.erro) return { erro: r.erro };
+
+    var fotoBase64 = null;
+    var fotoUrl = r.dados.fotoCarteirinhaUrl || r.dados.fotoUrl || '';
+    if (fotoUrl.trim()) {
+      try {
+        var match = fotoUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (!match) match = fotoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+          var file = DriveApp.getFileById(match[1]);
+          var blob = file.getBlob();
+          fotoBase64 = 'data:' + blob.getContentType() + ';base64,' + Utilities.base64Encode(blob.getBytes());
+        }
+      } catch (e) { /* foto não disponível */ }
+    }
+
+    return { sucesso: true, dados: r.dados, fotoBase64: fotoBase64 };
+  } catch (e) {
+    return { erro: 'Erro: ' + e.message };
+  }
+}
+
+/**
  * Retorna lista simples de associados (nome + CPF) para seleção na exportação.
  */
 function listarAssociadosResumido() {

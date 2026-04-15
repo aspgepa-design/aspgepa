@@ -1488,6 +1488,7 @@ function crtPopularPreviewSel() {
 }
 function crtCarregarPreview() {
   var cpf = document.getElementById('crtPreviewSel').value;
+  var msgEl = document.getElementById('crtMsgLayout');
   if (!cpf) {
     // Voltar para dados de exemplo
     document.getElementById('crtNome').textContent = 'NOME DO ASSOCIADO';
@@ -1503,12 +1504,23 @@ function crtCarregarPreview() {
     document.getElementById('crtPhotoPlaceholder').style.display = '';
     return;
   }
+  // Preencher dados imediatos da lista (nome, cpf, cargo)
+  for (var i = 0; i < crtListaAssoc.length; i++) {
+    if (crtListaAssoc[i].cpf === cpf) {
+      document.getElementById('crtNome').textContent = crtListaAssoc[i].nome || '';
+      document.getElementById('crtCpf').textContent = crtListaAssoc[i].cpf || '';
+      document.getElementById('crtCargo').textContent = crtListaAssoc[i].cargo || '';
+      break;
+    }
+  }
   var btn = document.querySelector('#crtPreviewSel + button');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Carregando...'; }
+  msgEl.innerHTML = '<span style="color:#2563eb">Carregando preview...</span>';
   google.script.run.withSuccessHandler(function(r) {
     if (btn) { btn.disabled = false; btn.textContent = '👁 Ver'; }
-    if (r.erro || !r.carteirinhas || !r.carteirinhas.length) return;
-    var c = r.carteirinhas[0]; var d = c.dados;
+    if (r.erro) { msgEl.innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    msgEl.innerHTML = '';
+    var d = r.dados;
     document.getElementById('crtNome').textContent = d.nomeCompleto || '';
     document.getElementById('crtMatricula').textContent = d.matricula || '';
     document.getElementById('crtCargo').textContent = d.cargo || '';
@@ -1518,9 +1530,9 @@ function crtCarregarPreview() {
     document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
     var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
     document.getElementById('crtValidade').textContent = crtFormatarData(val);
-    if (c.fotoBase64) {
+    if (r.fotoBase64) {
       var img = document.getElementById('crtPhotoImg');
-      img.src = c.fotoBase64;
+      img.src = r.fotoBase64;
       img.style.display = 'block';
       document.getElementById('crtPhotoPlaceholder').style.display = 'none';
     } else {
@@ -1529,7 +1541,8 @@ function crtCarregarPreview() {
     }
   }).withFailureHandler(function(e) {
     if (btn) { btn.disabled = false; btn.textContent = '👁 Ver'; }
-  }).obterDadosExportCarteirinhas(usuarioAtual.dados.cpf, [cpf]);
+    msgEl.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+  }).obterPreviewCarteirinha(cpf);
 }
 
 // --- Export PDF ---
