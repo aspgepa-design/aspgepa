@@ -116,6 +116,59 @@ function salvarUrlFoto(linha, fotoUrl) {
 }
 
 /**
+ * Faz upload da foto exclusiva da carteirinha para a pasta "Fotos Carteirinha".
+ * Não altera a foto de perfil do associado.
+ */
+function uploadFotoCarteirinha(base64Data, mimeType, cpf) {
+  try {
+    var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
+    
+    // Criar pasta "Fotos Carteirinha" se não existir
+    var pastasCart = pastaRaiz.getFoldersByName('Fotos Carteirinha');
+    var pastaFotos;
+    if (pastasCart.hasNext()) {
+      pastaFotos = pastasCart.next();
+    } else {
+      pastaFotos = pastaRaiz.createFolder('Fotos Carteirinha');
+    }
+    
+    var cpfLimpo = cpf.replace(/\D/g, '');
+    var extensao = mimeType.indexOf('png') !== -1 ? '.png' : '.jpg';
+    var nomeArquivo = cpfLimpo + extensao;
+    
+    // Remover foto antiga da carteirinha se existir
+    var existentes = pastaFotos.getFilesByName(cpfLimpo + '.jpg');
+    while (existentes.hasNext()) existentes.next().setTrashed(true);
+    existentes = pastaFotos.getFilesByName(cpfLimpo + '.png');
+    while (existentes.hasNext()) existentes.next().setTrashed(true);
+    
+    var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, nomeArquivo);
+    var arquivo = pastaFotos.createFile(blob);
+    arquivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    var fotoUrl = 'https://drive.google.com/thumbnail?id=' + arquivo.getId() + '&sz=w400';
+    
+    return { sucesso: true, url: fotoUrl, fileId: arquivo.getId() };
+  } catch (e) {
+    return { sucesso: false, erro: 'Erro no upload da foto da carteirinha: ' + e.toString() };
+  }
+}
+
+/**
+ * Salva a URL da foto da carteirinha na planilha (coluna S = 19).
+ */
+function salvarUrlFotoCarteirinha(linha, fotoUrl) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Associados');
+    aba.getRange(linha, 19).setValue(fotoUrl); // S = coluna 19
+    return 'Foto da carteirinha salva.';
+  } catch (e) {
+    return 'Erro: ' + e.toString();
+  }
+}
+
+/**
  * Faz upload de um documento do associado para "Documentos/[CPF]/".
  */
 function uploadDocumento(base64Data, mimeType, nomeOriginal, cpf) {
@@ -409,7 +462,8 @@ function buscarAssociadoPorCpf(cpfBusca) {
           cpf: String(dados[i][14] || ''),            // O - CPF
           rg: String(dados[i][15] || ''),             // P - RG
           expeditor: String(dados[i][16] || ''),       // Q - Expeditor
-          fotoUrl: String(dados[i][17] || '')           // R - Foto
+          fotoUrl: String(dados[i][17] || ''),            // R - Foto Perfil
+          fotoCarteirinhaUrl: String(dados[i][18] || '')  // S - Foto Carteirinha
         }
       };
     }
@@ -481,7 +535,8 @@ function atualizarAssociado(linha, dados) {
     if (dados.cpf) aba.getRange(linha, 15).setValue(dados.cpf);            // O - CPF
     if (dados.rg) aba.getRange(linha, 16).setValue(dados.rg);              // P - RG
     if (dados.expeditor) aba.getRange(linha, 17).setValue(dados.expeditor); // Q - Expeditor
-    if (dados.fotoUrl) aba.getRange(linha, 18).setValue(dados.fotoUrl);     // R - Foto
+    if (dados.fotoUrl) aba.getRange(linha, 18).setValue(dados.fotoUrl);     // R - Foto Perfil
+    if (dados.fotoCarteirinhaUrl) aba.getRange(linha, 19).setValue(dados.fotoCarteirinhaUrl); // S - Foto Carteirinha
     
     return "Sucesso! Seus dados foram atualizados.";
   } catch (e) {

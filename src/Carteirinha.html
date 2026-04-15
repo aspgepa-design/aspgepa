@@ -736,9 +736,12 @@
         document.getElementById(id).addEventListener('input', atualizarCardTextos);
       });
 
-      // Carregar foto existente se houver
-      if(d.fotoUrl && d.fotoUrl.trim() !== ''){
-        carregarFotoExistente(d.fotoUrl);
+      // Carregar foto: priorizar foto específica da carteirinha, senão usar foto do perfil
+      var fotoParaCarregar = (d.fotoCarteirinhaUrl && d.fotoCarteirinhaUrl.trim() !== '')
+        ? d.fotoCarteirinhaUrl
+        : (d.fotoUrl && d.fotoUrl.trim() !== '' ? d.fotoUrl : null);
+      if(fotoParaCarregar){
+        carregarFotoExistente(fotoParaCarregar);
       }
     }
 
@@ -1081,7 +1084,7 @@
             btn.disabled = false;
             showMsg('msgSalvar','Erro: ' + err.message, 'erro');
           })
-          .uploadFotoAssociado(fotoBase64, fotoMimeType, cpfAssociado);
+          .uploadFotoCarteirinha(fotoBase64, fotoMimeType, cpfAssociado);
       } else {
         salvarCampos(null);
       }
@@ -1096,7 +1099,7 @@
         cpf: document.getElementById('dCpf').value,
         rg: document.getElementById('dRg').value
       };
-      if(novaFotoUrl) dados.fotoUrl = novaFotoUrl;
+      if(novaFotoUrl) dados.fotoCarteirinhaUrl = novaFotoUrl;
 
       google.script.run
         .withSuccessHandler(function(res){
