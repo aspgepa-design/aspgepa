@@ -2347,6 +2347,13 @@ function filtrarAssociados() {
 
     var cpfDisplay = a.cpf ? a.cpf : '<span style="color:#d97706;font-style:italic">Sem CPF</span>';
 
+    var whatsBtn = '';
+    if (a.whatsapp && a.whatsapp.trim()) {
+      var num = a.whatsapp.replace(/\D/g, '');
+      if (num.length <= 11) num = '55' + num;
+      whatsBtn = '<a href="https://wa.me/' + num + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn btn-sm" style="background:#25d366;color:#fff;border:none;padding:4px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px" title="WhatsApp: ' + a.whatsapp + '">💬 Zap</a>';
+    }
+
     html += '<div class="assoc-row" onclick="abrirModalAssoc(' + i + ')" data-idx="' + i + '">' +
       avatarHtml +
       '<div class="assoc-info">' +
@@ -2355,6 +2362,7 @@ function filtrarAssociados() {
       '</div>' +
       statusHtml +
       '<div class="assoc-actions">' +
+        whatsBtn +
         '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();abrirModalAssoc(' + i + ')">Editar</button>' +
       '</div>' +
     '</div>';
