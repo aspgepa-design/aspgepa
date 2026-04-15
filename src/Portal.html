@@ -1592,6 +1592,34 @@ function crtCarregarPreview() {
       img.src = r.fotoBase64;
       img.style.display = 'block';
       document.getElementById('crtPhotoPlaceholder').style.display = 'none';
+      // Aplicar posição salva da foto se existir
+      img.onload = function() {
+        var fotoCfg = null;
+        try { fotoCfg = d.fotoConfig ? JSON.parse(d.fotoConfig) : null; } catch(e){}
+        if (fotoCfg && fotoCfg.zoom) {
+          var frame = document.getElementById('crtPhotoFrame');
+          var pdfFrameW = frame.offsetWidth;
+          var pdfFrameH = frame.offsetHeight;
+          var savedW = fotoCfg.frameW || pdfFrameW;
+          var savedH = fotoCfg.frameH || pdfFrameH;
+          var ratioW = pdfFrameW / savedW;
+          var ratioH = pdfFrameH / savedH;
+          var scaledZoom = fotoCfg.zoom * ratioW;
+          img.style.objectFit = 'none';
+          img.style.position = 'absolute';
+          img.style.width = (img.naturalWidth * scaledZoom) + 'px';
+          img.style.height = (img.naturalHeight * scaledZoom) + 'px';
+          img.style.left = ((fotoCfg.x || 0) * ratioW) + 'px';
+          img.style.top = ((fotoCfg.y || 0) * ratioH) + 'px';
+        } else {
+          img.style.objectFit = 'cover';
+          img.style.position = '';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.left = '';
+          img.style.top = '';
+        }
+      };
     } else {
       document.getElementById('crtPhotoImg').style.display = 'none';
       document.getElementById('crtPhotoPlaceholder').style.display = '';
