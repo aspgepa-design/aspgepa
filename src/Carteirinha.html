@@ -1283,7 +1283,7 @@
       google.script.run
         .withSuccessHandler(function(r){
           if(r.erro){ btn.disabled = false; showMsg('msgExport', r.erro, 'erro'); return; }
-          gerarPdfComDados(r.carteirinhas);
+          gerarPdfComDados(r.carteirinhas, r.templateBase64);
         })
         .withFailureHandler(function(err){
           btn.disabled = false;
@@ -1293,7 +1293,7 @@
         .obterDadosExportCarteirinhas(cpfAssociado, cpfs);
     }
 
-    function gerarPdfComDados(carteirinhas){
+    function gerarPdfComDados(carteirinhas, templateBase64){
       // Carregar config do layout salvo
       google.script.run
         .withSuccessHandler(function(r){
@@ -1308,18 +1308,17 @@
               if(cfg.campos) cc = cfg.campos;
             } catch(e){}
           }
-          renderizarCarteirinhasPdf(carteirinhas, fc, cc);
+          renderizarCarteirinhasPdf(carteirinhas, fc, cc, templateBase64);
         })
         .carregarConfigCarteirinha();
     }
 
-    function renderizarCarteirinhasPdf(carteirinhas, fc, cc){
+    function renderizarCarteirinhasPdf(carteirinhas, fc, cc, templateBase64){
       var area = document.getElementById('pdfRenderArea');
       // Dimensões em px (85mm × 112.22mm a 300 DPI ≈ escala 3.15x de 96dpi)
       var cardW = 321; // 85mm em px @96dpi
       var cardH = 424; // 112.22mm em px @96dpi
       var scale = 3.15; // para 300 DPI
-      var templateUrl = 'https://drive.google.com/thumbnail?id=1eFQxX1NLXY-0Im2C74hAcAHOmzxMUcX-&sz=w1200';
 
       var hoje = new Date();
       var validade = new Date(hoje);
@@ -1348,11 +1347,10 @@
         var div = document.createElement('div');
         div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5;';
 
-        // Template bg
+        // Template bg (usa base64 para evitar CORS)
         var bgImg = document.createElement('img');
-        bgImg.crossOrigin = 'anonymous';
         bgImg.style.cssText = 'width:100%;height:100%;display:block;';
-        bgImg.src = templateUrl;
+        bgImg.src = templateBase64 || '';
         div.appendChild(bgImg);
 
         // Foto
@@ -1396,7 +1394,7 @@
           if(imgLoaded >= imgCount) capturar();
         }
         function capturar(){
-          html2canvas(div, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: null })
+          html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
             .then(function(canvas){
               canvasArray.push(canvas);
               area.removeChild(div);

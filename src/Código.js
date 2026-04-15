@@ -746,6 +746,14 @@ function obterDadosExportCarteirinhas(cpfSolicitante, cpfList) {
     return { erro: 'Apenas o Diretor Sociocultural pode exportar carteirinhas.' };
   }
 
+  // Template da carteirinha em base64 (evita CORS)
+  var templateBase64 = null;
+  try {
+    var templateFile = DriveApp.getFileById('1eFQxX1NLXY-0Im2C74hAcAHOmzxMUcX-');
+    var templateBlob = templateFile.getBlob();
+    templateBase64 = 'data:' + templateBlob.getContentType() + ';base64,' + Utilities.base64Encode(templateBlob.getBytes());
+  } catch (e) { /* template não disponível */ }
+
   var resultados = [];
   for (var i = 0; i < cpfList.length; i++) {
     var r = buscarAssociadoPorCpf(cpfList[i]);
@@ -771,7 +779,7 @@ function obterDadosExportCarteirinhas(cpfSolicitante, cpfList) {
       fotoBase64: fotoBase64
     });
   }
-  return { sucesso: true, carteirinhas: resultados };
+  return { sucesso: true, carteirinhas: resultados, templateBase64: templateBase64 };
 }
 
 /**
