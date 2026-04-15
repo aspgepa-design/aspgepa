@@ -258,6 +258,7 @@ tbody tr:hover{background:#f9fafb}
 }
 /* Carteirinha config */
 .crt-overlay{position:absolute;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-weight:700;white-space:nowrap;pointer-events:none;user-select:none}
+#crtNome{white-space:normal;max-width:55%;line-height:1.2}
 .crt-ctrl{display:flex;align-items:center;gap:6px}.crt-ctrl label{min-width:32px;font-size:11px;font-weight:600;color:#555;margin:0;text-transform:uppercase}
 .crt-ctrl input[type="range"]{flex:1;padding:0;border:none;height:5px;-webkit-appearance:none;background:#dee2e6;border-radius:3px}
 .crt-ctrl input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#0075bf;cursor:pointer}
@@ -1637,7 +1638,9 @@ function crtRenderPdf(carteirinhas, fc, cc, templateBase64) {
     var campos = { cardNome:d.nomeCompleto||'', cardMatricula:d.matricula||'', cardCargo:d.cargo||'', cardCpf:d.cpf||'', cardRg:d.rg||'', cardEmissao:emStr, cardValidade:valStr };
     for (var id in campos) { var cfg = cc[id]; if (!cfg) continue;
       var s = document.createElement('span');
-      s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:nowrap';
+      var ws = (id === 'cardNome') ? 'normal' : 'nowrap';
+      var extra = (id === 'cardNome') ? 'max-width:55%;line-height:1.2;' : '';
+      s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:'+ws+';'+extra;
       s.textContent = campos[id]; div.appendChild(s);
     }
     area.appendChild(div);
