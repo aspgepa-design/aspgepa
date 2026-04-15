@@ -906,8 +906,14 @@ function renderFinanceiro(data) {
   document.getElementById('finResumo').innerHTML = resumoHtml;
   document.getElementById('finResumoTransp').innerHTML = resumoHtml;
 
-  // Dashboard: qtd convênios placeholder
-  document.getElementById('dashConvenios').textContent = '--';
+
+
+  if (!data.lancamentos.length) {
+    var vazioHtml = '<p style="color:#9ca3af;font-size:13px;padding:8px 0">Nenhum lançamento registrado.</p>';
+    document.getElementById('finTabela').innerHTML = vazioHtml;
+    document.getElementById('finTabelaTransp').innerHTML = vazioHtml;
+    return;
+  }
 
   var tabelaHtml = '<table><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Responsável</th><th style="text-align:right">Ação</th></tr></thead><tbody>';
   var tabelaTranspHtml = '<table><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Responsável</th></tr></thead><tbody>';
@@ -929,8 +935,8 @@ function renderFinanceiro(data) {
 
 // ===== RENDER: CONVÊNIOS =====
 function renderConvenios(data) {
+  document.getElementById('dashConvenios').textContent = (data && data.length) ? data.length : '0';
   if (!data || !data.length) { document.getElementById('conveniosGrid').innerHTML = '<p style="color:#9ca3af">Nenhum convênio cadastrado.</p>'; return; }
-  document.getElementById('dashConvenios').textContent = data.length;
   var catColors = { 'Saúde': 'badge-green', 'Educação': 'badge-blue', 'Lazer': 'badge-yellow' };
   var html = '';
   for (var i = 0; i < data.length; i++) {

@@ -264,7 +264,13 @@ function obterEventos() {
       var dados = aba.getDataRange().getValues();
       var lista = [];
       for (var i = 1; i < dados.length; i++) {
-        var dataStr = String(dados[i][0] || '');
+        var dataCell = dados[i][0];
+        var dataStr = '';
+        if (dataCell instanceof Date) {
+          dataStr = Utilities.formatDate(dataCell, 'America/Sao_Paulo', 'dd/MM/yyyy');
+        } else {
+          dataStr = String(dataCell || '');
+        }
         lista.push({
           data: dataStr,
           titulo: String(dados[i][1] || ''),
@@ -314,16 +320,7 @@ function obterFinanceiro() {
     }
   } catch (e) {}
   
-  // Dados exemplo se aba não existir
-  return {
-    lancamentos: [
-      { data: '10/01/2026', desc: 'Repasse Folha (Mensalidades)', valor: 15400, tipo: 'entrada', user: 'Auto-PGE' },
-      { data: '12/01/2026', desc: 'Internet Sede - Janeiro', valor: 180, tipo: 'saida', user: 'Carlos (Tesoureiro)' },
-      { data: '14/01/2026', desc: 'Manutenção Ar Condicionado', valor: 350, tipo: 'saida', user: 'Ana (Suplente)' },
-      { data: '15/01/2026', desc: 'Patrocínio Evento Verão', valor: 2500, tipo: 'entrada', user: 'Carlos (Tesoureiro)' }
-    ],
-    receitas: 17900, despesas: 530, saldo: 48220.12
-  };
+  return { lancamentos: [], receitas: 0, despesas: 0, saldo: 0 };
 }
 
 /**
@@ -396,11 +393,7 @@ function obterConvenios() {
     }
   } catch (e) {}
   
-  return [
-    { nome: 'Academia FitPará', desc: 'Desconto de 20% em todas as mensalidades para sócios ativos.', cat: 'Saúde', link: '#' },
-    { nome: 'Faculdade Conhecimento', desc: 'Bolsas de até 50% para graduação e pós-graduação.', cat: 'Educação', link: '#' },
-    { nome: 'Pizzaria Ver-o-Peso', desc: 'Ganhe uma pizza doce média em qualquer pedido de pizza grande.', cat: 'Lazer', link: '#' }
-  ];
+  return [];
 }
 
 /**
@@ -425,10 +418,7 @@ function obterVotacoes() {
     }
   } catch (e) {}
   
-  return [
-    { titulo: 'Aprovação Contas 2025', status: 'Aberta', fim: '20/01/2026', votos: 142 },
-    { titulo: 'Mudança de Sede Administrativa', status: 'Encerrada', fim: '10/12/2025', votos: 210 }
-  ];
+  return [];
 }
 
 /**
