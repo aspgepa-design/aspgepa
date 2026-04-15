@@ -644,6 +644,15 @@ function salvarInscricao(dados) {
     
     if (!aba) return "Erro: Aba 'Inscrições' não encontrada.";
 
+    // Upload da foto se enviada
+    var fotoUrl = '';
+    if (dados.fotoBase64 && dados.fotoMimeType && dados.cpf) {
+      var resultado = uploadFotoAssociado(dados.fotoBase64, dados.fotoMimeType, dados.cpf);
+      if (resultado.sucesso) {
+        fotoUrl = resultado.url;
+      }
+    }
+
     // Ordem exata conforme sua solicitação
     aba.appendRow([
       new Date(), // Carimbo de data/hora
@@ -660,7 +669,10 @@ function salvarInscricao(dados) {
       dados.bairro,
       dados.cep,
       dados.complemento,
-      dados.email
+      dados.email,
+      dados.matricula,
+      dados.sexo,
+      fotoUrl
     ]);
     
     return "Sucesso! Sua ficha de inscrição foi enviada corretamente.";
