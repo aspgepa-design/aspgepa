@@ -439,11 +439,15 @@ function buscarAssociadoPorCpf(cpfBusca) {
   for (var i = 1; i < dados.length; i++) {
     var cpfPlanilha = String(dados[i][14]).replace(/\D/g, ''); // Coluna O (índice 14)
     if (cpfPlanilha === cpfLimpo && cpfLimpo.length >= 11) {
+      // Verificar cargo na gestão ativa (DiretoriaGestao é fonte de verdade)
+      var cargoGestao = obterCargoGestao(cpfBusca);
+      var perfilFinal = cargoGestao || String(dados[i][3] || '') || 'Membro';
+
       return {
         linha: i + 1,
         dados: {
           nomeCompleto: String(dados[i][2] || ''),   // C - Nome do Associado
-          perfil: String(dados[i][3] || ''),          // D - Perfil
+          perfil: perfilFinal,                        // Cargo da gestão ativa ou Perfil da planilha
           sexo: String(dados[i][5] || ''),            // F - Sexo
           whatsapp: String(dados[i][8] || ''),        // I - WhatsApp
           email: String(dados[i][9] || ''),           // J - Email
@@ -479,17 +483,19 @@ function buscarAssociadoPorNome(nomeBusca) {
   for (var i = 1; i < dados.length; i++) {
     var nomePlanilha = String(dados[i][2] || '').toUpperCase();
     if (nomePlanilha && nomePlanilha.indexOf(nomeLimpo) !== -1) {
+      var cpfNome = String(dados[i][14] || '').trim();
+      var cargoGestaoNome = cpfNome ? obterCargoGestao(cpfNome) : null;
       resultados.push({
         linha: i + 1,
         dados: {
           nomeCompleto: String(dados[i][2] || ''),
-          perfil: String(dados[i][3] || ''),
+          perfil: cargoGestaoNome || String(dados[i][3] || ''),
           sexo: String(dados[i][5] || ''),
           whatsapp: String(dados[i][8] || ''),
           email: String(dados[i][9] || ''),
           matricula: String(dados[i][12] || ''),
           cargo: String(dados[i][13] || ''),
-          cpf: String(dados[i][14] || ''),
+          cpf: cpfNome,
           rg: String(dados[i][15] || ''),
           expeditor: String(dados[i][16] || ''),
           fotoUrl: String(dados[i][17] || '')           // R - Foto
@@ -704,6 +710,264 @@ function listarAssociadosResumido() {
 // ==============================================================================
 // SETUP INICIAL - EXECUTAR UMA VEZ para criar abas e pastas no Drive
 // ==============================================================================
+
+// ==============================================================================
+// GESTÕES - CONTROLE DE VIGÊNCIA
+// ==============================================================================
+
+/**
+ * Retorna a gestão ativa (a que tem Ativa = TRUE).
+ */
+function obterGestaoAtiva() {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Gestoes');
+    if (!aba || aba.getLastRow() < 2) return null;
+    var dados = aba.getDataRange().getValues();
+    for (var i = 1; i < dados.length; i++) {
+      if (dados[i][3] === true || String(dados[i][3]).toUpperCase() === 'TRUE') {
+        return {
+          linha: i + 1,
+          nome: String(dados[i][0] || ''),
+          inicio: dados[i][1] instanceof Date ? Utilities.formatDate(dados[i][1], 'America/Sao_Paulo', 'dd/MM/yyyy') : String(dados[i][1] || ''),
+          fim: dados[i][2] instanceof Date ? Utilities.formatDate(dados[i][2], 'America/Sao_Paulo', 'dd/MM/yyyy') : String(dados[i][2] || ''),
+          ativa: true
+        };
+      }
+    }
+    return null;
+  } catch (e) { return null; }
+}
+
+/**
+ * Busca o cargo de um associado pelo CPF na gestão ativa (aba DiretoriaGestao).
+ * Retorna o cargo (ex: "Diretor Sociocultural") ou null se não for da diretoria.
+ */
+function obterCargoGestao(cpfBusca) {
+  try {
+    var gestao = obterGestaoAtiva();
+    if (!gestao) return null;
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('DiretoriaGestao');
+    if (!aba || aba.getLastRow() < 2) return null;
+    var dados = aba.getDataRange().getValues();
+    var cpfLimpo = cpfBusca.replace(/\D/g, '');
+    for (var i = 1; i < dados.length; i++) {
+      var gestaoLinha = String(dados[i][0] || '').trim();
+      var cpfLinha = String(dados[i][1] || '').replace(/\D/g, '');
+      if (gestaoLinha === gestao.nome && cpfLinha === cpfLimpo && cpfLimpo.length >= 11) {
+        return String(dados[i][3] || '').trim(); // Coluna D = Cargo
+      }
+    }
+    return null;
+  } catch (e) { return null; }
+}
+
+/**
+ * Lista todas as gestões cadastradas.
+ */
+function listarGestoes() {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Gestoes');
+    if (!aba || aba.getLastRow() < 2) return [];
+    var dados = aba.getDataRange().getValues();
+    var lista = [];
+    for (var i = 1; i < dados.length; i++) {
+      lista.push({
+        linha: i + 1,
+        nome: String(dados[i][0] || ''),
+        inicio: dados[i][1] instanceof Date ? Utilities.formatDate(dados[i][1], 'America/Sao_Paulo', 'dd/MM/yyyy') : String(dados[i][1] || ''),
+        fim: dados[i][2] instanceof Date ? Utilities.formatDate(dados[i][2], 'America/Sao_Paulo', 'dd/MM/yyyy') : String(dados[i][2] || ''),
+        ativa: dados[i][3] === true || String(dados[i][3]).toUpperCase() === 'TRUE'
+      });
+    }
+    return lista;
+  } catch (e) { return []; }
+}
+
+/**
+ * Lista a diretoria de uma gestão específica.
+ */
+function listarDiretoriaGestao(nomeGestao) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('DiretoriaGestao');
+    if (!aba || aba.getLastRow() < 2) return [];
+    var dados = aba.getDataRange().getValues();
+    var lista = [];
+    for (var i = 1; i < dados.length; i++) {
+      if (String(dados[i][0] || '').trim() === nomeGestao) {
+        lista.push({
+          linha: i + 1,
+          gestao: String(dados[i][0] || ''),
+          cpf: String(dados[i][1] || ''),
+          nome: String(dados[i][2] || ''),
+          cargo: String(dados[i][3] || '')
+        });
+      }
+    }
+    return lista;
+  } catch (e) { return []; }
+}
+
+/**
+ * Salva/cria uma gestão na aba Gestoes.
+ */
+function salvarGestao(dados) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('Gestoes');
+    if (!aba) return { erro: 'Aba Gestoes não encontrada. Execute setupGestoes().' };
+
+    if (dados.linha) {
+      // Editar existente
+      aba.getRange(dados.linha, 1, 1, 4).setValues([[dados.nome, dados.inicio, dados.fim, false]]);
+    } else {
+      aba.appendRow([dados.nome, dados.inicio, dados.fim, false]);
+    }
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+/**
+ * Adiciona um membro à diretoria de uma gestão.
+ */
+function adicionarMembroDiretoria(nomeGestao, cpf, nome, cargo) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('DiretoriaGestao');
+    if (!aba) return { erro: 'Aba DiretoriaGestao não encontrada.' };
+    aba.appendRow([nomeGestao, cpf, nome, cargo]);
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+/**
+ * Remove um membro da diretoria pela linha.
+ */
+function removerMembroDiretoria(linha) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('DiretoriaGestao');
+    if (!aba) return { erro: 'Aba não encontrada.' };
+    if (linha < 2) return { erro: 'Linha inválida.' };
+    aba.deleteRow(linha);
+    return { sucesso: true };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+/**
+ * Ativa uma gestão e atualiza os perfis na aba Associados.
+ * 1. Desativa todas as gestões
+ * 2. Ativa a gestão selecionada
+ * 3. Reseta todos os perfis para "Membro"
+ * 4. Aplica os cargos da DiretoriaGestao nos perfis dos associados
+ */
+function ativarGestao(nomeGestao) {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var abaGestoes = ss.getSheetByName('Gestoes');
+    var abaDiretoria = ss.getSheetByName('DiretoriaGestao');
+    var abaAssociados = ss.getSheetByName('Associados');
+    if (!abaGestoes || !abaDiretoria || !abaAssociados) return { erro: 'Abas necessárias não encontradas.' };
+
+    // 1. Desativar todas as gestões
+    var dadosGestoes = abaGestoes.getDataRange().getValues();
+    var linhaAtivada = -1;
+    for (var g = 1; g < dadosGestoes.length; g++) {
+      abaGestoes.getRange(g + 1, 4).setValue(false);
+      if (String(dadosGestoes[g][0]).trim() === nomeGestao) linhaAtivada = g + 1;
+    }
+    if (linhaAtivada === -1) return { erro: 'Gestão "' + nomeGestao + '" não encontrada.' };
+
+    // 2. Ativar a gestão selecionada
+    abaGestoes.getRange(linhaAtivada, 4).setValue(true);
+
+    // 3. Ler diretoria da gestão selecionada
+    var dadosDiretoria = abaDiretoria.getDataRange().getValues();
+    var mapaCargos = {}; // cpfLimpo → cargo
+    for (var d = 1; d < dadosDiretoria.length; d++) {
+      if (String(dadosDiretoria[d][0]).trim() === nomeGestao) {
+        var cpfDir = String(dadosDiretoria[d][1] || '').replace(/\D/g, '');
+        if (cpfDir.length >= 11) {
+          mapaCargos[cpfDir] = String(dadosDiretoria[d][3] || '').trim();
+        }
+      }
+    }
+
+    // 4. Atualizar perfis na aba Associados
+    var dadosAssoc = abaAssociados.getDataRange().getValues();
+    for (var a = 1; a < dadosAssoc.length; a++) {
+      var cpfAssoc = String(dadosAssoc[a][14] || '').replace(/\D/g, '');
+      var novoPerfil = 'Membro'; // Reset padrão
+      if (cpfAssoc.length >= 11 && mapaCargos[cpfAssoc]) {
+        novoPerfil = mapaCargos[cpfAssoc];
+      }
+      abaAssociados.getRange(a + 1, 4).setValue(novoPerfil); // Coluna D = Perfil
+    }
+
+    return { sucesso: true, msg: 'Gestão "' + nomeGestao + '" ativada. ' + Object.keys(mapaCargos).length + ' cargo(s) aplicado(s).' };
+  } catch (e) { return { erro: 'Erro ao ativar gestão: ' + e.toString() }; }
+}
+
+/**
+ * Cria as abas Gestoes e DiretoriaGestao e popula com os dados atuais da aba Associados.
+ */
+function setupGestoes() {
+  var log = [];
+  var ss = SpreadsheetApp.openById(PLANILHA_ID);
+
+  // Aba Gestoes
+  if (!ss.getSheetByName('Gestoes')) {
+    var abaG = ss.insertSheet('Gestoes');
+    abaG.getRange('A1:D1').setValues([['Gestão', 'Início', 'Fim', 'Ativa']]);
+    abaG.getRange('A1:D1').setFontWeight('bold').setBackground('#1e3a5f').setFontColor('#ffffff');
+    abaG.setColumnWidth(1, 140);
+    abaG.setColumnWidth(2, 120);
+    abaG.setColumnWidth(3, 120);
+    abaG.setColumnWidth(4, 80);
+    abaG.setFrozenRows(1);
+    // Gestão atual
+    abaG.appendRow(['2026/2027', new Date(2026, 0, 1), new Date(2027, 11, 31), true]);
+    abaG.getRange('B2:C2').setNumberFormat('dd/MM/yyyy');
+    log.push('✅ Aba "Gestoes" criada com gestão 2026/2027 ativa.');
+  } else {
+    log.push('⏭️ Aba "Gestoes" já existe.');
+  }
+
+  // Aba DiretoriaGestao
+  if (!ss.getSheetByName('DiretoriaGestao')) {
+    var abaD = ss.insertSheet('DiretoriaGestao');
+    abaD.getRange('A1:D1').setValues([['Gestão', 'CPF', 'Nome', 'Cargo']]);
+    abaD.getRange('A1:D1').setFontWeight('bold').setBackground('#1e3a5f').setFontColor('#ffffff');
+    abaD.setColumnWidth(1, 140);
+    abaD.setColumnWidth(2, 160);
+    abaD.setColumnWidth(3, 300);
+    abaD.setColumnWidth(4, 250);
+    abaD.setFrozenRows(1);
+
+    // Popular com dados atuais da aba Associados (quem tem perfil diferente de Membro)
+    var abaAssoc = ss.getSheetByName('Associados');
+    if (abaAssoc) {
+      var dados = abaAssoc.getDataRange().getValues();
+      for (var i = 1; i < dados.length; i++) {
+        var perfil = String(dados[i][3] || '').trim();
+        var cpf = String(dados[i][14] || '').trim();
+        var nome = String(dados[i][2] || '').trim();
+        if (perfil && perfil.toLowerCase() !== 'membro' && cpf && nome) {
+          abaD.appendRow(['2026/2027', cpf, nome, perfil]);
+        }
+      }
+      log.push('✅ Aba "DiretoriaGestao" criada e populada com diretoria atual.');
+    }
+  } else {
+    log.push('⏭️ Aba "DiretoriaGestao" já existe.');
+  }
+
+  Logger.log(log.join('\n'));
+  return log.join('\n');
+}
 
 // ==============================================================================
 // CONFIGURAÇÃO DO LAYOUT DA CARTEIRINHA

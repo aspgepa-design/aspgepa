@@ -605,6 +605,118 @@ tbody tr:hover{background:#f9fafb}
           </div>
         </div>
 
+        <!-- ===== VIEW: GESTÕES ===== -->
+        <div id="view-gestoes_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gestões</h2>
+              <p style="font-size:13px;color:#6b7280">Controle de vigência e diretoria executiva por gestão.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalNovaGestao()">+ Nova Gestão</button>
+          </header>
+
+          <!-- Gestão ativa -->
+          <div class="card" style="margin-bottom:24px;border-left:4px solid #16a34a">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3 style="display:flex;align-items:center;gap:8px">🏛️ Gestão Vigente <span class="badge badge-green" id="gestaoAtivaLabel">--</span></h3>
+                <p id="gestaoAtivaPeriodo" style="font-size:12px;color:#6b7280;margin-top:4px"></p>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div id="gestaoAtivaDiretoria" style="padding:16px">
+                <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Histórico -->
+          <div class="card">
+            <div class="card-header"><h3>📋 Todas as Gestões</h3></div>
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="gestoesTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MODAL: NOVA GESTÃO ===== -->
+        <div class="modal-assoc-overlay" id="modalGestao" style="display:none">
+          <div class="modal-assoc" style="max-width:480px">
+            <div class="modal-assoc-header">
+              <h3>🏛️ Nova Gestão</h3>
+              <button onclick="document.getElementById('modalGestao').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af;padding:4px">✕</button>
+            </div>
+            <div class="modal-assoc-body" style="padding:24px">
+              <div style="display:grid;gap:16px">
+                <div>
+                  <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Nome da Gestão</label>
+                  <input type="text" id="gestaoNome" class="login-input" placeholder="Ex: 2028/2029" style="margin-bottom:0">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div>
+                    <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Início</label>
+                    <input type="date" id="gestaoInicio" class="login-input" style="margin-bottom:0">
+                  </div>
+                  <div>
+                    <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Fim</label>
+                    <input type="date" id="gestaoFim" class="login-input" style="margin-bottom:0">
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:24px">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('modalGestao').style.display='none'">Cancelar</button>
+                <button class="btn btn-primary btn-sm" onclick="criarGestao()">Criar Gestão</button>
+              </div>
+              <div id="gestaoStatus" style="font-size:12px;margin-top:12px;min-height:20px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MODAL: DIRETORIA DA GESTÃO ===== -->
+        <div class="modal-assoc-overlay" id="modalDiretoria" style="display:none">
+          <div class="modal-assoc" style="max-width:680px">
+            <div class="modal-assoc-header">
+              <h3 id="modalDiretoriaTitulo">Diretoria</h3>
+              <button onclick="document.getElementById('modalDiretoria').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af;padding:4px">✕</button>
+            </div>
+            <div class="modal-assoc-body" style="padding:24px">
+              <div id="listaDiretoriaModal">
+                <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+              </div>
+              <hr style="margin:20px 0;border:none;border-top:1px solid #e5e7eb">
+              <h4 style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px">Adicionar Membro</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                  <label style="font-size:11px;font-weight:700;color:#6b7280">CPF</label>
+                  <input type="text" id="dirCpf" class="login-input" placeholder="000.000.000-00" style="margin-bottom:0" oninput="mascaraCPF(this)">
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:700;color:#6b7280">Cargo</label>
+                  <select id="dirCargo" class="login-input" style="margin-bottom:0">
+                    <option value="">Selecione...</option>
+                    <option value="Presidente">Presidente</option>
+                    <option value="Vice-Presidente">Vice-Presidente</option>
+                    <option value="Secretária da Assembleia Geral">Secretária da Assembleia Geral</option>
+                    <option value="Presidente da Assembleia Geral">Presidente da Assembleia Geral</option>
+                    <option value="Vice-presidente da Assembleia Geral">Vice-presidente da Assembleia Geral</option>
+                    <option value="Tesoureiro">Tesoureiro</option>
+                    <option value="Diretor Sociocultural">Diretor Sociocultural</option>
+                    <option value="Diretora Administrativa">Diretora Administrativa</option>
+                    <option value="Conselho Fiscal">Conselho Fiscal</option>
+                    <option value="Suplente Conselho Fiscal">Suplente Conselho Fiscal</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px">
+                <button class="btn btn-success btn-sm" onclick="adicionarDiretoriaMembro()">+ Adicionar</button>
+              </div>
+              <div id="dirStatus" style="font-size:12px;margin-top:8px;min-height:20px"></div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /content -->
     </div><!-- /main -->
   </div><!-- /app-body -->
@@ -726,6 +838,7 @@ var ICONS = {
   financeiro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
   eventos_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   convenios_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+  gestoes_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   associados_adm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
   atualizacao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>'
 };
@@ -748,6 +861,7 @@ function getNav(role) {
   if (role === 'diretor') {
     nav.push({ id: 'eventos_adm', label: 'Gerir Eventos', roles: ['diretor'] });
     nav.push({ id: 'convenios_adm', label: 'Gerir Convênios', roles: ['diretor'] });
+    nav.push({ id: 'gestoes_adm', label: 'Gestões', roles: ['diretor'] });
   }
   return nav;
 }
@@ -867,7 +981,7 @@ function navegarPara(tabId) {
   }
   // Header
   var labels = { inicio: 'Início', transparencia: 'Transparência', convenios: 'Convênios', votacoes: 'Votações',
-    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', associados_adm: 'Gestão de Associados', eventos_adm: 'Gerir Eventos', convenios_adm: 'Gerir Convênios' };
+    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', associados_adm: 'Gestão de Associados', eventos_adm: 'Gerir Eventos', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
   // Fechar sidebar mobile
   document.getElementById('sidebar').classList.remove('open');
@@ -889,6 +1003,9 @@ function carregarDadosAsync() {
   var role = usuarioAtual && usuarioAtual.dados && usuarioAtual.dados.role;
   if (role === 'tesoureiro' || role === 'diretor') {
     carregarAssociados();
+  }
+  if (role === 'diretor') {
+    carregarGestoes();
   }
   // Foto e documentos
   if (usuarioAtual && usuarioAtual.dados.cpf) {
@@ -971,6 +1088,173 @@ function renderVotacoes(data) {
       '</div></div></div>';
   }
   document.getElementById('votacoesList').innerHTML = html;
+}
+
+// ===== GESTÕES =====
+var gestoesData = [];
+var gestaoAtivaNome = '';
+
+function carregarGestoes() {
+  google.script.run.withSuccessHandler(renderGestoes).listarGestoes();
+}
+
+function renderGestoes(data) {
+  gestoesData = data || [];
+  var ativa = null;
+  for (var i = 0; i < gestoesData.length; i++) {
+    if (gestoesData[i].ativa) { ativa = gestoesData[i]; break; }
+  }
+
+  if (ativa) {
+    gestaoAtivaNome = ativa.nome;
+    document.getElementById('gestaoAtivaLabel').textContent = ativa.nome;
+    document.getElementById('gestaoAtivaPeriodo').textContent = ativa.inicio + ' a ' + ativa.fim;
+    google.script.run.withSuccessHandler(renderDiretoriaAtiva).listarDiretoriaGestao(ativa.nome);
+  } else {
+    gestaoAtivaNome = '';
+    document.getElementById('gestaoAtivaLabel').textContent = 'Nenhuma';
+    document.getElementById('gestaoAtivaPeriodo').textContent = '';
+    document.getElementById('gestaoAtivaDiretoria').innerHTML = '<p style="color:#9ca3af;padding:8px">Nenhuma gestão ativa. Crie e ative uma gestão.</p>';
+  }
+
+  // Tabela de gestões
+  if (!gestoesData.length) {
+    document.getElementById('gestoesTabela').innerHTML = '<p style="color:#9ca3af;padding:16px">Nenhuma gestão cadastrada.</p>';
+    return;
+  }
+  var html = '<table><thead><tr><th>Gestão</th><th>Início</th><th>Fim</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody>';
+  for (var i = 0; i < gestoesData.length; i++) {
+    var g = gestoesData[i];
+    html += '<tr><td style="font-weight:700">' + g.nome + '</td>';
+    html += '<td style="color:#6b7280">' + g.inicio + '</td>';
+    html += '<td style="color:#6b7280">' + g.fim + '</td>';
+    html += '<td>' + (g.ativa ? '<span class="badge badge-green">Ativa</span>' : '<span class="badge badge-gray">Inativa</span>') + '</td>';
+    html += '<td style="text-align:right;display:flex;gap:4px;justify-content:flex-end">';
+    html += '<button class="btn btn-outline btn-sm" onclick="verDiretoria(\'' + g.nome + '\')">Diretoria</button>';
+    if (!g.ativa) {
+      html += ' <button class="btn btn-success btn-sm" onclick="confirmarAtivarGestao(\'' + g.nome + '\')">Ativar</button>';
+    }
+    html += '</td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('gestoesTabela').innerHTML = html;
+}
+
+function renderDiretoriaAtiva(lista) {
+  var el = document.getElementById('gestaoAtivaDiretoria');
+  if (!lista || !lista.length) {
+    el.innerHTML = '<p style="color:#9ca3af;padding:8px">Nenhum membro cadastrado na diretoria desta gestão.</p>';
+    return;
+  }
+  var html = '<table><thead><tr><th>Nome</th><th>Cargo</th><th>CPF</th></tr></thead><tbody>';
+  for (var i = 0; i < lista.length; i++) {
+    html += '<tr><td style="font-weight:600">' + lista[i].nome + '</td>';
+    html += '<td><span class="badge badge-blue">' + lista[i].cargo + '</span></td>';
+    html += '<td style="color:#6b7280">' + lista[i].cpf + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function abrirModalNovaGestao() {
+  document.getElementById('gestaoNome').value = '';
+  document.getElementById('gestaoInicio').value = '';
+  document.getElementById('gestaoFim').value = '';
+  document.getElementById('gestaoStatus').textContent = '';
+  document.getElementById('modalGestao').style.display = 'flex';
+}
+
+function criarGestao() {
+  var nome = document.getElementById('gestaoNome').value.trim();
+  var inicio = document.getElementById('gestaoInicio').value;
+  var fim = document.getElementById('gestaoFim').value;
+  if (!nome) { document.getElementById('gestaoStatus').textContent = 'Informe o nome da gestão.'; return; }
+  if (!inicio || !fim) { document.getElementById('gestaoStatus').textContent = 'Informe as datas de início e fim.'; return; }
+
+  google.script.run
+    .withSuccessHandler(function(r) {
+      if (r.erro) { document.getElementById('gestaoStatus').textContent = r.erro; return; }
+      document.getElementById('modalGestao').style.display = 'none';
+      carregarGestoes();
+    })
+    .salvarGestao({ nome: nome, inicio: inicio, fim: fim });
+}
+
+function confirmarAtivarGestao(nome) {
+  if (!confirm('Ativar a gestão "' + nome + '"?\n\nIsso irá:\n• Resetar TODOS os perfis para "Membro"\n• Aplicar os cargos da diretoria desta gestão\n• Desativar a gestão atual')) return;
+  google.script.run
+    .withSuccessHandler(function(r) {
+      if (r.erro) { alert('Erro: ' + r.erro); return; }
+      alert(r.msg);
+      // Recarregar a página para refletir as mudanças de perfil
+      window.location.reload();
+    })
+    .ativarGestao(nome);
+}
+
+var gestaoModalAtual = '';
+
+function verDiretoria(nomeGestao) {
+  gestaoModalAtual = nomeGestao;
+  document.getElementById('modalDiretoriaTitulo').textContent = '🏛️ Diretoria - ' + nomeGestao;
+  document.getElementById('dirCpf').value = '';
+  document.getElementById('dirCargo').value = '';
+  document.getElementById('dirStatus').textContent = '';
+  document.getElementById('listaDiretoriaModal').innerHTML = '<div class="loading-overlay"><div class="spinner"></div> Carregando...</div>';
+  document.getElementById('modalDiretoria').style.display = 'flex';
+  google.script.run.withSuccessHandler(renderDiretoriaModal).listarDiretoriaGestao(nomeGestao);
+}
+
+function renderDiretoriaModal(lista) {
+  var el = document.getElementById('listaDiretoriaModal');
+  if (!lista || !lista.length) {
+    el.innerHTML = '<p style="color:#9ca3af">Nenhum membro cadastrado.</p>';
+    return;
+  }
+  var html = '<table><thead><tr><th>Nome</th><th>Cargo</th><th>CPF</th><th style="text-align:right">Ação</th></tr></thead><tbody>';
+  for (var i = 0; i < lista.length; i++) {
+    html += '<tr><td style="font-weight:600">' + lista[i].nome + '</td>';
+    html += '<td><span class="badge badge-blue">' + lista[i].cargo + '</span></td>';
+    html += '<td style="color:#6b7280;font-size:12px">' + lista[i].cpf + '</td>';
+    html += '<td style="text-align:right"><button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px;color:#dc2626;border-color:#fca5a5" onclick="removerDiretMembro(' + lista[i].linha + ')">🗑</button></td></tr>';
+  }
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function adicionarDiretoriaMembro() {
+  var cpf = document.getElementById('dirCpf').value.trim();
+  var cargo = document.getElementById('dirCargo').value;
+  if (!cpf || cpf.replace(/\D/g,'').length < 11) { document.getElementById('dirStatus').textContent = 'CPF inválido.'; return; }
+  if (!cargo) { document.getElementById('dirStatus').textContent = 'Selecione um cargo.'; return; }
+
+  document.getElementById('dirStatus').innerHTML = '<span style="color:#2563eb">Buscando associado...</span>';
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { document.getElementById('dirStatus').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    var nome = r.dados.nomeCompleto;
+    google.script.run.withSuccessHandler(function(r2) {
+      if (r2.erro) { document.getElementById('dirStatus').innerHTML = '<span style="color:#dc2626">' + r2.erro + '</span>'; return; }
+      document.getElementById('dirCpf').value = '';
+      document.getElementById('dirCargo').value = '';
+      document.getElementById('dirStatus').innerHTML = '<span style="color:#16a34a">✅ ' + nome + ' adicionado(a)!</span>';
+      google.script.run.withSuccessHandler(renderDiretoriaModal).listarDiretoriaGestao(gestaoModalAtual);
+      // Se for gestão ativa, atualizar o card
+      if (gestaoModalAtual === gestaoAtivaNome) {
+        google.script.run.withSuccessHandler(renderDiretoriaAtiva).listarDiretoriaGestao(gestaoAtivaNome);
+      }
+    }).adicionarMembroDiretoria(gestaoModalAtual, cpf, nome, cargo);
+  }).buscarAssociadoPorCpf(cpf);
+}
+
+function removerDiretMembro(linha) {
+  if (!confirm('Remover este membro da diretoria?')) return;
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { alert(r.erro); return; }
+    google.script.run.withSuccessHandler(renderDiretoriaModal).listarDiretoriaGestao(gestaoModalAtual);
+    if (gestaoModalAtual === gestaoAtivaNome) {
+      google.script.run.withSuccessHandler(renderDiretoriaAtiva).listarDiretoriaGestao(gestaoAtivaNome);
+    }
+  }).removerMembroDiretoria(linha);
 }
 
 // ===== SALVAR ATUALIZAÇÃO =====
