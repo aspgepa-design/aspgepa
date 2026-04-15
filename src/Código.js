@@ -142,8 +142,7 @@ function obterLogs(limite) {
  */
 function uploadFotoAssociado(base64Data, mimeType, cpf) {
   try {
-    var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
-    var pastaFotos = pastaRaiz.getFoldersByName('Fotos Associados').next();
+    var pastaFotos = obterPastaFotos_();
     
     var cpfLimpo = cpf.replace(/\D/g, '');
     var extensao = mimeType.indexOf('png') !== -1 ? '.png' : '.jpg';
@@ -188,20 +187,7 @@ function salvarUrlFoto(linha, fotoUrl) {
  */
 function uploadFotoCarteirinha(base64Data, mimeType, cpf) {
   try {
-    var pastaFotos;
-    try {
-      var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
-      var pastasCart = pastaRaiz.getFoldersByName('Fotos Carteirinha');
-      if (pastasCart.hasNext()) {
-        pastaFotos = pastasCart.next();
-      } else {
-        pastaFotos = pastaRaiz.createFolder('Fotos Carteirinha');
-      }
-    } catch (e) {
-      // Fallback: usar mesma pasta de fotos de associados
-      var pastaRaiz2 = DriveApp.getFolderById(PASTA_RAIZ_ID);
-      pastaFotos = pastaRaiz2.getFoldersByName('Fotos Associados').next();
-    }
+    var pastaFotos = obterPastaFotos_();
     
     var cpfLimpo = cpf.replace(/\D/g, '');
     var extensao = mimeType.indexOf('png') !== -1 ? '.png' : '.jpg';
@@ -211,11 +197,6 @@ function uploadFotoCarteirinha(base64Data, mimeType, cpf) {
     var existentes = pastaFotos.getFilesByName('cart_' + cpfLimpo + '.jpg');
     while (existentes.hasNext()) existentes.next().setTrashed(true);
     existentes = pastaFotos.getFilesByName('cart_' + cpfLimpo + '.png');
-    while (existentes.hasNext()) existentes.next().setTrashed(true);
-    // Remover formato antigo (sem prefixo cart_)
-    existentes = pastaFotos.getFilesByName(cpfLimpo + '.jpg');
-    while (existentes.hasNext()) existentes.next().setTrashed(true);
-    existentes = pastaFotos.getFilesByName(cpfLimpo + '.png');
     while (existentes.hasNext()) existentes.next().setTrashed(true);
     
     var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, nomeArquivo);
@@ -227,6 +208,21 @@ function uploadFotoCarteirinha(base64Data, mimeType, cpf) {
     return { sucesso: true, url: fotoUrl, fileId: arquivo.getId() };
   } catch (e) {
     return { sucesso: false, erro: 'Erro no upload da foto da carteirinha: ' + e.toString() };
+  }
+}
+
+function obterPastaFotos_() {
+  // Tenta pelo ID da pasta raiz
+  try {
+    var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
+    var pastas = pastaRaiz.getFoldersByName('Fotos Associados');
+    if (pastas.hasNext()) return pastas.next();
+    return pastaRaiz.createFolder('Fotos Associados');
+  } catch (e) {
+    // Fallback: busca por nome no Drive inteiro
+    var it = DriveApp.getFoldersByName('Fotos Associados');
+    if (it.hasNext()) return it.next();
+    return DriveApp.createFolder('Fotos Associados');
   }
 }
 
