@@ -385,6 +385,7 @@
             status.style.backgroundColor = "#d4edda";
             status.style.color = "#155724";
             status.innerHTML = `<strong>✅ Sucesso!</strong> Sua ficha foi enviada e será processada pela equipe administrativa.`;
+            google.script.run.registrarLog(dados.cpf || '', dados.nome || '', 'Nova Inscrição', 'Ficha de inscrição enviada');
             document.getElementById('formInscricao').reset();
             // Resetar foto
             document.getElementById('fotoPreview').style.display = 'none';

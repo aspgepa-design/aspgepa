@@ -824,6 +824,7 @@
             btn.disabled = false;
             if (res.includes('Sucesso')) {
               mostrarMensagem('status', '✅ ' + res, 'sucesso');
+              google.script.run.registrarLog(cpfAssociado, document.getElementById('nomeCompleto').value, 'Atualizou Cadastro', 'Via página Atualização Cadastral');
               fotoAlterada = false;
               fotoBase64 = null;
               var tag = document.getElementById('tagFoto');

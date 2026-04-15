@@ -583,6 +583,7 @@
 
     function preencherDados(d){
       cpfAssociado = d.cpf || '';
+      google.script.run.registrarLog(d.cpf || '', d.nomeCompleto || '', 'Acesso Carteirinha', 'Buscou dados via página Carteirinha');
 
       document.getElementById('dNome').value = d.nomeCompleto || '';
       document.getElementById('dMatricula').value = d.matricula || '';
@@ -877,6 +878,7 @@
           if(res.indexOf('Sucesso') !== -1){
             showMsg('msgSalvar', res, 'ok');
             fotoAlterada = false;
+            google.script.run.registrarLog(cpfAssociado, document.getElementById('dNome').value, 'Atualizou Carteirinha', 'Salvou dados via página Carteirinha');
           } else {
             showMsg('msgSalvar', res, 'erro');
           }
