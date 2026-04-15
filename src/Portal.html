@@ -1195,6 +1195,7 @@ function fazerLogin() {
       btn.disabled = false; btn.textContent = 'Entrar no Portal';
       if (r.erro) { erro.textContent = r.erro; return; }
       usuarioAtual = r;
+      try { localStorage.setItem('aspge_cpf', cpf); } catch(e) {}
       logAcao('Login', 'Perfil: ' + (r.dados.role || 'associado'));
       iniciarApp();
     })
@@ -1208,6 +1209,7 @@ function fazerLogin() {
 function fazerLogout() {
   logAcao('Logout');
   usuarioAtual = null;
+  try { localStorage.removeItem('aspge_cpf'); } catch(e) {}
   document.getElementById('appScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginCpf').value = '';
@@ -2274,6 +2276,21 @@ function renderDocumentos(lista) {
 // ===== DRAG & DROP =====
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
+    // Auto-login persistente
+    try {
+      var cpfSalvo = localStorage.getItem('aspge_cpf');
+      if (cpfSalvo) {
+        google.script.run
+          .withSuccessHandler(function(r) {
+            if (r && !r.erro) {
+              usuarioAtual = r;
+              iniciarApp();
+            }
+          })
+          .autenticarPorCpf(cpfSalvo);
+      }
+    } catch(e) {}
+
     var dz = document.getElementById('dropZone');
     if (!dz) return;
     dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('dragover'); });
