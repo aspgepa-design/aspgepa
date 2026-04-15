@@ -719,6 +719,7 @@ function listarTodosAssociados() {
         linha: i + 1,
         nomeCompleto: nome,
         perfil: String(dados[i][3] || ''),
+        situacao: String(dados[i][4] || '').trim(),
         sexo: String(dados[i][5] || ''),
         whatsapp: String(dados[i][8] || ''),
         email: String(dados[i][9] || ''),

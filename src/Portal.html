@@ -591,6 +591,9 @@ tbody tr:hover{background:#f9fafb}
               <option value="pendente">Cadastro Pendente</option>
               <option value="completo">Cadastro Completo</option>
             </select>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#6b7280;cursor:pointer;white-space:nowrap">
+              <input type="checkbox" id="assocMostrarInativos" onchange="filtrarAssociados()" style="width:auto;cursor:pointer"> Mostrar Inativos
+            </label>
           </div>
 
           <!-- Lista -->
@@ -2303,20 +2306,29 @@ function renderAssociados(data) {
     return;
   }
   todosAssociados = data.associados || [];
-  var completos = todosAssociados.filter(function(a) { return a.cadastroCompleto; }).length;
-  var pendentes = todosAssociados.length - completos;
+  // Stats consideram apenas ativos
+  var ativos = todosAssociados.filter(function(a) { return !ehInativo(a); });
+  var completos = ativos.filter(function(a) { return a.cadastroCompleto; }).length;
+  var pendentes = ativos.length - completos;
 
-  document.getElementById('statTotal').textContent = todosAssociados.length;
+  document.getElementById('statTotal').textContent = ativos.length;
   document.getElementById('statCompletos').textContent = completos;
   document.getElementById('statPendentes').textContent = pendentes;
 
   filtrarAssociados();
 }
 
+function ehInativo(a) {
+  return a.situacao && a.situacao.toLowerCase() === 'inativo';
+}
+
 function filtrarAssociados() {
   var busca = (document.getElementById('assocBusca').value || '').toLowerCase().trim();
   var filtro = document.getElementById('assocFiltro').value;
+  var mostrarInativos = document.getElementById('assocMostrarInativos').checked;
   var lista = todosAssociados.filter(function(a) {
+    // filtro de inativos
+    if (!mostrarInativos && ehInativo(a)) return false;
     // filtro de status
     if (filtro === 'pendente' && a.cadastroCompleto) return false;
     if (filtro === 'completo' && !a.cadastroCompleto) return false;
@@ -2342,7 +2354,9 @@ function filtrarAssociados() {
       : '<div class="assoc-avatar-sm">' + iniciais + '</div>';
 
     var statusHtml;
-    if (a.cadastroCompleto) {
+    if (ehInativo(a)) {
+      statusHtml = '<span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#f3f4f6;color:#9ca3af">Inativo</span>';
+    } else if (a.cadastroCompleto) {
       statusHtml = '<span class="assoc-ok-badge">✓ Completo</span>';
     } else {
       statusHtml = '<span class="assoc-alert">⚠ Pendente (' + a.camposPreenchidos + '/' + a.totalCampos + ')</span>';
@@ -2417,7 +2431,9 @@ function abrirModalAssoc(idx) {
 function filtrarAssociadosLista() {
   var busca = (document.getElementById('assocBusca').value || '').toLowerCase().trim();
   var filtro = document.getElementById('assocFiltro').value;
+  var mostrarInativos = document.getElementById('assocMostrarInativos').checked;
   return todosAssociados.filter(function(a) {
+    if (!mostrarInativos && ehInativo(a)) return false;
     if (filtro === 'pendente' && a.cadastroCompleto) return false;
     if (filtro === 'completo' && !a.cadastroCompleto) return false;
     if (busca) {
