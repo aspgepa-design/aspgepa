@@ -1714,7 +1714,9 @@ function crtExportarPdf() {
     document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
   }).obterDadosExportCarteirinhas(usuarioAtual.dados.cpf, cpfs);
 }
+var crtTemplateBase64Cache = null;
 function crtGerarPdf(carteirinhas, templateBase64) {
+  crtTemplateBase64Cache = templateBase64;
   // Buscar imagens renderizadas para cada associado
   var total = carteirinhas.length, proc = 0;
   var imagens = [];
@@ -1824,7 +1826,7 @@ function crtRenderFallback(item, area, callback) {
   var div = document.createElement('div');
   div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5';
   var bg = document.createElement('img'); bg.style.cssText = 'width:100%;height:100%;display:block';
-  bg.src = 'https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007';
+  bg.src = crtTemplateBase64Cache || 'https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007';
   div.appendChild(bg);
 
   if (item.fotoBase64) {
@@ -1845,7 +1847,7 @@ function crtRenderFallback(item, area, callback) {
   var imgs = div.querySelectorAll('img'), ic = imgs.length, il = 0;
   function ready() { il++; if (il >= ic) capturar(); }
   function capturar() {
-    html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
+    html2canvas(div, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: null })
       .then(function(canvas) { area.removeChild(div); callback(canvas); })
       .catch(function() { area.removeChild(div); callback(null); });
   }
