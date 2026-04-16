@@ -759,7 +759,7 @@ tbody tr:hover{background:#f9fafb}
                 <!-- Preview Card -->
                 <div style="display:flex;flex-direction:column;align-items:center">
                   <div id="crtPreview" style="position:relative;width:85mm;height:112.22mm;overflow:hidden;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);background:#f5f5f5;flex-shrink:0">
-                    <img id="crtBg" src="https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007" style="width:100%;height:100%;display:block" draggable="false">
+                    <img id="crtBg" src="https://drive.google.com/thumbnail?id=1MB8qySrYp0EMQHQnIIFFvHkT_lIVC3ji&sz=w1007" style="width:100%;height:100%;display:block" draggable="false">
                     <div id="crtPhotoFrame" style="position:absolute;overflow:hidden;background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">
                       <span id="crtPhotoPlaceholder" style="font-size:24px;opacity:0.5">📷</span>
                       <img id="crtPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none">
@@ -811,6 +811,13 @@ tbody tr:hover{background:#f9fafb}
                   <!-- Botão Salvar Layout -->
                   <button class="btn btn-primary" onclick="crtSalvarLayout()" id="crtBtnSalvar" style="width:100%;padding:10px">💾 Salvar Layout (para todos)</button>
                   <div id="crtMsgLayout" style="font-size:12px;min-height:20px"></div>
+                  <!-- Template da Carteirinha -->
+                  <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px;margin-top:12px">
+                    <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Imagem Template</h4>
+                    <input type="text" id="crtTemplateIdInput" placeholder="URL do Google Drive da imagem template" style="width:100%;padding:6px 10px;border:1px solid #dee2e6;border-radius:6px;font-size:12px;margin-bottom:8px">
+                    <button class="btn btn-sm" onclick="crtSalvarTemplateId()" style="width:100%;padding:6px;background:#ff6600;color:#fff;border:none;border-radius:6px;font-size:12px">🖼 Salvar Template</button>
+                    <div id="crtMsgTemplate" style="font-size:11px;min-height:16px;margin-top:4px"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1447,6 +1454,10 @@ function crtCarregarConfig() {
         }
       } catch(e){}
     }
+    if (r && r.templateImageId) {
+      document.getElementById('crtBg').src = 'https://drive.google.com/thumbnail?id=' + r.templateImageId + '&sz=w1007';
+      document.getElementById('crtTemplateIdInput').value = 'https://drive.google.com/file/d/' + r.templateImageId + '/view';
+    }
     crtAplicarFrame();
     crtSincronizarFrameUI();
     crtAplicarTodosCampos();
@@ -1531,6 +1542,22 @@ function crtSalvarLayout() {
   }).withFailureHandler(function(e) {
     btn.disabled = false; el.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
   }).salvarConfigCarteirinha(usuarioAtual.dados.cpf, configJson);
+}
+
+function crtSalvarTemplateId() {
+  var url = document.getElementById('crtTemplateIdInput').value.trim();
+  var msg = document.getElementById('crtMsgTemplate');
+  var match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) { msg.innerHTML = '<span style="color:#dc2626">URL inválida. Use um link do Google Drive.</span>'; return; }
+  var imageId = match[1];
+  msg.innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  google.script.run.withSuccessHandler(function(r) {
+    if (r.erro) { msg.innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    msg.innerHTML = '<span style="color:#16a34a">Template atualizado!</span>';
+    document.getElementById('crtBg').src = 'https://drive.google.com/thumbnail?id=' + imageId + '&sz=w1007';
+  }).withFailureHandler(function(e) {
+    msg.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+  }).salvarTemplateImageId(usuarioAtual.dados.cpf, imageId);
 }
 
 // --- Preview associado ---
@@ -1836,7 +1863,7 @@ function crtRenderFallback(item, area, callback) {
   var div = document.createElement('div');
   div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5';
   var bg = document.createElement('img'); bg.style.cssText = 'width:100%;height:100%;display:block';
-  bg.src = crtTemplateBase64Cache || 'https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007';
+  bg.src = crtTemplateBase64Cache || 'https://drive.google.com/thumbnail?id=1MB8qySrYp0EMQHQnIIFFvHkT_lIVC3ji&sz=w1007';
   div.appendChild(bg);
 
   if (item.fotoBase64) {

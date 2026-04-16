@@ -407,7 +407,7 @@
         <!-- COLUNA ESQUERDA: Preview da Carteirinha -->
         <div class="card-preview-wrapper">
           <div class="card-preview" id="cardPreview">
-            <img class="card-bg" src="https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007" alt="Template Carteirinha" draggable="false">
+            <img class="card-bg" id="cardBg" src="https://drive.google.com/thumbnail?id=1MB8qySrYp0EMQHQnIIFFvHkT_lIVC3ji&sz=w1007" alt="Template Carteirinha" draggable="false">
 
             <!-- Frame da foto do associado -->
             <div class="photo-frame empty" id="photoFrame"
@@ -640,6 +640,9 @@
                 }
               }
             } catch(e){}
+          }
+          if(r && r.templateImageId){
+            document.getElementById('cardBg').src = 'https://drive.google.com/thumbnail?id=' + r.templateImageId + '&sz=w1007';
           }
           // Aplicar posições (com config carregada ou padrão)
           aplicarFrameConfig();

@@ -913,7 +913,7 @@ function obterDadosExportCarteirinhas(cpfSolicitante, cpfList) {
   // Template da carteirinha em base64 (evita CORS)
   var templateBase64 = null;
   try {
-    var templateFile = DriveApp.getFileById('1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB');
+    var templateFile = DriveApp.getFileById(obterTemplateImageId_());
     var templateBlob = templateFile.getBlob();
     templateBase64 = 'data:' + templateBlob.getContentType() + ';base64,' + Utilities.base64Encode(templateBlob.getBytes());
   } catch (e) { /* template não disponível */ }
@@ -1319,18 +1319,62 @@ function carregarConfigCarteirinha() {
   try {
     var ss = SpreadsheetApp.openById(PLANILHA_ID);
     var aba = ss.getSheetByName('ConfigCarteirinha');
-    if (!aba) return { config: null };
+    if (!aba) return { config: null, templateImageId: null };
 
     var dados = aba.getDataRange().getValues();
+    var result = { config: null, templateImageId: null };
     for (var i = 1; i < dados.length; i++) {
-      if (dados[i][0] === 'layoutCarteirinha') {
-        return { config: dados[i][1] };
-      }
+      if (dados[i][0] === 'layoutCarteirinha') result.config = dados[i][1];
+      if (dados[i][0] === 'templateImageId') result.templateImageId = dados[i][1];
     }
-    return { config: null };
+    return result;
   } catch (e) {
-    return { config: null };
+    return { config: null, templateImageId: null };
   }
+}
+
+function salvarTemplateImageId(cpfSolicitante, imageId) {
+  var assoc = buscarAssociadoPorCpf(cpfSolicitante);
+  if (assoc.erro) return { erro: 'Usuário não encontrado.' };
+  var perfil = (assoc.dados.perfil || '').toLowerCase();
+  if (perfil.indexOf('sociocultural') === -1) {
+    return { erro: 'Apenas o Diretor Sociocultural pode alterar o template.' };
+  }
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('ConfigCarteirinha');
+    if (!aba) {
+      aba = ss.insertSheet('ConfigCarteirinha');
+      aba.getRange('A1:B1').setValues([['Chave', 'Valor']]);
+      aba.getRange('A1:B1').setFontWeight('bold');
+    }
+    var dados = aba.getDataRange().getValues();
+    var linha = -1;
+    for (var i = 1; i < dados.length; i++) {
+      if (dados[i][0] === 'templateImageId') { linha = i + 1; break; }
+    }
+    if (linha > 0) {
+      aba.getRange(linha, 2).setValue(imageId);
+    } else {
+      aba.appendRow(['templateImageId', imageId]);
+    }
+    return { sucesso: true };
+  } catch (e) {
+    return { erro: 'Erro ao salvar: ' + e.toString() };
+  }
+}
+
+function obterTemplateImageId_() {
+  try {
+    var ss = SpreadsheetApp.openById(PLANILHA_ID);
+    var aba = ss.getSheetByName('ConfigCarteirinha');
+    if (!aba) return '1MB8qySrYp0EMQHQnIIFFvHkT_lIVC3ji';
+    var dados = aba.getDataRange().getValues();
+    for (var i = 1; i < dados.length; i++) {
+      if (dados[i][0] === 'templateImageId' && dados[i][1]) return dados[i][1];
+    }
+  } catch(e) {}
+  return '1MB8qySrYp0EMQHQnIIFFvHkT_lIVC3ji';
 }
 
 /**
