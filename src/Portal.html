@@ -1559,6 +1559,7 @@ function crtCarregarPreview() {
     document.getElementById('crtValidade').textContent = crtFormatarData(val);
     document.getElementById('crtPhotoImg').style.display = 'none';
     document.getElementById('crtPhotoPlaceholder').style.display = '';
+    var ov = document.getElementById('crtSnapshotOverlay'); if (ov) ov.style.display = 'none';
     return;
   }
   // Preencher dados imediatos da lista (nome, cpf, cargo)
@@ -1587,39 +1588,61 @@ function crtCarregarPreview() {
     document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
     var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
     document.getElementById('crtValidade').textContent = crtFormatarData(val);
-    if (r.fotoBase64) {
-      var img = document.getElementById('crtPhotoImg');
-      img.src = r.fotoBase64;
-      img.style.display = 'block';
-      document.getElementById('crtPhotoPlaceholder').style.display = 'none';
-      // Aplicar posição salva da foto se existir
-      img.onload = function() {
-        var fotoCfg = null;
-        try { fotoCfg = d.fotoConfig ? JSON.parse(d.fotoConfig) : null; } catch(e){}
-        if (fotoCfg && fotoCfg.zoom) {
-          var frame = document.getElementById('crtPhotoFrame');
-          var pdfFrameW = frame.offsetWidth;
-          var pdfFrameH = frame.offsetHeight;
-          var savedW = fotoCfg.frameW || pdfFrameW;
-          var savedH = fotoCfg.frameH || pdfFrameH;
-          var ratioW = pdfFrameW / savedW;
-          var ratioH = pdfFrameH / savedH;
-          var scaledZoom = fotoCfg.zoom * ratioW;
-          img.style.objectFit = 'none';
-          img.style.position = 'absolute';
-          img.style.width = (img.naturalWidth * scaledZoom) + 'px';
-          img.style.height = (img.naturalHeight * scaledZoom) + 'px';
-          img.style.left = ((fotoCfg.x || 0) * ratioW) + 'px';
-          img.style.top = ((fotoCfg.y || 0) * ratioH) + 'px';
-        } else {
+    // Tentar carregar imagem renderizada da carteirinha
+    google.script.run.withSuccessHandler(function(imgBase64) {
+      if (imgBase64) {
+        // Usar imagem pronta - sobrepor todo o preview
+        var prev = document.getElementById('crtPreview');
+        var overlay = document.getElementById('crtSnapshotOverlay');
+        if (!overlay) {
+          overlay = document.createElement('img');
+          overlay.id = 'crtSnapshotOverlay';
+          overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;border-radius:4px';
+          prev.appendChild(overlay);
+        }
+        overlay.src = imgBase64;
+        overlay.style.display = 'block';
+      } else {
+        // Sem snapshot, usar foto com posição como fallback
+        var overlay = document.getElementById('crtSnapshotOverlay');
+        if (overlay) overlay.style.display = 'none';
+        if (r.fotoBase64) {
+          var img = document.getElementById('crtPhotoImg');
+          img.src = r.fotoBase64;
+          img.style.display = 'block';
           img.style.objectFit = 'cover';
           img.style.position = '';
           img.style.width = '100%';
           img.style.height = '100%';
           img.style.left = '';
           img.style.top = '';
+          document.getElementById('crtPhotoPlaceholder').style.display = 'none';
         }
-      };
+      }
+    }).withFailureHandler(function() {
+      // Fallback: usar foto normal
+      if (r.fotoBase64) {
+        var img = document.getElementById('crtPhotoImg');
+        img.src = r.fotoBase64;
+        img.style.display = 'block';
+        img.style.objectFit = 'cover';
+        img.style.position = '';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        document.getElementById('crtPhotoPlaceholder').style.display = 'none';
+      }
+    }).obterImagemCarteirinha(cpf);
+    if (r.fotoBase64) {
+      var img = document.getElementById('crtPhotoImg');
+      img.src = r.fotoBase64;
+      img.style.display = 'block';
+      img.style.objectFit = 'cover';
+      img.style.position = '';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.left = '';
+      img.style.top = '';
+      document.getElementById('crtPhotoPlaceholder').style.display = 'none';
     } else {
       document.getElementById('crtPhotoImg').style.display = 'none';
       document.getElementById('crtPhotoPlaceholder').style.display = '';
@@ -1672,6 +1695,7 @@ function crtContador() {
   var n = document.querySelectorAll('.crt-check:checked').length;
   document.getElementById('crtSelecionados').textContent = n + ' selecionado' + (n !== 1 ? 's' : '');
 }
+function crtFormatarData(d) { return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear(); }
 function crtExportarPdf() {
   var cks = document.querySelectorAll('.crt-check:checked'); var cpfs = [];
   for (var i = 0; i < cks.length; i++) cpfs.push(cks[i].value);
@@ -1691,99 +1715,142 @@ function crtExportarPdf() {
   }).obterDadosExportCarteirinhas(usuarioAtual.dados.cpf, cpfs);
 }
 function crtGerarPdf(carteirinhas, templateBase64) {
-  // Usar config atual (já carregada)
-  var fc = { left: crtFrameConfig.left, top: crtFrameConfig.top, width: crtFrameConfig.width, height: crtFrameConfig.height };
-  var cc = {};
-  for (var localId in crtCamposConfig) { cc[crtKeyMap[localId] || localId] = crtCamposConfig[localId]; }
-  crtRenderPdf(carteirinhas, fc, cc, templateBase64);
-}
-function crtFormatarData(d) { return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear(); }
-function crtRenderPdf(carteirinhas, fc, cc, templateBase64) {
-  var area = document.getElementById('crtPdfArea');
-  var cardW = 321, cardH = 424, scale = 3.15;
-  var hoje = new Date(), val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
-  var emStr = crtFormatarData(hoje), valStr = crtFormatarData(val);
-  var total = carteirinhas.length, arr = [], proc = 0;
-  function proxima() {
-    if (proc >= total) { crtMontarPdf(arr); return; }
-    document.getElementById('crtBarra').style.width = Math.round((proc/total)*80) + '%';
-    document.getElementById('crtProgTexto').textContent = 'Renderizando ' + (proc+1) + ' de ' + total + '...';
-    var c = carteirinhas[proc], d = c.dados;
-    var div = document.createElement('div');
-    div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5';
-    var bg = document.createElement('img'); bg.style.cssText = 'width:100%;height:100%;display:block'; bg.src = templateBase64 || '';
-    div.appendChild(bg);
-    var pdfFotoEl = null, pdfFotoCfg = null;
-    if (c.fotoBase64) {
-      var ff = document.createElement('div');
-      ff.style.cssText = 'position:absolute;left:'+fc.left+'%;top:'+fc.top+'%;width:'+fc.width+'%;height:'+fc.height+'%;overflow:hidden';
-      var fi = document.createElement('img'); fi.src = c.fotoBase64;
-      try { pdfFotoCfg = c.dados.fotoConfig ? JSON.parse(c.dados.fotoConfig) : null; } catch(e){}
-      if (pdfFotoCfg && pdfFotoCfg.zoom) {
-        fi.style.cssText = 'position:absolute';
-        pdfFotoEl = fi;
-      } else {
-        fi.style.cssText = 'width:100%;height:100%;object-fit:cover';
-      }
-      ff.appendChild(fi); div.appendChild(ff);
+  // Buscar imagens renderizadas para cada associado
+  var total = carteirinhas.length, proc = 0;
+  var imagens = [];
+  document.getElementById('crtProgTexto').textContent = 'Buscando imagens das carteirinhas...';
+  function buscarProxima() {
+    if (proc >= total) {
+      crtMontarPdfComImagens(imagens);
+      return;
     }
-    var campos = { cardNome:d.nomeCompleto||'', cardMatricula:d.matricula||'', cardCargo:d.cargo||'', cardCpf:d.cpf||'', cardRg:d.rg||'', cardEmissao:emStr, cardValidade:valStr };
-    for (var id in campos) { var cfg = cc[id]; if (!cfg) continue;
-      var s = document.createElement('span');
-      var ws = (id === 'cardNome') ? 'normal' : 'nowrap';
-      var extra = (id === 'cardNome') ? 'max-width:55%;line-height:1.2;' : '';
-      s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:'+ws+';'+extra;
-      s.textContent = campos[id]; div.appendChild(s);
-    }
-    area.appendChild(div);
-    var imgs = div.querySelectorAll('img'), ic = imgs.length, il = 0;
-    function ready() { il++; if (il >= ic) capturar(); }
-    function capturar() {
-      if (pdfFotoEl && pdfFotoCfg) {
-        var pdfFrameW = cardW * fc.width / 100;
-        var pdfFrameH = cardH * fc.height / 100;
-        var savedW = pdfFotoCfg.frameW || pdfFrameW;
-        var savedH = pdfFotoCfg.frameH || pdfFrameH;
-        var ratioW = pdfFrameW / savedW;
-        var ratioH = pdfFrameH / savedH;
-        var scaledZoom = pdfFotoCfg.zoom * ratioW;
-        pdfFotoEl.style.width = (pdfFotoEl.naturalWidth * scaledZoom) + 'px';
-        pdfFotoEl.style.height = (pdfFotoEl.naturalHeight * scaledZoom) + 'px';
-        pdfFotoEl.style.left = ((pdfFotoCfg.x || 0) * ratioW) + 'px';
-        pdfFotoEl.style.top = ((pdfFotoCfg.y || 0) * ratioH) + 'px';
-      }
-      html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
-        .then(function(canvas) { arr.push(canvas); area.removeChild(div); proc++; proxima(); })
-        .catch(function() { arr.push(null); area.removeChild(div); proc++; proxima(); });
-    }
-    if (ic === 0) { capturar(); return; }
-    for (var k = 0; k < imgs.length; k++) { if (imgs[k].complete) ready(); else { imgs[k].onload = ready; imgs[k].onerror = ready; } }
+    document.getElementById('crtBarra').style.width = Math.round((proc/total)*60) + '%';
+    var cpf = carteirinhas[proc].dados.cpf || '';
+    google.script.run.withSuccessHandler(function(imgBase64) {
+      imagens.push({ imgBase64: imgBase64, dados: carteirinhas[proc].dados, fotoBase64: carteirinhas[proc].fotoBase64 });
+      proc++;
+      buscarProxima();
+    }).withFailureHandler(function() {
+      imagens.push({ imgBase64: null, dados: carteirinhas[proc].dados, fotoBase64: carteirinhas[proc].fotoBase64 });
+      proc++;
+      buscarProxima();
+    }).obterImagemCarteirinha(cpf);
   }
-  proxima();
+  buscarProxima();
 }
-function crtMontarPdf(arr) {
-  document.getElementById('crtBarra').style.width = '90%';
+
+function crtMontarPdfComImagens(imagens) {
+  document.getElementById('crtBarra').style.width = '70%';
   document.getElementById('crtProgTexto').textContent = 'Gerando PDF...';
   try {
     var jsPDF = window.jspdf.jsPDF;
     var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
     var cW=85, cH=112.22, cols=2, rows=2, gapX=10, gapY=10;
     var mX=(210-cols*cW-(cols-1)*gapX)/2, mY=(297-rows*cH-(rows-1)*gapY)/2, pp=cols*rows;
-    var validos = arr.filter(function(c){return c});
-    var tp = Math.ceil(validos.length/pp);
-    for (var i=0;i<validos.length;i++) {
-      var pi = i%pp; if (i>0 && pi===0) pdf.addPage('a4','portrait');
-      var col=pi%cols, row=Math.floor(pi/cols);
-      var x=mX+col*(cW+gapX), y=mY+row*(cH+gapY);
-      pdf.addImage(validos[i].toDataURL('image/jpeg',0.95),'JPEG',x,y,cW,cH);
-      pdf.setDrawColor(200); pdf.setLineWidth(0.2); pdf.rect(x,y,cW,cH);
+
+    var processados = 0, canvases = [];
+    var area = document.getElementById('crtPdfArea');
+
+    function processarProxima() {
+      if (processados >= imagens.length) {
+        finalizarPdf();
+        return;
+      }
+      document.getElementById('crtBarra').style.width = (70 + Math.round((processados/imagens.length)*25)) + '%';
+      var item = imagens[processados];
+
+      if (item.imgBase64) {
+        // Usar imagem pronta — criar canvas a partir dela
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          canvases.push(canvas);
+          processados++;
+          processarProxima();
+        };
+        img.onerror = function() {
+          canvases.push(null);
+          processados++;
+          processarProxima();
+        };
+        img.src = item.imgBase64;
+      } else {
+        // Fallback: renderizar com html2canvas (código antigo)
+        crtRenderFallback(item, area, function(canvas) {
+          canvases.push(canvas);
+          processados++;
+          processarProxima();
+        });
+      }
     }
-    document.getElementById('crtBarra').style.width = '100%';
-    document.getElementById('crtProgTexto').textContent = 'Concluído!';
-    pdf.save('Carteirinhas_ASPGE_' + crtFormatarData(new Date()).replace(/\//g,'-') + '.pdf');
-    document.getElementById('crtMsgExport').innerHTML = '<span style="color:#16a34a">PDF gerado! ' + validos.length + ' carteirinha(s) em ' + tp + ' página(s) A4.</span>';
-  } catch(e) { document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
-  document.getElementById('crtBtnPdf').disabled = false;
+
+    function finalizarPdf() {
+      var validos = canvases.filter(function(c){return c});
+      var tp = Math.ceil(validos.length/pp);
+      for (var i=0;i<validos.length;i++) {
+        var pi = i%pp; if (i>0 && pi===0) pdf.addPage('a4','portrait');
+        var col=pi%cols, row=Math.floor(pi/cols);
+        var x=mX+col*(cW+gapX), y=mY+row*(cH+gapY);
+        pdf.addImage(validos[i].toDataURL('image/jpeg',0.95),'JPEG',x,y,cW,cH);
+        pdf.setDrawColor(200); pdf.setLineWidth(0.2); pdf.rect(x,y,cW,cH);
+      }
+      document.getElementById('crtBarra').style.width = '100%';
+      document.getElementById('crtProgTexto').textContent = 'Concluído!';
+      pdf.save('Carteirinhas_ASPGE_' + crtFormatarData(new Date()).replace(/\//g,'-') + '.pdf');
+      document.getElementById('crtMsgExport').innerHTML = '<span style="color:#16a34a">PDF gerado! ' + validos.length + ' carteirinha(s) em ' + tp + ' página(s) A4.</span>';
+      document.getElementById('crtBtnPdf').disabled = false;
+    }
+
+    processarProxima();
+  } catch(e) {
+    document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+    document.getElementById('crtBtnPdf').disabled = false;
+  }
+}
+
+function crtRenderFallback(item, area, callback) {
+  var fc = { left: crtFrameConfig.left, top: crtFrameConfig.top, width: crtFrameConfig.width, height: crtFrameConfig.height };
+  var cc = {};
+  for (var localId in crtCamposConfig) { cc[crtKeyMap[localId] || localId] = crtCamposConfig[localId]; }
+  var cardW = 321, cardH = 424, scale = 3.15;
+  var d = item.dados;
+  var hoje = new Date(), val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+  var emStr = crtFormatarData(hoje), valStr = crtFormatarData(val);
+
+  var div = document.createElement('div');
+  div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5';
+  var bg = document.createElement('img'); bg.style.cssText = 'width:100%;height:100%;display:block';
+  bg.src = 'https://drive.google.com/thumbnail?id=1LeHAW0YXZZqrCjSDbMDnH_kD38Xf84yB&sz=w1007';
+  div.appendChild(bg);
+
+  if (item.fotoBase64) {
+    var ff = document.createElement('div');
+    ff.style.cssText = 'position:absolute;left:'+fc.left+'%;top:'+fc.top+'%;width:'+fc.width+'%;height:'+fc.height+'%;overflow:hidden';
+    var fi = document.createElement('img'); fi.src = item.fotoBase64; fi.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    ff.appendChild(fi); div.appendChild(ff);
+  }
+  var campos = { cardNome:d.nomeCompleto||'', cardMatricula:d.matricula||'', cardCargo:d.cargo||'', cardCpf:d.cpf||'', cardRg:d.rg||'', cardEmissao:emStr, cardValidade:valStr };
+  for (var id in campos) { var cfg = cc[id]; if (!cfg) continue;
+    var s = document.createElement('span');
+    var ws = (id === 'cardNome') ? 'normal' : 'nowrap';
+    var extra = (id === 'cardNome') ? 'max-width:55%;line-height:1.2;' : '';
+    s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:'+ws+';'+extra;
+    s.textContent = campos[id]; div.appendChild(s);
+  }
+  area.appendChild(div);
+  var imgs = div.querySelectorAll('img'), ic = imgs.length, il = 0;
+  function ready() { il++; if (il >= ic) capturar(); }
+  function capturar() {
+    html2canvas(div, { scale: scale, useCORS: false, allowTaint: false, backgroundColor: null })
+      .then(function(canvas) { area.removeChild(div); callback(canvas); })
+      .catch(function() { area.removeChild(div); callback(null); });
+  }
+  if (ic === 0) { capturar(); return; }
+  for (var k = 0; k < imgs.length; k++) { if (imgs[k].complete) ready(); else { imgs[k].onload = ready; imgs[k].onerror = ready; } }
 }
 
 // ===== GERIR EVENTOS =====

@@ -241,6 +241,73 @@ function salvarUrlFotoCarteirinha(linha, fotoUrl) {
 }
 
 /**
+ * Salva imagem renderizada da carteirinha (snapshot do card) na pasta "Carteirinhas".
+ * Substitui se já existir uma anterior para o mesmo CPF.
+ * Retorna URL da imagem salva.
+ */
+function salvarImagemCarteirinha(base64Data, cpf) {
+  try {
+    var pastaRaiz = null;
+    var pastaCarteirinhas = null;
+    try {
+      pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
+      var it = pastaRaiz.getFoldersByName('Carteirinhas');
+      pastaCarteirinhas = it.hasNext() ? it.next() : pastaRaiz.createFolder('Carteirinhas');
+    } catch(e) {
+      var it2 = DriveApp.getFoldersByName('Carteirinhas');
+      pastaCarteirinhas = it2.hasNext() ? it2.next() : DriveApp.createFolder('Carteirinhas');
+    }
+
+    var cpfLimpo = cpf.replace(/\D/g, '');
+    var nomeArquivo = 'carteirinha_' + cpfLimpo + '.png';
+
+    // Remover versão anterior
+    var existentes = pastaCarteirinhas.getFilesByName(nomeArquivo);
+    while (existentes.hasNext()) existentes.next().setTrashed(true);
+
+    var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), 'image/png', nomeArquivo);
+    var arquivo = pastaCarteirinhas.createFile(blob);
+    arquivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    var imgUrl = 'https://drive.google.com/thumbnail?id=' + arquivo.getId() + '&sz=w800';
+    return { sucesso: true, url: imgUrl, fileId: arquivo.getId() };
+  } catch(e) {
+    return { sucesso: false, erro: e.toString() };
+  }
+}
+
+/**
+ * Obtém a imagem renderizada da carteirinha de um associado (da pasta "Carteirinhas").
+ * Retorna base64 da imagem ou null se não existir.
+ */
+function obterImagemCarteirinha(cpf) {
+  try {
+    var cpfLimpo = cpf.replace(/\D/g, '');
+    var nomeArquivo = 'carteirinha_' + cpfLimpo + '.png';
+    var pastaCarteirinhas = null;
+    try {
+      var pastaRaiz = DriveApp.getFolderById(PASTA_RAIZ_ID);
+      var it = pastaRaiz.getFoldersByName('Carteirinhas');
+      if (it.hasNext()) pastaCarteirinhas = it.next();
+    } catch(e) {}
+    if (!pastaCarteirinhas) {
+      var it2 = DriveApp.getFoldersByName('Carteirinhas');
+      if (it2.hasNext()) pastaCarteirinhas = it2.next();
+    }
+    if (!pastaCarteirinhas) return null;
+
+    var arquivos = pastaCarteirinhas.getFilesByName(nomeArquivo);
+    if (!arquivos.hasNext()) return null;
+
+    var file = arquivos.next();
+    var blob = file.getBlob();
+    return 'data:' + blob.getContentType() + ';base64,' + Utilities.base64Encode(blob.getBytes());
+  } catch(e) {
+    return null;
+  }
+}
+
+/**
  * Faz upload de um documento do associado para "Documentos/[CPF]/".
  */
 function uploadDocumento(base64Data, mimeType, nomeOriginal, cpf) {
