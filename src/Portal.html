@@ -258,7 +258,7 @@ tbody tr:hover{background:#f9fafb}
 }
 /* Carteirinha config */
 .crt-overlay{position:absolute;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-weight:700;white-space:nowrap;pointer-events:none;user-select:none}
-#crtNome{white-space:normal;max-width:55%;line-height:1.2}
+#crtNome,#crtCargo{white-space:normal;max-width:55%;line-height:1.2}
 .crt-ctrl{display:flex;align-items:center;gap:6px}.crt-ctrl label{min-width:32px;font-size:11px;font-weight:600;color:#555;margin:0;text-transform:uppercase}
 .crt-ctrl input[type="range"]{flex:1;padding:0;border:none;height:5px;-webkit-appearance:none;background:#dee2e6;border-radius:3px}
 .crt-ctrl input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#0075bf;cursor:pointer}
@@ -752,6 +752,7 @@ tbody tr:hover{background:#f9fafb}
                 <div style="display:flex;gap:6px">
                   <select id="crtPreviewSel" style="flex:1;padding:5px 8px;border:1px solid #dee2e6;border-radius:6px;font-size:12px"><option value="">— Dados de exemplo —</option></select>
                   <button class="btn btn-outline btn-sm" onclick="crtCarregarPreview()" style="padding:4px 10px;font-size:11px">👁 Ver</button>
+                  <button class="btn btn-sm" id="crtBtnEditar" onclick="crtEditarCarteirinha()" style="padding:4px 10px;font-size:11px;background:#ff6600;color:#fff;border:none;border-radius:4px;display:none">✏️ Editar</button>
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start">
@@ -1543,9 +1544,18 @@ function crtPopularPreviewSel() {
   }
   if (old) sel.value = old;
 }
+function crtEditarCarteirinha() {
+  var cpf = document.getElementById('crtPreviewSel').value;
+  if (!cpf) return;
+  google.script.run.withSuccessHandler(function(url) {
+    window.open(url + '?p=carteirinha&cpf=' + encodeURIComponent(cpf), '_blank');
+  }).obterUrlApp();
+}
 function crtCarregarPreview() {
   var cpf = document.getElementById('crtPreviewSel').value;
   var msgEl = document.getElementById('crtMsgLayout');
+  var btnEditar = document.getElementById('crtBtnEditar');
+  if (btnEditar) btnEditar.style.display = cpf ? '' : 'none';
   if (!cpf) {
     // Voltar para dados de exemplo
     document.getElementById('crtNome').textContent = 'NOME DO ASSOCIADO';
@@ -1838,8 +1848,8 @@ function crtRenderFallback(item, area, callback) {
   var campos = { cardNome:d.nomeCompleto||'', cardMatricula:d.matricula||'', cardCargo:d.cargo||'', cardCpf:d.cpf||'', cardRg:d.rg||'', cardEmissao:emStr, cardValidade:valStr };
   for (var id in campos) { var cfg = cc[id]; if (!cfg) continue;
     var s = document.createElement('span');
-    var ws = (id === 'cardNome') ? 'normal' : 'nowrap';
-    var extra = (id === 'cardNome') ? 'max-width:55%;line-height:1.2;' : '';
+    var ws = (id === 'cardNome' || id === 'cardCargo') ? 'normal' : 'nowrap';
+    var extra = (id === 'cardNome' || id === 'cardCargo') ? 'max-width:55%;line-height:1.2;' : '';
     s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:'+ws+';'+extra;
     s.textContent = campos[id]; div.appendChild(s);
   }

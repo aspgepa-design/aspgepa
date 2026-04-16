@@ -221,7 +221,7 @@
       pointer-events: none;
       user-select: none;
     }
-    #cardNome {
+    #cardNome, #cardCargo {
       white-space: normal;
       max-width: 55%;
       line-height: 1.2;
@@ -563,6 +563,16 @@
     });
     var wEl = document.getElementById('dWhatsapp');
     if(wEl) wEl.addEventListener('input', function(e){ e.target.value = mTel(e.target.value); });
+
+    /* Auto-fill CPF from URL parameter (?cpf=...) */
+    if (google.script.url) {
+      google.script.url.getLocation(function(loc) {
+        if (loc && loc.parameter && loc.parameter.cpf) {
+          document.getElementById('cpfBusca').value = mCPF(loc.parameter.cpf);
+          buscarAssociado();
+        }
+      });
+    }
 
     /* ==========================================================
        BUSCA DO ASSOCIADO
