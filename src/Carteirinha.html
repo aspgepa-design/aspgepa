@@ -604,9 +604,19 @@
       document.getElementById('dEmail').value = d.email || '';
 
       // Carregar config salva do layout (para todos)
-      var fotoParaCarregar = (d.fotoCarteirinhaUrl && d.fotoCarteirinhaUrl.trim() !== '')
-        ? d.fotoCarteirinhaUrl
-        : (d.fotoUrl && d.fotoUrl.trim() !== '' ? d.fotoUrl : null);
+      // Foto padrão: coluna R (foto perfil). Se o associado enviou foto específica na carteirinha (coluna S), usa ela.
+      var fotoParaCarregar = null;
+      var fonteUsada = '';
+      if(d.fotoCarteirinhaUrl && d.fotoCarteirinhaUrl.trim() !== ''){
+        fotoParaCarregar = d.fotoCarteirinhaUrl;
+        fonteUsada = 'Foto específica da carteirinha (coluna S)';
+      } else if(d.fotoUrl && d.fotoUrl.trim() !== ''){
+        fotoParaCarregar = d.fotoUrl;
+        fonteUsada = 'Foto de perfil padrão (coluna R)';
+      }
+      if(fonteUsada){
+        google.script.run.registrarLog(d.cpf || '', d.nomeCompleto || '', 'Foto Carteirinha', fonteUsada);
+      }
 
       google.script.run
         .withSuccessHandler(function(r){
