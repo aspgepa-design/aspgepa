@@ -308,6 +308,23 @@ function obterImagemCarteirinha(cpf) {
 }
 
 /**
+ * Valida se o valor da coluna T é um JSON de fotoConfig válido.
+ * Retorna a string se válida, string vazia se não.
+ */
+function validarFotoConfig_(val) {
+  if (!val || typeof val !== 'string') return '';
+  val = val.trim();
+  if (val.charAt(0) !== '{') return '';
+  try {
+    var obj = JSON.parse(val);
+    if (typeof obj.zoom === 'number') return val;
+    return '';
+  } catch(e) {
+    return '';
+  }
+}
+
+/**
  * Faz upload de um documento do associado para "Documentos/[CPF]/".
  */
 function uploadDocumento(base64Data, mimeType, nomeOriginal, cpf) {
@@ -687,7 +704,7 @@ function buscarAssociadoPorCpf(cpfBusca) {
           expeditor: String(dados[i][16] || ''),       // Q - Expeditor
           fotoUrl: String(dados[i][17] || ''),            // R - Foto Perfil
           fotoCarteirinhaUrl: String(dados[i][18] || ''),  // S - Foto Carteirinha
-          fotoConfig: String(dados[i][19] || '')              // T - Config posição foto carteirinha
+          fotoConfig: validarFotoConfig_(String(dados[i][19] || ''))  // T - Config posição foto carteirinha
         }
       };
     }
