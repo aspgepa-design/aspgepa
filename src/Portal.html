@@ -1712,28 +1712,12 @@ function crtExportarPdf() {
 var crtTemplateBase64Cache = null;
 function crtGerarPdf(carteirinhas, templateBase64) {
   crtTemplateBase64Cache = templateBase64;
-  // Buscar imagens renderizadas para cada associado
-  var total = carteirinhas.length, proc = 0;
+  // Sempre usar renderização ao vivo com template atual (ignora snapshots antigos)
   var imagens = [];
-  document.getElementById('crtProgTexto').textContent = 'Buscando imagens das carteirinhas...';
-  function buscarProxima() {
-    if (proc >= total) {
-      crtMontarPdfComImagens(imagens);
-      return;
-    }
-    document.getElementById('crtBarra').style.width = Math.round((proc/total)*60) + '%';
-    var cpf = carteirinhas[proc].dados.cpf || '';
-    google.script.run.withSuccessHandler(function(imgBase64) {
-      imagens.push({ imgBase64: imgBase64, dados: carteirinhas[proc].dados, fotoBase64: carteirinhas[proc].fotoBase64 });
-      proc++;
-      buscarProxima();
-    }).withFailureHandler(function() {
-      imagens.push({ imgBase64: null, dados: carteirinhas[proc].dados, fotoBase64: carteirinhas[proc].fotoBase64 });
-      proc++;
-      buscarProxima();
-    }).obterImagemCarteirinha(cpf);
+  for (var i = 0; i < carteirinhas.length; i++) {
+    imagens.push({ imgBase64: null, dados: carteirinhas[i].dados, fotoBase64: carteirinhas[i].fotoBase64 });
   }
-  buscarProxima();
+  crtMontarPdfComImagens(imagens);
 }
 
 function crtMontarPdfComImagens(imagens) {
