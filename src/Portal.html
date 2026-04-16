@@ -1625,50 +1625,8 @@ function crtCarregarPreview() {
     document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
     var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
     document.getElementById('crtValidade').textContent = crtFormatarData(val);
-    // Tentar carregar imagem renderizada da carteirinha
-    google.script.run.withSuccessHandler(function(imgBase64) {
-      if (imgBase64) {
-        // Usar imagem pronta - sobrepor todo o preview
-        var prev = document.getElementById('crtPreview');
-        var overlay = document.getElementById('crtSnapshotOverlay');
-        if (!overlay) {
-          overlay = document.createElement('img');
-          overlay.id = 'crtSnapshotOverlay';
-          overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;border-radius:4px';
-          prev.appendChild(overlay);
-        }
-        overlay.src = imgBase64;
-        overlay.style.display = 'block';
-      } else {
-        // Sem snapshot, usar foto com posição como fallback
-        var overlay = document.getElementById('crtSnapshotOverlay');
-        if (overlay) overlay.style.display = 'none';
-        if (r.fotoBase64) {
-          var img = document.getElementById('crtPhotoImg');
-          img.src = r.fotoBase64;
-          img.style.display = 'block';
-          img.style.objectFit = 'cover';
-          img.style.position = '';
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.left = '';
-          img.style.top = '';
-          document.getElementById('crtPhotoPlaceholder').style.display = 'none';
-        }
-      }
-    }).withFailureHandler(function() {
-      // Fallback: usar foto normal
-      if (r.fotoBase64) {
-        var img = document.getElementById('crtPhotoImg');
-        img.src = r.fotoBase64;
-        img.style.display = 'block';
-        img.style.objectFit = 'cover';
-        img.style.position = '';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        document.getElementById('crtPhotoPlaceholder').style.display = 'none';
-      }
-    }).obterImagemCarteirinha(cpf);
+    // Sempre usar preview ao vivo (bg + foto + overlays) — snapshot é usado apenas no PDF
+    var ov = document.getElementById('crtSnapshotOverlay'); if (ov) ov.style.display = 'none';
     if (r.fotoBase64) {
       var img = document.getElementById('crtPhotoImg');
       img.src = r.fotoBase64;
