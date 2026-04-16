@@ -1811,7 +1811,15 @@ function crtRenderFallback(item, area, callback) {
   if (item.fotoBase64) {
     var ff = document.createElement('div');
     ff.style.cssText = 'position:absolute;left:'+fc.left+'%;top:'+fc.top+'%;width:'+fc.width+'%;height:'+fc.height+'%;overflow:hidden';
-    var fi = document.createElement('img'); fi.src = item.fotoBase64; fi.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    var fi = document.createElement('img'); fi.src = item.fotoBase64;
+    var fCfg = null;
+    try { if (d.fotoConfig) fCfg = JSON.parse(d.fotoConfig); } catch(e){}
+    if (fCfg && fCfg.zoom) {
+      fi.style.cssText = 'position:absolute;pointer-events:none';
+      fi.setAttribute('data-fotocfg', d.fotoConfig);
+    } else {
+      fi.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    }
     ff.appendChild(fi); div.appendChild(ff);
   }
   var campos = { cardNome:d.nomeCompleto||'', cardMatricula:d.matricula||'', cardCargo:d.cargo||'', cardCpf:d.cpf||'', cardRg:d.rg||'', cardEmissao:emStr, cardValidade:valStr };
@@ -1824,7 +1832,35 @@ function crtRenderFallback(item, area, callback) {
   }
   area.appendChild(div);
   var imgs = div.querySelectorAll('img'), ic = imgs.length, il = 0;
-  function ready() { il++; if (il >= ic) capturar(); }
+  function ready() {
+    il++;
+    if (il >= ic) {
+      // Aplicar fotoConfig a photos com data-fotocfg antes de capturar
+      var cfgImgs = div.querySelectorAll('img[data-fotocfg]');
+      for (var ci = 0; ci < cfgImgs.length; ci++) {
+        try {
+          var cfgI = cfgImgs[ci];
+          var fCfg = JSON.parse(cfgI.getAttribute('data-fotocfg'));
+          var frameEl = cfgI.parentElement;
+          var frameWpx = frameEl.offsetWidth, frameHpx = frameEl.offsetHeight;
+          var zoom = fCfg.zoom;
+          var savedFrameW = fCfg.frameW || frameWpx;
+          var savedFrameH = fCfg.frameH || frameHpx;
+          var ratioW = frameWpx / savedFrameW;
+          var ratioH = frameHpx / savedFrameH;
+          var imgWpx = cfgI.naturalWidth * zoom * ratioW;
+          var imgHpx = cfgI.naturalHeight * zoom * ratioH;
+          var px = (fCfg.x || 0) * ratioW;
+          var py = (fCfg.y || 0) * ratioH;
+          cfgI.style.width = imgWpx + 'px';
+          cfgI.style.height = imgHpx + 'px';
+          cfgI.style.left = px + 'px';
+          cfgI.style.top = py + 'px';
+        } catch(e){}
+      }
+      capturar();
+    }
+  }
   function capturar() {
     html2canvas(div, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: null })
       .then(function(canvas) { area.removeChild(div); callback(canvas); })
