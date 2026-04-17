@@ -830,7 +830,15 @@ tbody tr:hover{background:#f9fafb}
               <p style="font-size:13px;color:#6b7280;margin:0 0 12px">Selecione os associados e gere um PDF A4 com 4 carteirinhas por folha.</p>
               <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
                 <input type="text" id="crtBusca" placeholder="Buscar por nome ou CPF..." style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px" oninput="crtFiltrar()">
-                <button class="btn btn-primary btn-sm" onclick="crtSelTodos(true)">Selecionar Todos</button>
+                <select id="crtFiltroFoto" onchange="crtFiltrar()" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px">
+                  <option value="">Todos</option>
+                  <option value="comFoto">Com foto 📷</option>
+                  <option value="semFoto">Sem foto ❌</option>
+                </select>
+                <select id="crtFiltroCargo" onchange="crtFiltrar()" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;max-width:220px">
+                  <option value="">Todos os cargos</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="crtSelTodos(true)">Selecionar Visíveis</button>
                 <button class="btn btn-outline btn-sm" onclick="crtSelTodos(false)">Limpar</button>
               </div>
               <div id="crtLista" style="max-height:320px;overflow-y:auto;border:1px solid #e9ecef;border-radius:8px;margin-bottom:16px;background:#fafafa">
@@ -1709,9 +1717,11 @@ function crtRenderLista(lista) {
   h += '<th style="padding:8px 12px;text-align:left;width:36px"><input type="checkbox" id="crtCheckAll" onchange="crtSelTodos(this.checked)"></th>';
   h += '<th style="padding:8px 12px;text-align:left">Nome</th><th style="padding:8px 12px;text-align:left">CPF</th>';
   h += '<th style="padding:8px 12px;text-align:left">Cargo</th><th style="padding:8px 12px;text-align:center;width:36px">📷</th></tr></thead><tbody>';
+  var cargos = {};
   for (var i = 0; i < lista.length; i++) {
-    var a = lista[i];
-    h += '<tr class="crt-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" style="border-bottom:1px solid #f3f4f6">';
+    var a = lista[i]; var cargoNorm = (a.cargo||'').trim();
+    if (cargoNorm) cargos[cargoNorm] = true;
+    h += '<tr class="crt-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" data-foto="' + (a.temFoto?'1':'0') + '" data-cargo="' + (cargoNorm||'').toLowerCase() + '" style="border-bottom:1px solid #f3f4f6">';
     h += '<td style="padding:6px 12px"><input type="checkbox" class="crt-check" value="' + a.cpf + '" onchange="crtContador()"></td>';
     h += '<td style="padding:6px 12px;font-weight:600">' + a.nome + '</td>';
     h += '<td style="padding:6px 12px;color:#6b7280">' + a.cpf + '</td>';
@@ -1719,14 +1729,31 @@ function crtRenderLista(lista) {
     h += '<td style="padding:6px 12px;text-align:center">' + (a.temFoto ? '✅' : '❌') + '</td></tr>';
   }
   h += '</tbody></table>'; el.innerHTML = h; crtContador();
+  // Popular filtro de cargos
+  var sel = document.getElementById('crtFiltroCargo');
+  var opts = Object.keys(cargos).sort();
+  sel.innerHTML = '<option value="">Todos os cargos</option>';
+  for (var j = 0; j < opts.length; j++) sel.innerHTML += '<option value="' + opts[j].toLowerCase() + '">' + opts[j] + '</option>';
 }
 function crtFiltrar() {
   var b = (document.getElementById('crtBusca').value || '').toLowerCase().trim();
+  var ff = document.getElementById('crtFiltroFoto').value;
+  var fc = (document.getElementById('crtFiltroCargo').value || '').toLowerCase();
   var rows = document.querySelectorAll('.crt-row');
+  var vis = 0;
   for (var i = 0; i < rows.length; i++) {
     var n = rows[i].getAttribute('data-nome')||'', c = rows[i].getAttribute('data-cpf')||'';
-    rows[i].style.display = (!b || n.indexOf(b) !== -1 || c.indexOf(b) !== -1) ? '' : 'none';
+    var foto = rows[i].getAttribute('data-foto')||'';
+    var cargo = rows[i].getAttribute('data-cargo')||'';
+    var show = true;
+    if (b && n.indexOf(b) === -1 && c.indexOf(b) === -1) show = false;
+    if (ff === 'comFoto' && foto !== '1') show = false;
+    if (ff === 'semFoto' && foto !== '0') show = false;
+    if (fc && cargo !== fc) show = false;
+    rows[i].style.display = show ? '' : 'none';
+    if (show) vis++;
   }
+  document.getElementById('crtSelecionados').textContent = document.querySelectorAll('.crt-check:checked').length + ' selecionados | ' + vis + ' visíveis';
 }
 function crtSelTodos(checked) {
   var cks = document.querySelectorAll('.crt-check');
