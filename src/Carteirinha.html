@@ -924,7 +924,7 @@
         cargo: document.getElementById('dCargo').value,
         cpf: document.getElementById('dCpf').value,
         rg: document.getElementById('dRg').value,
-        fotoConfig: JSON.stringify({ x: fotoX, y: fotoY, zoom: fotoZoom, frameW: frame.offsetWidth, frameH: frame.offsetHeight })
+        fotoConfig: JSON.stringify({ x: fotoX, y: fotoY, zoom: fotoZoom, frameW: frame.offsetWidth, frameH: frame.offsetHeight, naturalWidth: document.getElementById('photoImg').naturalWidth, naturalHeight: document.getElementById('photoImg').naturalHeight })
       };
       if(novaFotoUrl) dados.fotoCarteirinhaUrl = novaFotoUrl;
 

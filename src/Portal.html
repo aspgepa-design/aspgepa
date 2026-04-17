@@ -1625,11 +1625,20 @@ function crtCarregarPreview() {
     document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
     var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
     document.getElementById('crtValidade').textContent = crtFormatarData(val);
-    // Sempre usar preview ao vivo (bg + foto + overlays) — snapshot é usado apenas no PDF
+    // Sempre usar preview ao vivo (bg + foto + overlays)
     var ov = document.getElementById('crtSnapshotOverlay'); if (ov) ov.style.display = 'none';
-    if (r.fotoBase64) {
+    // Usar thumbnail URL (mesma resolução da Carteirinha) para fotoConfig funcionar corretamente
+    var fotoUrlSrc = d.fotoCarteirinhaUrl || d.fotoUrl || '';
+    var thumbUrl = null;
+    if (fotoUrlSrc) {
+      var m = fotoUrlSrc.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (!m) m = fotoUrlSrc.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (m) thumbUrl = 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w400';
+    }
+    var fotoSrc = thumbUrl || r.fotoBase64;
+    if (fotoSrc) {
       var img = document.getElementById('crtPhotoImg');
-      img.src = r.fotoBase64;
+      img.src = fotoSrc;
       img.style.display = 'block';
       document.getElementById('crtPhotoPlaceholder').style.display = 'none';
       // Aplicar fotoConfig (posição/zoom) como na Carteirinha.html
@@ -1882,6 +1891,13 @@ function crtRenderFallback(item, area, callback) {
           var frameEl = cfgI.parentElement;
           var frameWpx = frameEl.offsetWidth, frameHpx = frameEl.offsetHeight;
           var zoom = fCfg.zoom;
+          // Ajustar zoom para diferença de resolução (fotoConfig salvo com thumbnail w400)
+          if (fCfg.naturalWidth && fCfg.naturalWidth !== cfgI.naturalWidth) {
+            zoom = zoom * (fCfg.naturalWidth / cfgI.naturalWidth);
+          } else if (!fCfg.naturalWidth && cfgI.naturalWidth > 500) {
+            // Config antigo sem naturalWidth — thumbnail era ~400px de largura
+            zoom = zoom * (400 / cfgI.naturalWidth);
+          }
           var savedFrameW = fCfg.frameW || frameWpx;
           var savedFrameH = fCfg.frameH || frameHpx;
           var ratioW = frameWpx / savedFrameW;
