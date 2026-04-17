@@ -754,12 +754,23 @@
           fotoX = savedFotoConfig.x || 0;
           fotoY = savedFotoConfig.y || 0;
           fotoZoom = savedFotoConfig.zoom || 1;
+          console.log('=== [CARTEIRINHA] Foto Config (salvo) ===');
+          console.log('savedFotoConfig:', JSON.stringify(savedFotoConfig));
           savedFotoConfig = null;
         } else {
           var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
           fotoZoom = Math.max(frameW / img.naturalWidth, frameH / img.naturalHeight);
           centralizarFoto();
+          console.log('=== [CARTEIRINHA] Foto Config (auto) ===');
         }
+        console.log('Frame DOM: offsetWidth=' + frame.offsetWidth + 'px, offsetHeight=' + frame.offsetHeight + 'px');
+        console.log('Frame CSS: left=' + frame.style.left + ', top=' + frame.style.top + ', width=' + frame.style.width + ', height=' + frame.style.height);
+        console.log('Img natural: ' + img.naturalWidth + 'x' + img.naturalHeight);
+        console.log('fotoX=' + fotoX + ', fotoY=' + fotoY + ', fotoZoom=' + fotoZoom);
+        console.log('Img renderizada: width=' + (img.naturalWidth * fotoZoom).toFixed(1) + 'px, height=' + (img.naturalHeight * fotoZoom).toFixed(1) + 'px');
+        console.log('Img style: left=' + fotoX.toFixed(1) + 'px, top=' + fotoY.toFixed(1) + 'px');
+        console.log('frameConfig:', JSON.stringify(frameConfig));
+        console.log('==========================================');
         aplicarTransform();
         document.getElementById('zoomSlider').value = fotoZoom;
         document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
