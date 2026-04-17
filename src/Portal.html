@@ -1732,7 +1732,7 @@ function crtRenderLista(lista) {
   // Popular filtro de cargos
   var sel = document.getElementById('crtFiltroCargo');
   var opts = Object.keys(cargos).sort();
-  sel.innerHTML = '<option value="">Todos os cargos</option>';
+  sel.innerHTML = '<option value="">Todos os cargos</option><option value="__comCargo">Com cargo definido</option><option value="__semCargo">Sem cargo definido</option>';
   for (var j = 0; j < opts.length; j++) sel.innerHTML += '<option value="' + opts[j].toLowerCase() + '">' + opts[j] + '</option>';
 }
 function crtFiltrar() {
@@ -1749,7 +1749,9 @@ function crtFiltrar() {
     if (b && n.indexOf(b) === -1 && c.indexOf(b) === -1) show = false;
     if (ff === 'comFoto' && foto !== '1') show = false;
     if (ff === 'semFoto' && foto !== '0') show = false;
-    if (fc && cargo !== fc) show = false;
+    if (fc === '__comCargo' && !cargo) show = false;
+    if (fc === '__semCargo' && cargo) show = false;
+    if (fc && fc !== '__comCargo' && fc !== '__semCargo' && cargo !== fc) show = false;
     rows[i].style.display = show ? '' : 'none';
     if (show) vis++;
   }
