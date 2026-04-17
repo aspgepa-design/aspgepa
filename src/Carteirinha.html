@@ -466,10 +466,10 @@
             </div>
 
             <div class="zoom-controls">
-              <button class="pos-btn" onclick="ajustarZoom(-0.05)">&#8722;</button>
-              <input type="range" class="zoom-slider" id="zoomSlider" min="0.5" max="3" step="0.05" value="1" oninput="setZoom(this.value)">
-              <button class="pos-btn" onclick="ajustarZoom(0.05)">+</button>
-              <span class="zoom-label" id="zoomLabel">100%</span>
+              <button class="pos-btn" onclick="ajustarZoom(-0.1)">&#8722;</button>
+              <input type="range" class="zoom-slider" id="zoomSlider" min="0.5" max="3" step="0.1" value="1" oninput="setZoom(this.value)">
+              <button class="pos-btn" onclick="ajustarZoom(0.1)">+</button>
+              <input type="number" class="zoom-label" id="zoomLabel" min="50" max="300" step="10" value="100" style="width:60px;text-align:center;" oninput="setZoom(this.value/100)">%
             </div>
           </div>
 
@@ -724,7 +724,7 @@
           aplicarTransform();
 
           document.getElementById('zoomSlider').value = fotoZoom;
-          document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
+          document.getElementById('zoomLabel').value = Math.round(fotoZoom * 100);
         };
 
         document.getElementById('posControls').style.display = 'block';
@@ -773,7 +773,7 @@
         console.log('==========================================');
         aplicarTransform();
         document.getElementById('zoomSlider').value = fotoZoom;
-        document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
+        document.getElementById('zoomLabel').value = Math.round(fotoZoom * 100);
         document.getElementById('posControls').style.display = 'block';
       };
 
@@ -811,14 +811,15 @@
       centralizarFoto();
       aplicarTransform();
       document.getElementById('zoomSlider').value = fotoZoom;
-      document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
+      document.getElementById('zoomLabel').value = Math.round(fotoZoom * 100);
     }
 
     function setZoom(val){
       fotoZoom = parseFloat(val);
       centralizarFoto();
       aplicarTransform();
-      document.getElementById('zoomLabel').textContent = Math.round(fotoZoom * 100) + '%';
+      document.getElementById('zoomSlider').value = fotoZoom;
+      document.getElementById('zoomLabel').value = Math.round(fotoZoom * 100);
     }
 
     /* ---------- Drag ---------- */
