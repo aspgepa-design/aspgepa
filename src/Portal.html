@@ -1631,13 +1631,35 @@ function crtCarregarPreview() {
       var img = document.getElementById('crtPhotoImg');
       img.src = r.fotoBase64;
       img.style.display = 'block';
-      img.style.objectFit = 'cover';
-      img.style.position = '';
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.left = '';
-      img.style.top = '';
       document.getElementById('crtPhotoPlaceholder').style.display = 'none';
+      // Aplicar fotoConfig (posição/zoom) como na Carteirinha.html
+      var fCfg = null;
+      try { if (d.fotoConfig) fCfg = JSON.parse(d.fotoConfig); } catch(e){}
+      if (fCfg && fCfg.zoom) {
+        img.style.objectFit = '';
+        img.style.position = 'absolute';
+        img.onload = function() {
+          var frame = document.getElementById('crtPhotoFrame');
+          var frameWpx = frame.offsetWidth, frameHpx = frame.offsetHeight;
+          var savedFrameW = fCfg.frameW || frameWpx;
+          var savedFrameH = fCfg.frameH || frameHpx;
+          var ratioW = frameWpx / savedFrameW;
+          var ratioH = frameHpx / savedFrameH;
+          var zoom = fCfg.zoom;
+          img.style.width = (img.naturalWidth * zoom * ratioW) + 'px';
+          img.style.height = (img.naturalHeight * zoom * ratioH) + 'px';
+          img.style.left = ((fCfg.x || 0) * ratioW) + 'px';
+          img.style.top = ((fCfg.y || 0) * ratioH) + 'px';
+        };
+        if (img.complete) img.onload();
+      } else {
+        img.style.objectFit = 'cover';
+        img.style.position = '';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.left = '';
+        img.style.top = '';
+      }
     } else {
       document.getElementById('crtPhotoImg').style.display = 'none';
       document.getElementById('crtPhotoPlaceholder').style.display = '';
