@@ -521,7 +521,6 @@
     <p class="footer-text">&copy; 2026 ASPGE-PA &mdash; Diretoria Executiva</p>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     /* ==========================================================
        VARIÁVEIS GLOBAIS
@@ -925,8 +924,6 @@
             showMsg('msgSalvar', res, 'ok');
             fotoAlterada = false;
             google.script.run.registrarLog(cpfAssociado, document.getElementById('dNome').value, 'Atualizou Carteirinha', 'Salvou dados via página Carteirinha');
-            // Capturar snapshot da carteirinha e salvar no Drive
-            capturarSnapshotCarteirinha();
           } else {
             showMsg('msgSalvar', res, 'erro');
           }
@@ -936,31 +933,6 @@
           showMsg('msgSalvar','Erro: ' + err.message, 'erro');
         })
         .atualizarAssociado(linhaAssociado, dados);
-    }
-
-    function capturarSnapshotCarteirinha(){
-      var card = document.getElementById('cardPreview');
-      if(!card || !cpfAssociado) return;
-      // Remover borda do photo-frame temporariamente
-      var pf = document.getElementById('photoFrame');
-      var oldBorder = pf.style.border;
-      pf.style.border = 'none';
-      showMsg('msgSalvar', 'Gerando imagem da carteirinha...', 'info');
-      html2canvas(card, { scale: 3, useCORS: true, allowTaint: true, backgroundColor: null }).then(function(canvas){
-        pf.style.border = oldBorder;
-        var dataUrl = canvas.toDataURL('image/png');
-        var base64 = dataUrl.split(',')[1];
-        google.script.run
-          .withSuccessHandler(function(r){
-            if(r.sucesso){
-              showMsg('msgSalvar', 'Carteirinha salva com sucesso!', 'ok');
-            }
-          })
-          .withFailureHandler(function(){})
-          .salvarImagemCarteirinha(base64, cpfAssociado);
-      }).catch(function(){
-        pf.style.border = oldBorder;
-      });
     }
 
     /* ==========================================================
