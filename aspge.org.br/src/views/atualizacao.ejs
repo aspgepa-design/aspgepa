@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atualização Cadastral - ASPGE-PA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 28px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .search-section {
+      background: #f9fafb;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 32px;
+    }
+    .search-input {
+      display: flex;
+      gap: 12px;
+    }
+    .search-input input {
+      flex: 1;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+    .search-input button {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .form-section {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .tag-ok {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .tag-pendente {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    input, select {
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    input.preenchido {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+    input.vazio {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      display: none;
+    }
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      display: block;
+    }
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+    }
+    .hidden {
+      display: none;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">A</div>
+      <h1>Atualização Cadastral</h1>
+      <p class="subtitle">Atualize seus dados cadastrais na ASPGE-PA</p>
+    </div>
+    
+    <div class="search-section" id="secaoBusca">
+      <h3 style="margin-bottom:16px;font-size:16px">Buscar Associado</h3>
+      <div class="search-input">
+        <input type="text" id="buscaCpf" placeholder="Digite seu CF">
+        <button onclick="buscarAssociado()">Buscar</button>
+      </div>
+      <p id="buscaStatus" style="margin-top:12px;font-size:14px;color:#6b7280"></p>
+    </div>
+    
+    <form id="formAtualizacao" class="hidden">
+      <div id="dadosHeader" style="margin-bottom:24px;padding:16px;background:#f9fafb;border-radius:12px;">
+        <h3 id="nomeAssociado" style="font-size:18px;font-weight:700"></h3>
+      </div>
+      
+      <div class="form-section">
+        <h2 class="section-title">Dados Pessoais</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>RG <span class="tag tag-pendente" id="tagRg">PENDENTE</span></label>
+            <input type="text" id="rg" name="rg">
+          </div>
+          <div class="form-group">
+            <label>Órgão Expedidor <span class="tag tag-pendente" id="tagExpeditor">PENDENTE</span></label>
+            <input type="text" id="expeditor" name="expeditor">
+          </div>
+          <div class="form-group">
+            <label>Matrícula <span class="tag tag-pendente" id="tagMatricula">PENDENTE</span></label>
+            <input type="text" id="matricula" name="matricula">
+          </div>
+          <div class="form-group">
+            <label>Cargo <span class="tag tag-pendente" id="tagCargo">PENDENTE</span></label>
+            <input type="text" id="cargo" name="cargo">
+          </div>
+          <div class="form-group">
+            <label>WhatsApp <span class="tag tag-pendente" id="tagWhatsapp">PENDENTE</span></label>
+            <input type="text" id="whatsapp" name="whatsapp">
+          </div>
+          <div class="form-group">
+            <label>Email <span class="tag tag-pendente" id="tagEmail">PENDENTE</span></label>
+            <input type="email" id="email" name="email">
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn-submit" id="btnSubmit">Salvar Alterações</button>
+      
+      <div id="statusMsg" class="status"></div>
+    </form>
+    
+    <a href="/" class="back-link">← Voltar para o login</a>
+  </div>
+
+  <script>
+    let associadoId = null;
+    
+    function maskCpf(value) {
+      return value.replace(/\D/g, '')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    
+    function maskWhatsapp(value) {
+      return value.replace(/\D/g, '')
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d)/, '$1-$2');
+    }
+    
+    document.getElementById('buscaCpf').addEventListener('input', function(e) {
+      e.target.value = maskCpf(e.target.value);
+    });
+    
+    document.getElementById('whatsapp').addEventListener('input', function(e) {
+      e.target.value = maskWhatsapp(e.target.value);
+    });
+    
+    async function buscarAssociado() {
+      const cpf = document.getElementById('buscaCpf').value;
+      const status = document.getElementById('buscaStatus');
+      
+      status.textContent = 'Buscando...';
+      
+      try {
+        const response = await fetch(`/api/associados/cpf/${cpf}`);
+        const data = await response.json();
+        
+        if (data.sucesso) {
+          associadoId = data.dados.id;
+          
+          document.getElementById('nomeAssociado').textContent = data.dados.nomeCompleto;
+          
+          // Preencher campos
+          document.getElementById('rg').value = data.dados.rg || '';
+          document.getElementById('expeditor').value = data.dados.expeditor || '';
+          document.getElementById('matricula').value = data.dados.matricula || '';
+          document.getElementById('cargo').value = data.dados.cargo || '';
+          document.getElementById('whatsapp').value = data.dados.whatsapp || '';
+          document.getElementById('email').value = data.dados.email || '';
+          
+          // Atualizar tags
+          atualizarTag('rg', data.dados.rg);
+          atualizarTag('expeditor', data.dados.expeditor);
+          atualizarTag('matricula', data.dados.matricula);
+          atualizarTag('cargo', data.dados.cargo);
+          atualizarTag('whatsapp', data.dados.whatsapp);
+          atualizarTag('email', data.dados.email);
+          
+          document.getElementById('secaoBusca').classList.add('hidden');
+          document.getElementById('formAtualizacao').classList.remove('hidden');
+        } else {
+          status.textContent = data.erro || 'Associado não encontrado.';
+        }
+      } catch (error) {
+        status.textContent = 'Erro de conexão. Tente novamente.';
+      }
+    }
+    
+    function atualizarTag(campo, valor) {
+      const tag = document.getElementById('tag' + campo.charAt(0).toUpperCase() + campo.slice(1));
+      const input = document.getElementById(campo);
+      
+      if (valor && valor.trim() !== '' && valor.toLowerCase() !== 'não') {
+        tag.textContent = '✓ OK';
+        tag.className = 'tag tag-ok';
+        input.classList.add('preenchido');
+        input.classList.remove('vazio');
+      } else {
+        tag.textContent = 'PENDENTE';
+        tag.className = 'tag tag-pendente';
+        input.classList.add('vazio');
+        input.classList.remove('preenchido');
+      }
+    }
+    
+    // Atualizar tags ao digitar
+    ['rg', 'expeditor', 'matricula', 'cargo', 'whatsapp', 'email'].forEach(campo => {
+      document.getElementById(campo).addEventListener('input', function() {
+        atualizarTag(campo, this.value);
+      });
+    });
+    
+    // Submit
+    document.getElementById('formAtualizacao').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('btnSubmit');
+      const status = document.getElementById('statusMsg');
+      
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      status.className = 'status';
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+      
+      try {
+        const response = await fetch(`/api/associados/${associadoId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.sucesso) {
+          status.className = 'status success';
+          status.textContent = 'Dados atualizados com sucesso!';
+        } else {
+          status.className = 'status error';
+          status.textContent = result.erro || 'Erro ao atualizar.';
+        }
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = 'Erro de conexão. Tente novamente.';
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Salvar Alterações';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPGE-PA - Associação dos Procuradores do Estado do Pará</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6}
+
+/* HEADER */
+.header{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-img{width:48px;height:48px;object-fit:contain}
+.logo-text{font-weight:900;color:#dc2626;font-size:20px;letter-spacing:-.5px}
+.nav-links{display:flex;gap:8px}
+.nav-link{padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:.2s}
+.nav-link-primary{background:#0075bf;color:#fff}.nav-link-primary:hover{background:#005a91}
+.nav-link-secondary{color:#4b5563}.nav-link-secondary:hover{background:#f3f4f6}
+
+/* HERO BANNER */
+.hero{position:relative;background:linear-gradient(135deg,#dc2626 0%,#16a34a 50%,#0075bf 100%);color:#fff;padding:80px 24px;overflow:hidden}
+.hero-bg{position:absolute;top:0;right:0;bottom:0;left:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>') center/cover;opacity:.3}
+.hero-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.hero h1{font-size:48px;font-weight:900;margin-bottom:16px;line-height:1.1}
+.hero p{font-size:20px;opacity:.9;max-width:600px;margin-bottom:32px}
+.hero-btn{display:inline-block;padding:16px 32px;background:#fff;color:#dc2626;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;transition:.2s}
+.hero-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+/* SECTIONS */
+.section{padding:64px 24px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-title{font-size:32px;font-weight:900;color:#dc2626;margin-bottom:48px;text-align:center}
+
+/* CARDS GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.card{background:#fff;border-radius:16px;padding:32px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card h3{font-size:20px;font-weight:700;color:#dc2626;margin-bottom:12px}
+.card p{color:#6b7280;font-size:15px}
+
+/* INFO CARDS */
+.info-card{background:linear-gradient(135deg,#fee2e2 0%,#dcfce7 50%,#eff6ff 100%);border:1px solid #bfdbfe}
+.info-card h3{color:#dc2626}
+.info-card p{color:#dc2626}
+
+/* NEWS CARDS */
+.news-card{overflow:hidden}
+.news-card h3{font-size:18px;margin-bottom:8px}
+.news-date{font-size:12px;color:#9ca3af;margin-bottom:12px;display:block}
+.news-desc{color:#6b7280;font-size:14px;line-height:1.5}
+
+/* POLL CARD */
+.poll-card{background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border:1px solid #fcd34d}
+.poll-card h3{color:#92400e}
+.poll-status{display:inline-block;padding:4px 12px;background:#fff;border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:12px}
+
+/* FOOTER */
+.footer{background:#1e3a5f;color:#fff;padding:48px 24px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;margin-bottom:32px}
+.footer h4{font-size:16px;font-weight:700;margin-bottom:16px}
+.footer a{color:#93c5fd;text-decoration:none;display:block;margin-bottom:8px;font-size:14px}
+.footer a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;text-align:center;font-size:13px;opacity:.7}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero h1{font-size:32px}
+  .hero p{font-size:16px}
+  .section-title{font-size:24px}
+  .header-inner{flex-direction:column;gap:16px}
+  .nav-links{flex-direction:column;width:100%}
+  .nav-link{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <img src="/public/logo.png" alt="ASPGE-PA Logo" class="logo-img">
+      <div class="logo-text">ASPGE-PA</div>
+    </a>
+    <nav class="nav-links">
+      <a href="#sobre" class="nav-link nav-link-secondary">Sobre</a>
+      <a href="#noticias" class="nav-link nav-link-secondary">Notícias</a>
+      <a href="#enquetes" class="nav-link nav-link-secondary">Enquetes</a>
+      <a href="/login" class="nav-link nav-link-primary">Acesso Associados</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO BANNER -->
+<section class="hero" id="banner">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <h1 id="hero-title">ASPGE-PA</h1>
+    <p id="hero-subtitle">Associação dos Procuradores do Estado do Pará</p>
+    <a href="/login" class="hero-btn">Acessar Portal</a>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section class="section" id="sobre">
+  <div class="section-inner">
+    <h2 class="section-title">Sobre a ASPGE-PA</h2>
+    <div class="grid">
+      <div class="card info-card">
+        <h3>Missão</h3>
+        <p id="missao-text">Carregando...</p>
+      </div>
+      <div class="card info-card">
+        <h3>Visão</h3>
+        <p id="visao-text">Carregando...</p>
+      </div>
+      <div class="card info-card">
+        <h3>Valores</h3>
+        <p id="valores-text">Carregando...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRETORIA -->
+<section class="section" id="diretoria">
+  <div class="section-inner">
+    <h2 class="section-title">Diretoria</h2>
+    <div class="grid" id="diretoria-grid">
+      <p>Carregando diretoria...</p>
+    </div>
+  </div>
+</section>
+
+<!-- NOTÍCIAS -->
+<section class="section" id="noticias" style="display:none">
+  <div class="section-inner">
+    <h2 class="section-title">Notícias</h2>
+    <div class="grid" id="noticias-grid">
+      <p>Carregando notícias...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ENQUETES -->
+<section class="section" id="enquetes" style="display:none">
+  <div class="section-inner">
+    <h2 class="section-title">Enquetes</h2>
+    <div class="grid" id="enquetes-grid">
+      <p>Carregando enquetes...</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <h4>Links Rápidos</h4>
+        <div id="links-rapidos">
+          <a href="/login">Portal do Associado</a>
+          <a href="/inscricao">Ficha de Inscrição</a>
+        </div>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <p style="opacity:.8;font-size:14px">Belém, Pará</p>
+      </div>
+      <div>
+        <h4>ASPGE-PA</h4>
+        <p style="opacity:.8;font-size:14px">Associação dos Procuradores do Estado do Pará</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 ASPGE-PA. Todos os direitos reservados.
+    </div>
+  </div>
+</footer>
+
+<script>
+async function carregarConfig() {
+  try {
+    const response = await fetch('/api/site-config');
+    const data = await response.json();
+    
+    if (data.sucesso && data.dados) {
+      const config = data.dados;
+      
+      // Atualizar textos
+      if (config.sobreTexto) document.getElementById('hero-subtitle').textContent = config.sobreTexto;
+      if (config.missao) document.getElementById('missao-text').textContent = config.missao;
+      if (config.visao) document.getElementById('visao-text').textContent = config.visao;
+      if (config.valores) document.getElementById('valores-text').textContent = config.valores;
+      
+      // Mostrar/ocultar seções
+      if (config.mostrarNoticias) document.getElementById('noticias').style.display = 'block';
+      if (config.mostrarEnquetes) document.getElementById('enquetes').style.display = 'block';
+      
+      // Links rápidos
+      if (config.linksRapidos && config.linksRapidos.length > 0) {
+        const linksContainer = document.getElementById('links-rapidos');
+        linksContainer.innerHTML = config.linksRapidos.map(link => 
+          `<a href="${link.url}">${link.titulo}</a>`
+        ).join('');
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao carregar configurações:', error);
+  }
+}
+
+async function carregarDiretoria() {
+  try {
+    const response = await fetch('/api/gestoes/ativa');
+    const data = await response.json();
+    
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      const gestaoAtiva = data.dados.find(g => g.ativa) || data.dados[0];
+      
+      if (gestaoAtiva.membros && gestaoAtiva.membros.length > 0) {
+        const grid = document.getElementById('diretoria-grid');
+        grid.innerHTML = gestaoAtiva.membros.map(membro => `
+          <div class="card">
+            <h3>${membro.nome}</h3>
+            <p style="color:#2563eb;font-weight:600">${membro.cargo}</p>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao carregar diretoria:', error);
+  }
+}
+
+async function carregarNoticias() {
+  try {
+    const response = await fetch('/api/noticias?limite=3');
+    const data = await response.json();
+    
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      const grid = document.getElementById('noticias-grid');
+      grid.innerHTML = data.dados.map(noticia => `
+        <div class="card news-card">
+          <h3>${noticia.titulo}</h3>
+          <span class="news-date">${new Date(noticia.dataPublicacao).toLocaleDateString('pt-BR')}</span>
+          <p class="news-desc">${noticia.descricao || noticia.conteudo?.substring(0, 150) + '...'}</p>
+        </div>
+      `).join('');
+    } else {
+      document.getElementById('noticias-grid').innerHTML = '<p>Nenhuma notícia publicada.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar notícias:', error);
+  }
+}
+
+async function carregarEnquetes() {
+  try {
+    const response = await fetch('/api/votacoes');
+    const data = await response.json();
+    
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      const enquetesAbertas = data.dados.filter(v => v.status === 'Aberta');
+      
+      if (enquetesAbertas.length > 0) {
+        const grid = document.getElementById('enquetes-grid');
+        grid.innerHTML = enquetesAbertas.map(enquete => `
+          <div class="card poll-card">
+            <span class="poll-status">${enquete.status}</span>
+            <h3>${enquete.titulo}</h3>
+            <p style="color:#92400e;font-size:14px;margin-top:8px">${enquete.votos} votos</p>
+            <a href="/login" style="display:inline-block;margin-top:12px;padding:8px 16px;background:#fff;color:#92400e;text-decoration:none;border-radius:8px;font-weight:600;font-size:12px">Participar</a>
+          </div>
+        `).join('');
+      } else {
+        document.getElementById('enquetes-grid').innerHTML = '<p>Nenhuma enquete aberta no momento.</p>';
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao carregar enquetes:', error);
+  }
+}
+
+// Carregar dados ao iniciar
+carregarConfig();
+carregarDiretoria();
+carregarNoticias();
+carregarEnquetes();
+</script>
+
+</body>
+</html>

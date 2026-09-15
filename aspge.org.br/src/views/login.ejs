@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login - ASPGE-PA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937}
+
+.login-bg{min-height:100vh;background:linear-gradient(135deg,#dc2626 0%,#16a34a 50%,#0075bf 100%);display:flex;align-items:center;justify-content:center;padding:16px}
+.login-card{max-width:420px;width:100%;background:#fff;border-radius:24px;box-shadow:0 25px 50px rgba(0,0,0,.25);padding:48px 40px;text-align:center}
+.login-logo{width:80px;height:80px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;object-fit:contain}
+.login-card h1{font-size:22px;font-weight:900;color:#111827;margin-bottom:4px}
+.login-card .subtitle{color:#6b7280;margin-bottom:32px;font-size:14px}
+.login-input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid #e5e7eb;font-size:15px;outline:none;transition:.2s;margin-bottom:12px}
+.login-input:focus{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.15)}
+.login-btn{width:100%;padding:16px;font-size:16px;background:#dc2626;color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s;margin-top:8px}
+.login-btn:hover{background:#b91c1c}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-error{color:#dc2626;font-size:13px;margin-top:12px;min-height:20px}
+.login-links{margin-top:32px;padding-top:24px;border-top:1px solid #f3f4f6}
+.login-links a{color:#dc2626;font-size:13px;font-weight:700;text-decoration:none}
+.login-links a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="login-bg">
+  <div class="login-card">
+    <img src="/public/logo.png" alt="ASPGE-PA Logo" class="login-logo">
+    <h1>Portal do Associado</h1>
+    <p class="subtitle">ASPGE - Pará</p>
+    <input type="text" id="loginCpf" class="login-input" placeholder="Digite seu CPF" maxlength="14"
+      onkeydown="if(event.key==='Enter')document.getElementById('loginSenha').focus()" oninput="mascaraCPF(this)">
+    <input type="password" id="loginSenha" class="login-input" placeholder="Digite sua senha"
+      onkeydown="if(event.key==='Enter')fazerLogin()">
+    <button class="login-btn" id="loginBtn" onclick="fazerLogin()">Entrar no Portal</button>
+    <div class="login-error" id="loginErro"></div>
+    <div class="login-links">
+      <a href="/inscricao">Ainda não é associado? Inscreva-se</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function mascaraCPF(el) {
+  var v = el.value.replace(/\D/g, '').substring(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  el.value = v;
+}
+
+async function fazerLogin() {
+  var cpf = document.getElementById('loginCpf').value;
+  var senha = document.getElementById('loginSenha').value;
+  var btn = document.getElementById('loginBtn');
+  var erro = document.getElementById('loginErro');
+  
+  if (cpf.replace(/\D/g, '').length < 11) {
+    erro.textContent = 'Digite um CPF válido.';
+    return;
+  }
+  
+  if (!senha) {
+    erro.textContent = 'Digite sua senha.';
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  erro.textContent = '';
+  
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cpf: cpf, senha: senha })
+    });
+    
+    const data = await response.json();
+    
+    btn.disabled = false;
+    btn.textContent = 'Entrar no Portal';
+    
+    if (data.erro) {
+      erro.textContent = data.erro;
+      return;
+    }
+    
+    localStorage.setItem('token', data.token);
+    window.location.href = '/portal';
+    
+  } catch (error) {
+    btn.disabled = false;
+    btn.textContent = 'Entrar no Portal';
+    erro.textContent = 'Erro de conexão. Tente novamente.';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+version: "1.0"
+jobs:
+  - id: weekly-parity-report
+    cron: "0 9 * * 1" # Segundas-feiras às 09:00
+    task_file: ".agents/schedules/weekly-parity-report.md"
+    assigned_agent: ".agents/subagents/orchestrator.md"
+    output_path: "./reports"

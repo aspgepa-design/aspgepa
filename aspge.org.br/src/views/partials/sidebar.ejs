@@ -1,0 +1,215 @@
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">
+      <img src="https://drive.google.com/thumbnail?id=1-iaEyYHTTmxL-pi_EFZzA9mYR75dVV0K&sz=w100" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+    </div>
+    <span class="sidebar-name">ASPGE-PA</span>
+  </div>
+  
+  <nav class="sidebar-nav" id="sidebarNav">
+    <button class="nav-btn active" data-view="inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Início
+    </button>
+    <button class="nav-btn" data-view="transparencia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Transparência
+    </button>
+    <button class="nav-btn" data-view="convenios">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Convênios
+    </button>
+    
+    <% if (user && (user.role === 'presidente' || user.role === 'diretor' || user.role === 'tesoureiro')) { %>
+    <button class="nav-btn" data-view="associados_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Associados
+    </button>
+    <button class="nav-btn" data-view="eventos_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Eventos
+    </button>
+    <button class="nav-btn" data-view="convenios_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Convênios
+    </button>
+    <% } %>
+    
+    <% if (user && user.role === 'diretor') { %>
+    <button class="nav-btn" data-view="carteirinhas_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="8" cy="15" r="2"/></svg>
+      Carteirinhas
+    </button>
+    <% } %>
+    
+    <% if (user && (user.role === 'presidente' || user.role === 'tesoureiro')) { %>
+    <button class="nav-btn" data-view="financeiro_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Financeiro
+    </button>
+    <button class="nav-btn" data-view="gestoes_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Gestões
+    </button>
+    <% } %>
+    
+    <% if (user && user.role === 'presidente') { %>
+    <button class="nav-btn" data-view="logs_adm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+      Logs
+    </button>
+    <% } %>
+  </nav>
+  
+  <div class="sidebar-user">
+    <div class="user-card">
+      <div class="user-info">
+        <div class="user-avatar"><%= user.iniciais %></div>
+        <div>
+          <p class="user-name"><%= user.nome %></p>
+          <p class="user-role"><%= user.perfil || 'Associado' %></p>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="fazerLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <a href="/versoes" style="font-size:11px;color:#9ca3af;text-decoration:none">Versão 2.0.0</a>
+    </div>
+  </div>
+</aside>
+
+<style>
+.sidebar {
+  width: 256px;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+.sidebar-brand {
+  padding: 24px 24px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-logo {
+  width: 36px;
+  height: 36px;
+  background: #1e3a5f;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+}
+.sidebar-name {
+  font-weight: 900;
+  color: #1e3a5f;
+  letter-spacing: -.5px;
+  font-size: 15px;
+}
+.sidebar-nav {
+  flex: 1;
+  padding: 0 12px;
+}
+.nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: .2s;
+  text-align: left;
+  margin-bottom: 4px;
+}
+.nav-btn:hover {
+  background: #f9fafb;
+  color: #4b5563;
+}
+.nav-btn.active {
+  background: #eff6ff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(37,99,235,.08);
+}
+.nav-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.sidebar-user {
+  padding: 16px;
+  margin-top: auto;
+}
+.user-card {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #f3f4f6;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg,#60a5fa,#2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(37,99,235,.25);
+}
+.user-name {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 14px;
+}
+.user-role {
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: capitalize;
+}
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: .2s;
+}
+.logout-btn:hover {
+  background: #b91c1c;
+}
+</style>

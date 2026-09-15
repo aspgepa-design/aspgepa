@@ -1,0 +1,2433 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal do Associado - ASPGE-PA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;overflow:hidden}
+
+/* ===== APP LAYOUT ===== */
+.app{display:flex;flex-direction:column;height:100vh;width:100%}
+.app-body{display:flex;flex:1;min-height:0;overflow:hidden}
+
+/* ===== SIDEBAR ===== */
+.sidebar{width:256px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-brand{padding:24px 24px 16px;display:flex;align-items:center;gap:12px}
+.sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#dc2626,#0075bf);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px}
+.sidebar-name{font-weight:900;color:#1e3a5f;letter-spacing:-.5px;font-size:15px}
+.sidebar-nav{flex:1;padding:0 12px}
+.nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:none;background:transparent;color:#9ca3af;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;text-align:left}
+.nav-btn:hover{background:#f9fafb;color:#4b5563}
+.nav-btn.active{background:#eff6ff;color:#0075bf;box-shadow:0 1px 3px rgba(0,117,191,.08)}
+.nav-btn svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-user{padding:16px;margin-top:auto}
+.user-card{background:#f9fafb;padding:16px;border-radius:16px;border:1px solid #f3f4f6}
+.user-info{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.user-avatar{width:40px;height:40px;background:linear-gradient(135deg,#16a34a,#0075bf);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;box-shadow:0 4px 12px rgba(0,117,191,.25)}
+.user-name{font-size:12px;font-weight:700;color:#1f2937}
+.user-role{font-size:10px;color:#6b7280;text-transform:capitalize}
+.logout-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border:none;background:transparent;color:#dc2626;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;border-radius:8px;transition:.2s}
+.logout-btn:hover{background:#fef2f2}
+
+/* ===== HEADER ===== */
+.header{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);padding:16px 32px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.header h1{font-size:20px;font-weight:900;color:#111827;text-transform:capitalize}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-avatar{width:40px;height:40px;background:linear-gradient(135deg,#dc2626,#0075bf);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+
+/* ===== MAIN CONTENT ===== */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.content{flex:1;overflow-y:auto;padding:24px 32px}
+.view{display:none;animation:fadeIn .4s ease}
+.view.active{display:block}
+
+/* ===== COMPONENTS: CARDS ===== */
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid #e5e7eb;overflow:hidden}
+.card-header{padding:16px 24px;border-bottom:1px solid #f3f4f6;background:rgba(249,250,251,.5)}
+.card-header h3{font-size:16px;font-weight:700;color:#1f2937}
+.card-header p{font-size:13px;color:#6b7280}
+.card-body{padding:24px}
+
+/* ===== COMPONENTS: BADGE ===== */
+.badge{display:inline-block;font-size:10px;padding:2px 10px;border-radius:99px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-red{background:#fee2e2;color:#dc2626}
+.badge-yellow{background:#fef9c3;color:#a16207}
+.badge-gray{background:#f3f4f6;color:#4b5563}
+
+/* ===== COMPONENTS: BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;border-radius:8px;border:none;font-weight:600;font-size:14px;cursor:pointer;transition:.2s}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-primary{background:#0075bf;color:#fff}.btn-primary:hover{background:#005a91}
+.btn-success{background:#16a34a;color:#fff}.btn-success:hover{background:#15803d}
+.btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-outline{background:transparent;border:1px solid #0075bf;color:#0075bf}.btn-outline:hover{background:#eff6ff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ===== COMPONENTS: TABLE ===== */
+.table-wrap{overflow-x:auto;width:100%}
+table{width:100%;text-align:left;font-size:13px;border-collapse:collapse}
+thead tr{border-bottom:1px solid #e5e7eb}
+th{padding:12px 16px;color:#9ca3af;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+td{padding:12px 16px}
+tbody tr{border-bottom:1px solid #f3f4f6;transition:.15s}
+tbody tr:hover{background:#f9fafb}
+
+/* ===== DASHBOARD: CARTEIRA ===== */
+.carteira{background:linear-gradient(135deg,#16a34a 0%,#0075bf 100%);border-radius:16px;padding:24px;color:#fff;box-shadow:0 20px 40px rgba(0,117,191,.3);position:relative;overflow:hidden;min-height:220px}
+.carteira-bg{position:absolute;top:0;right:0;padding:16px;opacity:.08;font-size:100px}
+.carteira-inner{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:180px}
+.carteira-top{margin-bottom:auto}
+.carteira-top .badge{margin-bottom:8px}
+.carteira-nome{font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:-.3px;margin-top:12px}
+.carteira-sub{color:#93c5fd;font-size:11px;opacity:.8;margin-top:2px}
+.carteira-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px}
+.qr-placeholder{background:#fff;padding:6px;border-radius:8px;box-shadow:inset 0 1px 3px rgba(0,0,0,.1)}
+.qr-inner{width:48px;height:48px;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:6px}
+.carteira-validade{text-align:right}
+.carteira-validade small{display:block;font-size:9px;text-transform:uppercase;opacity:.5}
+.carteira-validade span{font-family:monospace;font-weight:700;font-size:14px}
+
+/* ===== DASHBOARD: WIDGETS ===== */
+.widgets-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.widget-stat{display:flex;flex-direction:column;justify-content:center}
+.widget-stat .label{color:#6b7280;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.widget-stat .value{font-size:32px;font-weight:900;color:#1f2937;margin-top:4px}
+.widget-stat .sub{font-size:10px;color:#16a34a;background:#dcfce7;display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;margin-top:4px}
+.widget-stat .sub-gray{font-size:11px;color:#9ca3af;font-style:italic}
+.border-l-blue{border-left:4px solid #3b82f6}
+.border-l-green{border-left:4px solid #10b981}
+
+/* ===== DASHBOARD: EVENTOS ===== */
+.evento-item{display:flex;align-items:center;gap:16px;padding:12px;background:#eff6ff;border-radius:12px;border:1px solid #dbeafe}
+.evento-data{background:#fff;padding:8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center;min-width:50px}
+.evento-data .dia{display:block;font-weight:900;color:#1e3a5f;font-size:20px}
+.evento-data .mes{display:block;font-size:9px;text-transform:uppercase;color:#6b7280;font-weight:700}
+.evento-info .titulo{font-weight:700;color:#1e3a5f;font-size:14px}
+.evento-info .local{font-size:11px;color:#6b7280}
+
+/* ===== FINANCEIRO: RESUMO ===== */
+.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.fin-card{padding:24px;border-radius:16px;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.fin-card.receitas{background:#16a34a}
+.fin-card.despesas{background:#dc2626}
+.fin-card.saldo{background:#1e3a5f}
+.fin-card .fin-label{font-size:11px;font-weight:700;text-transform:uppercase;opacity:.75}
+.fin-card .fin-valor{font-size:28px;font-weight:900;margin-top:4px}
+.valor-positivo{color:#16a34a;font-weight:700}
+.valor-negativo{color:#dc2626;font-weight:700}
+
+/* ===== CONVENIOS ===== */
+.convenios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.convenio-card .icon-area{height:100px;background:#f3f4f6;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:40px}
+.convenio-card h3{font-size:16px;font-weight:700;margin-top:8px;color:#1f2937}
+.convenio-card .desc{font-size:12px;color:#6b7280;margin:6px 0 16px;min-height:40px;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.convenio-actions{display:flex;gap:8px}
+.convenio-actions .btn{flex:1}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:50;transition:left .3s ease;box-shadow:4px 0 24px rgba(0,0,0,.1)}
+  .sidebar.open{left:0}
+  .content{padding:16px}
+  .fin-grid{grid-template-columns:1fr}
+  .widgets-grid{grid-template-columns:1fr}
+  .header{padding:12px 16px}
+  .header h1{font-size:16px}
+  .dashboard-grid{grid-template-columns:1fr !important}
+}
+
+/* ===== LOADING ===== */
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #e5e7eb;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite}
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:60px;color:#6b7280;gap:12px;font-size:14px}
+/* ===== CARTEIRINHA CONFIG ===== */
+.crt-overlay{position:absolute;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-weight:700;white-space:nowrap;pointer-events:none;user-select:none}
+#crtNome,#crtCargo{white-space:normal;max-width:55%;line-height:1.2}
+.crt-ctrl{display:flex;align-items:center;gap:6px}.crt-ctrl label{min-width:32px;font-size:11px;font-weight:600;color:#555;margin:0;text-transform:uppercase}
+.crt-ctrl input[type="range"]{flex:1;padding:0;border:none;height:5px;-webkit-appearance:none;background:#dee2e6;border-radius:3px}
+.crt-ctrl input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#0075bf;cursor:pointer}
+.crt-ctrl input[type="range"]:focus{box-shadow:none}
+.crt-val{width:58px;padding:2px 4px;border:1px solid #dee2e6;border-radius:4px;font-size:11px;color:#374151;font-family:monospace;text-align:center;background:#fff}
+.crt-val:focus{border-color:#0075bf;outline:none;box-shadow:0 0 0 2px rgba(0,117,191,.15)}
+.crt-campo-hl{outline:2px dashed #ff6600!important;outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- APP SCREEN -->
+<div class="app">
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">ASP</div>
+        <span class="sidebar-name">ASPGE-PA</span>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <!-- Preenchido via JS -->
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-card">
+          <div class="user-info">
+            <div class="user-avatar" id="userAvatar">US</div>
+            <div>
+              <p class="user-name" id="userName">Carregando...</p>
+              <p class="user-role" id="userRole">associado</p>
+            </div>
+          </div>
+          <button class="logout-btn" onclick="fazerLogout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sair
+          </button>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <a href="/versoes" style="font-size:11px;color:#9ca3af;text-decoration:none">Versão 2.0.0</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- HEADER -->
+      <header class="header">
+        <h1 id="headerTitle">Início</h1>
+        <div class="header-right">
+          <div class="header-avatar" id="headerAvatar">US</div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div class="content">
+
+        <!-- ===== VIEW: INÍCIO/DASHBOARD ===== -->
+        <div id="view-inicio" class="view active">
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px" class="dashboard-grid">
+            <!-- Carteira Digital -->
+            <div>
+              <div class="carteira">
+                <div class="carteira-bg">📱</div>
+                <div class="carteira-inner">
+                  <div class="carteira-top">
+                    <span class="badge badge-green" id="dashStatus">Associado Ativo</span>
+                    <h2 class="carteira-nome" id="dashNome">CARREGANDO...</h2>
+                    <p class="carteira-sub" id="dashCargo">--</p>
+                  </div>
+                  <div class="carteira-bottom">
+                    <div class="qr-placeholder">
+                      <div class="qr-inner">QR CODE</div>
+                    </div>
+                    <div class="carteira-validade">
+                      <small>Válido até</small>
+                      <span>DEZ/2026</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Widgets -->
+            <div>
+              <div class="widgets-grid">
+                <div class="card widget-stat border-l-blue">
+                  <div class="card-body">
+                    <p class="label">Convênios Disponíveis</p>
+                    <span class="value" id="dashConvenios">--</span>
+                    <span class="sub">Parceiros ativos</span>
+                  </div>
+                </div>
+                <div class="card widget-stat border-l-green">
+                  <div class="card-body">
+                    <p class="label">Situação Cadastral</p>
+                    <span class="value" style="font-size:20px" id="dashSituacao">--</span>
+                    <span class="sub-gray">Dados na planilha</span>
+                  </div>
+                </div>
+                <div class="card" style="grid-column:span 2">
+                  <div class="card-body">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                      <h4 style="font-weight:700;display:flex;align-items:center;gap:8px">📅 Próximos Eventos</h4>
+                    </div>
+                    <div id="dashEventos">
+                      <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Link rápido para atualização -->
+          <div class="card" style="margin-top:24px;border-left:4px solid #f59e0b">
+            <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+              <div>
+                <h4 style="font-weight:700;color:#92400e">📋 Seus dados estão completos?</h4>
+                <p style="font-size:13px;color:#6b7280">Verifique e atualize seu cadastro para manter tudo em dia.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="navegarPara('atualizacao')">Atualizar Cadastro</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: TRANSPARÊNCIA ===== -->
+        <div id="view-transparencia" class="view">
+          <div style="margin-bottom:24px">
+            <h2 style="font-size:22px;font-weight:900;color:#1f2937">Transparência Financeira</h2>
+            <p style="font-size:13px;color:#6b7280">Prestação de contas da associação.</p>
+          </div>
+          <div class="fin-grid" id="finResumoTransp">
+            <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Movimentações</h3></div>
+            <div class="card-body">
+              <div class="table-wrap" id="finTabelaTransp">
+                <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: FINANCEIRO (Tesoureiro) ===== -->
+        <div id="view-financeiro" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gestão de Tesouraria</h2>
+              <p style="font-size:13px;color:#6b7280">Controle de entradas, saídas e prestação de contas.</p>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-success btn-sm" onclick="abrirModalLanc('Entrada')">+ Entrada</button>
+              <button class="btn btn-danger btn-sm" onclick="abrirModalLanc('Saída')">+ Saída</button>
+            </div>
+          </header>
+          <div class="fin-grid" id="finResumo">
+            <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Últimas Movimentações</h3></div>
+            <div class="card-body">
+              <div class="table-wrap" id="finTabela">
+                <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: CONVÊNIOS ===== -->
+        <div id="view-convenios" class="view">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <h2 style="font-size:22px;font-weight:900;color:#1f2937">Parceiros e Convênios</h2>
+          </div>
+          <div class="convenios-grid" id="conveniosGrid">
+            <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: VOTAÇÕES ===== -->
+        <div id="view-votacoes" class="view">
+          <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:24px">Decisões e Votações</h2>
+          <div id="votacoesList">
+            <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: ATUALIZAÇÃO CADASTRAL ===== -->
+        <div id="view-atualizacao" class="view">
+          <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:8px">Meu Cadastro</h2>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Atualize seus dados e posicione sua foto para emissão da carteirinha digital.</p>
+
+          <!-- EDITOR ESTILO GAS: grid esquerda=preview, direita=controles -->
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:start">
+
+            <!-- COLUNA ESQUERDA: Preview da Carteirinha -->
+            <div style="display:flex;flex-direction:column;align-items:center;position:sticky;top:0;z-index:5;gap:12px">
+              <div id="myCardPreview" style="position:relative;width:85mm;height:54mm;overflow:hidden;border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,0.18);background:#f5f5f5;flex-shrink:0">
+                <img id="myCardBg" src="" style="width:100%;height:100%;display:block;user-select:none" draggable="false">
+                <div id="myPhotoFrame" style="position:absolute;overflow:hidden;cursor:move;border:1px solid rgba(0,117,191,0.3);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.6)" onmousedown="myCardStartDrag(event)" ontouchstart="myCardStartDrag(event)">
+                  <span id="myPhotoPlaceholder" style="font-size:24px;opacity:0.5">📷</span>
+                  <img id="myPhotoImg" src="" style="position:absolute;display:none;pointer-events:none;user-select:none">
+                </div>
+                <span class="crt-overlay" id="myCardLblNome">ASSOCIADO:</span>
+                <span class="crt-overlay" id="myCardNome"></span>
+                <span class="crt-overlay" id="myCardLblMatricula">MATRÍCULA:</span>
+                <span class="crt-overlay" id="myCardMatricula"></span>
+                <span class="crt-overlay" id="myCardLblCargo">CARGO:</span>
+                <span class="crt-overlay" id="myCardCargo"></span>
+                <span class="crt-overlay" id="myCardLblEmissao">EMISSÃO:</span>
+                <span class="crt-overlay" id="myCardEmissao"></span>
+                <span class="crt-overlay" id="myCardLblValidade">VALIDADE:</span>
+                <span class="crt-overlay" id="myCardValidade"></span>
+              </div>
+              <div id="myCardPreviewVerso" style="position:relative;width:85mm;height:54mm;overflow:hidden;border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,0.18);background:#f5f5f5;flex-shrink:0">
+                <img id="myCardBgVerso" src="" style="width:100%;height:100%;display:block;user-select:none" draggable="false">
+                <span class="crt-overlay" id="myCardLblDadosPessoais">DADOS PESSOAIS</span>
+                <span class="crt-overlay" id="myCardLblCpf">CPF:</span>
+                <span class="crt-overlay" id="myCardCpf"></span>
+                <span class="crt-overlay" id="myCardLblRg">RG:</span>
+                <span class="crt-overlay" id="myCardRg"></span>
+              </div>
+              <p style="font-size:11px;color:#999;margin-top:4px">Tamanho real: 85 × 54 mm (frente e verso)</p>
+            </div>
+
+            <!-- COLUNA DIREITA: Controles -->
+            <div style="display:flex;flex-direction:column;gap:20px">
+
+              <!-- Upload de Foto -->
+              <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:10px;padding:15px">
+                <h3 style="margin:0 0 12px;font-size:13px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:6px">Foto do Associado</h3>
+                <div id="myUploadArea" onclick="document.getElementById('myInputFoto').click()" style="border:2px dashed #adb5bd;border-radius:8px;padding:20px;text-align:center;cursor:pointer;background:#fff;transition:all .3s">
+                  <div style="font-size:32px">📤</div>
+                  <p style="margin:5px 0;font-weight:600;font-size:13px">Clique para enviar sua foto</p>
+                  <p style="margin:0;font-size:12px;color:#666">JPG ou PNG, máximo 5MB</p>
+                </div>
+                <input type="file" id="myInputFoto" accept="image/jpeg,image/png" style="display:none" onchange="myCardOnFoto(this)">
+                <div id="myMsgFoto" style="margin-top:8px;font-size:12px"></div>
+              </div>
+
+              <!-- Ajuste de Posição -->
+              <div id="myPosControls" style="display:none;background:#f8f9fa;border:1px solid #e9ecef;border-radius:10px;padding:15px">
+                <h3 style="margin:0 0 12px;font-size:13px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:6px">Ajuste de Posição da Foto</h3>
+                <p style="font-size:12px;color:#666;margin:0 0 10px">Arraste a foto no cartão ou use os botões abaixo.</p>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                  <div style="display:flex;gap:4px;align-items:center">
+                    <div style="width:36px"></div>
+                    <button onclick="myCardMover(0,-2)" style="width:36px;height:36px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">&#9650;</button>
+                    <div style="width:36px"></div>
+                  </div>
+                  <div style="display:flex;gap:4px;align-items:center">
+                    <button onclick="myCardMover(-2,0)" style="width:36px;height:36px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">&#9664;</button>
+                    <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999">foto</div>
+                    <button onclick="myCardMover(2,0)" style="width:36px;height:36px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">&#9654;</button>
+                  </div>
+                  <div style="display:flex;gap:4px;align-items:center">
+                    <div style="width:36px"></div>
+                    <button onclick="myCardMover(0,2)" style="width:36px;height:36px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">&#9660;</button>
+                    <div style="width:36px"></div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+                  <button onclick="myCardAjustarZoom(-0.1)" style="width:40px;height:36px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">&#8722;</button>
+                  <input type="range" id="myZoomSlider" min="0.5" max="3" step="0.1" value="1" oninput="myCardSetZoom(this.value)" style="flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:#dee2e6;outline:none">
+                  <button onclick="myCardAjustarZoom(0.1)" style="width:40px;height:36px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">+</button>
+                  <span id="myZoomLabel" style="font-size:12px;color:#666;min-width:40px;text-align:center">100%</span>
+                </div>
+              </div>
+
+              <!-- Dados do Associado -->
+              <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:10px;padding:15px">
+                <h3 style="margin:0 0 12px;font-size:13px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:6px">Dados do Associado</h3>
+                <form id="formAtualizacao" onsubmit="event.preventDefault(); myCardSalvar()">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div style="grid-column:span 2">
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">Nome Completo</label>
+                      <input type="text" id="atNome" readonly style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px;background:#eee;color:#666">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">Matrícula</label>
+                      <input type="text" id="atMatricula" placeholder="Nº da matrícula" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">Cargo</label>
+                      <input type="text" id="atCargo" placeholder="Ex: Analista" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">CPF</label>
+                      <input type="text" id="atCpf" maxlength="14" oninput="mascaraCPF(this)" placeholder="000.000.000-00" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">RG</label>
+                      <input type="text" id="atRg" placeholder="Nº do RG" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">Expeditor</label>
+                      <input type="text" id="atExpeditor" placeholder="SSP/PA" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">WhatsApp</label>
+                      <input type="text" id="atWhatsapp" maxlength="15" oninput="mascaraTelefone(this)" placeholder="(91) 98888-8888" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                    <div>
+                      <label style="display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#555;text-transform:uppercase">E-mail</label>
+                      <input type="email" id="atEmail" placeholder="seu@email.com" style="width:100%;padding:8px 10px;border:2px solid #e1e1e1;border-radius:8px;font-size:13px">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Botão Salvar -->
+              <button class="btn btn-primary" onclick="myCardSalvar()" id="myBtnSalvarCard" style="width:100%;padding:14px;font-size:16px;font-weight:600;background:#229954;border:none;border-radius:8px;color:#fff;cursor:pointer;box-shadow:0 3px 6px rgba(34,153,84,0.3)">
+                Salvar Dados e Foto
+              </button>
+              <div id="myMsgSalvarCard" style="font-size:13px;min-height:20px;text-align:center"></div>
+              <div id="atStatus" style="font-size:13px;min-height:20px;text-align:center"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: GESTÃO DE ASSOCIADOS (Diretoria) ===== -->
+        <div id="view-associados_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gestão de Associados</h2>
+              <p style="font-size:13px;color:#6b7280">Visualize e edite os dados de todos os associados.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="carregarAssociados()">↻ Atualizar Lista</button>
+          </header>
+          <!-- Stats Cards -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px" id="assocStats">
+            <div style="background:#1e3a5f;color:#fff;border-radius:12px;padding:24px;text-align:center">
+              <div style="font-size:36px;font-weight:900" id="statTotal">0</div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8">Total Associados</div>
+            </div>
+            <div style="background:#16a34a;color:#fff;border-radius:12px;padding:24px;text-align:center">
+              <div style="font-size:36px;font-weight:900" id="statCompleto">0</div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8">Cadastro Completo</div>
+            </div>
+            <div style="background:#ea580c;color:#fff;border-radius:12px;padding:24px;text-align:center">
+              <div style="font-size:36px;font-weight:900" id="statPendente">0</div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8">Cadastro Pendente</div>
+            </div>
+          </div>
+          <!-- Filtros -->
+          <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
+            <input type="text" id="assocBusca" placeholder="Buscar por nome, CPF ou cargo..." style="flex:1;min-width:200px;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" oninput="filtrarAssociados()">
+            <select id="assocFiltroPerfil" style="padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" onchange="filtrarAssociados()">
+              <option value="">Todos</option>
+              <option value="presidente">Presidente</option>
+              <option value="diretor">Diretor</option>
+              <option value="tesoureiro">Tesoureiro</option>
+              <option value="associado">Associado</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#6b7280;cursor:pointer">
+              <input type="checkbox" id="assocMostrarInativos" onchange="filtrarAssociados()"> Mostrar Inativos
+            </label>
+          </div>
+          <!-- Lista -->
+          <div id="assocLista">
+            <div class="loading-overlay"><div class="spinner"></div> Carregando associados...</div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: GERIR EVENTOS ===== -->
+        <div id="view-eventos_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gerir Eventos</h2>
+              <p style="font-size:13px;color:#6b7280">Cadastre, edite, oculte ou exclua eventos da associação.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalEvento()">+ Novo Evento</button>
+          </header>
+          <div class="card">
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="eventosAdmTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: GERIR CONVÊNIOS ===== -->
+        <div id="view-convenios_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gerir Convênios</h2>
+              <p style="font-size:13px;color:#6b7280">Cadastre, edite, oculte ou exclua convênios e parcerias.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalConvenio()">+ Novo Convênio</button>
+          </header>
+          <div class="card">
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="conveniosAdmTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: CARTEIRINHAS ===== -->
+        <div id="view-carteirinhas_adm" class="view">
+          <header style="margin-bottom:24px">
+            <h2 style="font-size:22px;font-weight:900;color:#1f2937">Emissão de Carteirinhas</h2>
+            <p style="font-size:13px;color:#6b7280">Configure o layout, ajuste campos e exporte carteirinhas em lote para PDF A4.</p>
+          </header>
+
+          <!-- PREVIEW + CONTROLES DE LAYOUT -->
+          <div class="card" style="margin-bottom:24px">
+            <div class="card-header"><h3>⚙ Configuração do Layout</h3></div>
+            <div class="card-body">
+              <!-- Seletor de preview -->
+              <div style="margin-bottom:16px;max-width:400px">
+                <label style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;display:block;margin-bottom:4px">Pré-visualizar Associado</label>
+                <div style="display:flex;gap:6px">
+                  <select id="crtPreviewSel" style="flex:1;padding:5px 8px;border:1px solid #dee2e6;border-radius:6px;font-size:12px"><option value="">— Dados de exemplo —</option></select>
+                  <button class="btn btn-outline btn-sm" onclick="crtCarregarPreview()" style="padding:4px 10px;font-size:11px">👁 Ver</button>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start">
+                <!-- Preview Card -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+                  <div id="crtPreview" style="position:relative;width:85mm;height:54mm;overflow:hidden;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);background:#f5f5f5;flex-shrink:0">
+                    <img id="crtBg" src="" style="width:100%;height:100%;display:block" draggable="false">
+                    <div id="crtPhotoFrame" style="position:absolute;overflow:hidden;background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">
+                      <span id="crtPhotoPlaceholder" style="font-size:24px;opacity:0.5">📷</span>
+                      <img id="crtPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none">
+                    </div>
+                    <span class="crt-overlay" id="crtLblNome">ASSOCIADO:</span>
+                    <span class="crt-overlay" id="crtNome">NOME DO ASSOCIADO</span>
+                    <span class="crt-overlay" id="crtLblMatricula">MATRÍCULA:</span>
+                    <span class="crt-overlay" id="crtMatricula">12345678</span>
+                    <span class="crt-overlay" id="crtLblCargo">CARGO:</span>
+                    <span class="crt-overlay" id="crtCargo">Cargo</span>
+                    <span class="crt-overlay" id="crtLblEmissao">EMISSÃO:</span>
+                    <span class="crt-overlay" id="crtEmissao">15/04/2026</span>
+                    <span class="crt-overlay" id="crtLblValidade">VALIDADE:</span>
+                    <span class="crt-overlay" id="crtValidade">15/04/2030</span>
+                  </div>
+                  <div id="crtPreviewVerso" style="position:relative;width:85mm;height:54mm;overflow:hidden;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);background:#f5f5f5;flex-shrink:0">
+                    <img id="crtBgVerso" src="" style="width:100%;height:100%;display:block" draggable="false">
+                    <span class="crt-overlay" id="crtLblDadosPessoais">DADOS PESSOAIS</span>
+                    <span class="crt-overlay" id="crtLblCpf">CPF:</span>
+                    <span class="crt-overlay" id="crtCpf">000.000.000-00</span>
+                    <span class="crt-overlay" id="crtLblRg">RG:</span>
+                    <span class="crt-overlay" id="crtRg">0000000</span>
+                  </div>
+                  <p style="font-size:11px;color:#9ca3af;margin-top:6px">85 × 54 mm (frente e verso)</p>
+                </div>
+                <!-- Controles -->
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <!-- Enquadramento da Foto -->
+                  <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px">
+                    <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Enquadramento da Foto</h4>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.1" id="crtFrameLeft" value="7.5" oninput="crtSyncFrameFromRange('crtFrameLeft','crtFrameLeftVal','left')"><input type="number" class="crt-val" id="crtFrameLeftVal" value="7.5" min="0" max="100" step="0.1" oninput="crtSyncFrameFromNum('crtFrameLeftVal','crtFrameLeft','left')"></div>
+                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.1" id="crtFrameTop" value="14.2" oninput="crtSyncFrameFromRange('crtFrameTop','crtFrameTopVal','top')"><input type="number" class="crt-val" id="crtFrameTopVal" value="14.2" min="0" max="100" step="0.1" oninput="crtSyncFrameFromNum('crtFrameTopVal','crtFrameTop','top')"></div>
+                      <div class="crt-ctrl"><label>Larg.</label><input type="range" min="3" max="80" step="0.1" id="crtFrameW" value="29.4" oninput="crtSyncFrameFromRange('crtFrameW','crtFrameWVal','width')"><input type="number" class="crt-val" id="crtFrameWVal" value="29.4" min="3" max="80" step="0.1" oninput="crtSyncFrameFromNum('crtFrameWVal','crtFrameW','width')"></div>
+                      <div class="crt-ctrl"><label>Alt.</label><input type="range" min="3" max="80" step="0.1" id="crtFrameH" value="24.1" oninput="crtSyncFrameFromRange('crtFrameH','crtFrameHVal','height')"><input type="number" class="crt-val" id="crtFrameHVal" value="24.1" min="3" max="80" step="0.1" oninput="crtSyncFrameFromNum('crtFrameHVal','crtFrameH','height')"></div>
+                    </div>
+                  </div>
+                  <!-- Campos de Texto -->
+                  <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px">
+                    <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Campos de Texto</h4>
+                    <div style="margin-bottom:8px">
+                      <select id="crtCampoSel" onchange="crtSelecionarCampo(this.value)" style="width:100%;padding:6px 10px;border:1px solid #dee2e6;border-radius:6px;font-size:13px">
+                        <optgroup label="Frente — Dados">
+                          <option value="crtNome">Nome</option>
+                          <option value="crtMatricula">Matrícula</option>
+                          <option value="crtCargo">Cargo</option>
+                          <option value="crtEmissao">Emissão</option>
+                          <option value="crtValidade">Validade</option>
+                        </optgroup>
+                        <optgroup label="Frente — Rótulos">
+                          <option value="crtLblNome">Rótulo: Associado</option>
+                          <option value="crtLblMatricula">Rótulo: Matrícula</option>
+                          <option value="crtLblCargo">Rótulo: Cargo</option>
+                          <option value="crtLblEmissao">Rótulo: Emissão</option>
+                          <option value="crtLblValidade">Rótulo: Validade</option>
+                        </optgroup>
+                        <optgroup label="Verso — Dados">
+                          <option value="crtCpf">CPF</option>
+                          <option value="crtRg">RG</option>
+                        </optgroup>
+                        <optgroup label="Verso — Rótulos">
+                          <option value="crtLblDadosPessoais">Rótulo: Dados Pessoais</option>
+                          <option value="crtLblCpf">Rótulo: CPF</option>
+                          <option value="crtLblRg">Rótulo: RG</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                      <div class="crt-ctrl"><label>X</label><input type="range" min="0" max="100" step="0.1" id="crtCampoX" oninput="crtSyncFromRange('crtCampoX','crtCampoXVal','%');crtAtualizarCampo()"><input type="number" class="crt-val" id="crtCampoXVal" value="0" min="0" max="100" step="0.1" oninput="crtSyncFromNum('crtCampoXVal','crtCampoX');crtAtualizarCampo()"></div>
+                      <div class="crt-ctrl"><label>Y</label><input type="range" min="0" max="100" step="0.1" id="crtCampoY" oninput="crtSyncFromRange('crtCampoY','crtCampoYVal','%');crtAtualizarCampo()"><input type="number" class="crt-val" id="crtCampoYVal" value="0" min="0" max="100" step="0.1" oninput="crtSyncFromNum('crtCampoYVal','crtCampoY');crtAtualizarCampo()"></div>
+                      <div class="crt-ctrl"><label>Tam.</label><input type="range" min="0.5" max="6" step="0.1" id="crtCampoSize" oninput="crtSyncFromRange('crtCampoSize','crtCampoSizeVal','mm');crtAtualizarCampo()"><input type="number" class="crt-val" id="crtCampoSizeVal" value="0" min="0.5" max="6" step="0.1" oninput="crtSyncFromNum('crtCampoSizeVal','crtCampoSize');crtAtualizarCampo()"></div>
+                      <div class="crt-ctrl"><label>Peso</label><select id="crtCampoBold" onchange="crtAtualizarCampo()" style="width:100%;padding:4px;border:1px solid #dee2e6;border-radius:4px;font-size:12px"><option value="400">Normal</option><option value="600">Semi</option><option value="700" selected>Negrito</option><option value="900">Extra</option></select></div>
+                    </div>
+                    <div class="crt-ctrl" style="margin-top:8px"><label>Cor</label><input type="color" id="crtCampoCor" value="#1a1a1a" oninput="crtAtualizarCampo()" style="width:36px;height:26px;padding:1px;border:1px solid #dee2e6;border-radius:4px;cursor:pointer"><input type="text" class="crt-val" id="crtCampoCorVal" value="#1a1a1a" maxlength="7" onchange="document.getElementById('crtCampoCor').value=this.value;crtAtualizarCampo()" style="width:64px"></div>
+                    <div class="crt-ctrl" id="crtCampoTextoWrapper" style="margin-top:8px;display:none"><label>Texto</label><input type="text" id="crtCampoTexto" value="" oninput="crtAtualizarCampo()" style="width:100%;padding:6px 10px;border:1px solid #dee2e6;border-radius:6px;font-size:12px"></div>
+                  </div>
+                  <!-- Botão Salvar Layout -->
+                  <button class="btn btn-primary" onclick="crtSalvarLayout()" id="crtBtnSalvar" style="width:100%;padding:10px">💾 Salvar Layout (para todos)</button>
+                  <div id="crtMsgLayout" style="font-size:12px;min-height:20px"></div>
+                  <!-- Template da Carteirinha -->
+                  <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px;margin-top:12px">
+                    <h4 style="margin:0 0 10px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Imagem Template</h4>
+                    <div style="margin-bottom:8px">
+                      <label style="font-size:11px;color:#555;margin-bottom:4px;display:block">Frente</label>
+                      <div style="display:flex;gap:6px">
+                        <input type="file" id="crtTemplateFrente" accept="image/*" style="flex:1;font-size:12px;margin-bottom:4px">
+                        <button class="btn btn-danger btn-sm" onclick="crtExcluirTemplate('frente')" style="padding:4px 8px;font-size:11px">🗑</button>
+                      </div>
+                    </div>
+                    <div style="margin-bottom:8px">
+                      <label style="font-size:11px;color:#555;margin-bottom:4px;display:block">Verso</label>
+                      <div style="display:flex;gap:6px">
+                        <input type="file" id="crtTemplateVerso" accept="image/*" style="flex:1;font-size:12px;margin-bottom:8px">
+                        <button class="btn btn-danger btn-sm" onclick="crtExcluirTemplate('verso')" style="padding:4px 8px;font-size:11px">🗑</button>
+                      </div>
+                    </div>
+                    <button class="btn btn-sm" onclick="crtSalvarTemplates()" style="width:100%;padding:6px;background:#ff6600;color:#fff;border:none;border-radius:6px;font-size:12px">🖼 Salvar Templates</button>
+                    <div id="crtMsgTemplate" style="font-size:11px;min-height:16px;margin-top:4px"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPORTAR PDF -->
+          <div class="card">
+            <div class="card-header"><h3>📄 Exportar Carteirinhas para PDF</h3></div>
+            <div class="card-body">
+              <p style="font-size:13px;color:#6b7280;margin:0 0 12px">Selecione os associados e gere um PDF A4 com carteirinhas frente e verso.</p>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+                <input type="text" id="crtBusca" placeholder="Buscar por nome ou CPF..." style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px" oninput="crtFiltrar()">
+                <select id="crtFiltroFoto" onchange="crtFiltrar()" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px">
+                  <option value="">Todos</option>
+                  <option value="comFoto">Com foto 📷</option>
+                  <option value="semFoto">Sem foto ❌</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="crtSelTodos(true)">Selecionar Visíveis</button>
+                <button class="btn btn-outline btn-sm" onclick="crtSelTodos(false)">Limpar</button>
+              </div>
+              <div id="crtLista" style="max-height:320px;overflow-y:auto;border:1px solid #e9ecef;border-radius:8px;margin-bottom:16px;background:#fafafa">
+                <div style="text-align:center;padding:24px;color:#9ca3af">Carregando associados...</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <button class="btn btn-primary" id="crtBtnPdf" onclick="crtExportarPdf()" style="padding:12px 28px;font-size:14px">📄 Gerar PDF para Impressão</button>
+                <span id="crtSelecionados" style="font-size:13px;color:#6b7280">0 selecionados</span>
+                <div id="crtProgresso" style="display:none;flex:1;min-width:200px">
+                  <div style="background:#e5e7eb;border-radius:8px;height:8px;overflow:hidden">
+                    <div id="crtBarra" style="height:100%;background:#16a34a;border-radius:8px;transition:width .3s;width:0%"></div>
+                  </div>
+                  <span id="crtProgTexto" style="font-size:11px;color:#6b7280;margin-top:4px;display:block"></span>
+                </div>
+              </div>
+              <div id="crtMsgExport" style="margin-top:10px;font-size:13px;min-height:20px"></div>
+            </div>
+          </div>
+          <div id="crtPdfArea" style="position:absolute;left:-9999px;top:0"></div>
+        </div>
+
+        <!-- ===== VIEW: GESTÕES ===== -->
+        <div id="view-gestoes_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Gestões</h2>
+              <p style="font-size:13px;color:#6b7280">Histórico de gestões da ASPGE-PA.</p>
+            </div>
+          </header>
+          <div class="card">
+            <div class="card-body" id="gestoesContent">
+              <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: LOGS ===== -->
+        <div id="view-logs_adm" class="view">
+          <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:24px">Logs do Sistema</h2>
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap" id="logsTabela">
+                <div class="loading-overlay"><div class="spinner"></div> Carregando logs...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-site_config_adm" class="view">
+          <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:24px">Configurar Página Pública</h2>
+          <div class="card">
+            <div class="card-body">
+              <form id="siteConfigForm" style="display:grid;gap:16px">
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Texto Sobre</label>
+                  <textarea id="scSobre" rows="3" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px"></textarea>
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Missão</label>
+                  <textarea id="scMissao" rows="2" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px"></textarea>
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Visão</label>
+                  <textarea id="scVisao" rows="2" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px"></textarea>
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Valores</label>
+                  <textarea id="scValores" rows="2" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px"></textarea>
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Estatutos</label>
+                  <textarea id="scEstatutos" rows="3" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                  <div>
+                    <label style="display:block;font-weight:600;margin-bottom:8px">Banner URL</label>
+                    <input type="text" id="scBannerUrl" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                  </div>
+                  <div>
+                    <label style="display:block;font-weight:600;margin-bottom:8px">Banner Alt</label>
+                    <input type="text" id="scBannerAlt" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                  </div>
+                </div>
+                <div style="display:flex;gap:24px">
+                  <label style="display:flex;align-items:center;gap:8px">
+                    <input type="checkbox" id="scMostrarEnquetes">
+                    Mostrar Enquetes
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px">
+                    <input type="checkbox" id="scMostrarNoticias">
+                    Mostrar Notícias
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px">
+                    <input type="checkbox" id="scMostrarEventos">
+                    Mostrar Eventos
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="justify-content:center">Salvar Configurações</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-noticias_adm" class="view">
+          <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:24px">Gerenciar Notícias</h2>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <h3>Nova Notícia</h3>
+            </div>
+            <div class="card-body">
+              <form id="noticiaForm" style="display:grid;gap:16px">
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Título</label>
+                  <input type="text" id="notTitulo" required style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Descrição</label>
+                  <input type="text" id="notDescricao" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Conteúdo</label>
+                  <textarea id="notConteudo" rows="4" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px"></textarea>
+                </div>
+                <div style="display:flex;gap:16px;align-items:center">
+                  <div>
+                    <label style="display:block;font-weight:600;margin-bottom:8px">Data Publicação</label>
+                    <input type="date" id="notData" style="padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                  </div>
+                  <label style="display:flex;align-items:center;gap:8px">
+                    <input type="checkbox" id="notVisivel" checked>
+                    Visível
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="justify-content:center">Publicar Notícia</button>
+              </form>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Notícias Publicadas</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap" id="noticiasTabela">
+                <div class="loading-overlay"><div class="spinner"></div> Carregando notícias...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== VARIÁVEIS GLOBAIS =====
+let usuarioAtual = null;
+let abAtiva = 'inicio';
+
+// ===== ÍCONES =====
+const ICONS = {
+  inicio: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  transparencia: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  convenios: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  votacoes: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>',
+  financeiro: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  atualizacao: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  associados_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  eventos_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  convenios_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>',
+  carteirinhas_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+  gestoes_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+  logs_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+  site_config_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2h.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  noticias_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>'
+};
+
+// ===== NAVEGAÇÃO POR PERFIL =====
+function getNav(role) {
+  var nav = [];
+  // Menu base para todos os perfis
+  nav.push({ id: 'inicio', label: 'Início' });
+  nav.push({ id: 'transparencia', label: 'Transparência' });
+  nav.push({ id: 'convenios', label: 'Convênios' });
+  nav.push({ id: 'votacoes', label: 'Votações' });
+  nav.push({ id: 'atualizacao', label: 'Meu Cadastro' });
+
+  // Tesoureiro: + Associados
+  if (role === 'tesoureiro' || role === 'diretor' || role === 'presidente') {
+    nav.push({ id: 'associados_adm', label: 'Associados' });
+  }
+
+  // Diretor: + Gerir Eventos, Carteirinhas, Gerir Convênios, Gestões, Logs, Site Config, Notícias
+  if (role === 'diretor' || role === 'presidente') {
+    nav.push({ id: 'eventos_adm', label: 'Gerir Eventos' });
+    nav.push({ id: 'carteirinhas_adm', label: 'Carteirinhas' });
+    nav.push({ id: 'convenios_adm', label: 'Gerir Convênios' });
+    nav.push({ id: 'gestoes_adm', label: 'Gestões' });
+    nav.push({ id: 'logs_adm', label: 'Logs' });
+    nav.push({ id: 'site_config_adm', label: 'Configurar Site' });
+    nav.push({ id: 'noticias_adm', label: 'Notícias' });
+  }
+
+  // Tesoureiro: + Financeiro (separado)
+  if (role === 'presidente' || role === 'tesoureiro') {
+    nav.push({ id: 'financeiro', label: 'Financeiro' });
+  }
+
+  return nav;
+}
+
+// ===== MÁSCARAS =====
+function mascaraCPF(el) {
+  var v = el.value.replace(/\D/g, '').substring(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  el.value = v;
+}
+function mascaraTelefone(el) {
+  var v = el.value.replace(/\D/g, '').substring(0, 11);
+  v = v.replace(/(\d{2})(\d)/, '($1) $2');
+  v = v.replace(/(\d{5})(\d)/, '$1-$2');
+  el.value = v;
+}
+function formatarMoeda(n) {
+  return 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ===== LOGIN =====
+function fazerLogout() {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
+}
+
+// ===== SIDEBAR NAVIGATION =====
+function montarNavegacao(role) {
+  var nav = getNav(role);
+  var html = '';
+  for (var i = 0; i < nav.length; i++) {
+    var n = nav[i];
+    html += '<button class="nav-btn" data-tab="' + n.id + '" onclick="navegarPara(\'' + n.id + '\')">';
+    html += '<span style="display:flex;align-items:center">' + (ICONS[n.id] || '') + '</span>';
+    html += n.label + '</button>';
+  }
+  document.getElementById('sidebarNav').innerHTML = html;
+}
+
+function navegarPara(tabId) {
+  abAtiva = tabId;
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].classList.remove('active');
+  var view = document.getElementById('view-' + tabId);
+  if (view) view.classList.add('active');
+  var btns = document.querySelectorAll('.nav-btn');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].classList.toggle('active', btns[j].getAttribute('data-tab') === tabId);
+  }
+  var labels = { inicio: 'Início', transparencia: 'Transparência', convenios: 'Convênios', votacoes: 'Votações',
+    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', associados_adm: 'Associados', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs', site_config_adm: 'Configurar Site', noticias_adm: 'Notícias' };
+  document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
+}
+
+// ===== CARREGAR DADOS =====
+async function carregarDadosUsuario() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = '/login';
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/auth/perfil', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    
+    if (data.sucesso) {
+      usuarioAtual = data.dados;
+      var d = data.dados;
+      var ini = d.nomeCompleto ? d.nomeCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'US';
+      document.getElementById('userAvatar').textContent = ini;
+      document.getElementById('headerAvatar').textContent = ini;
+      document.getElementById('userName').textContent = d.nomeCompleto || 'Usuário';
+      document.getElementById('userRole').textContent = d.cargoGestao || d.perfil || 'associado';
+      
+      document.getElementById('dashNome').textContent = d.nomeCompleto || '--';
+      document.getElementById('dashCargo').textContent = (d.cargo || 'Servidor') + (d.matricula ? ' • Mat. ' + d.matricula : '');
+      document.getElementById('dashStatus').textContent = d.cargoGestao || d.situacao || 'Associado';
+      
+      var campos = [d.cpf, d.rg, d.matricula, d.cargo, d.whatsapp, d.email];
+      var preenchidos = campos.filter(function(c) { return c && c.trim() !== '' && c.toLowerCase() !== 'não'; }).length;
+      document.getElementById('dashSituacao').textContent = preenchidos + '/' + campos.length + ' campos';
+      document.getElementById('dashSituacao').style.color = preenchidos === campos.length ? '#16a34a' : '#d97706';
+      
+      document.getElementById('atNome').value = d.nomeCompleto || '';
+      document.getElementById('atCpf').value = d.cpf || '';
+      document.getElementById('atRg').value = d.rg || '';
+      document.getElementById('atExpeditor').value = d.expeditor || '';
+      document.getElementById('atMatricula').value = d.matricula || '';
+      document.getElementById('atCargo').value = d.cargo || '';
+      document.getElementById('atWhatsapp').value = d.whatsapp || '';
+      document.getElementById('atEmail').value = d.email || '';
+      
+      montarNavegacao(d.perfil || 'associado');
+      navegarPara('inicio');
+      carregarDadosAsync();
+      myCardInit();
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dados:', error);
+  }
+}
+
+async function carregarDadosAsync() {
+  await carregarEventos();
+  await carregarConvenios();
+  await carregarFinanceiro();
+  await carregarVotacoes();
+  
+  if (usuarioAtual && (usuarioAtual.perfil === 'tesoureiro' || usuarioAtual.perfil === 'diretor' || usuarioAtual.perfil === 'presidente')) {
+    await carregarAssociados();
+  }
+  if (usuarioAtual && (usuarioAtual.perfil === 'diretor' || usuarioAtual.perfil === 'presidente')) {
+    await carregarLogs();
+    await carregarGestoes();
+    crtCarregarConfig();
+    crtCarregarLista();
+    await carregarSiteConfig();
+    await carregarNoticias();
+  }
+}
+
+async function carregarEventos() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/eventos', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      document.getElementById('dashConvenios').textContent = data.dados.length || '0';
+      var html = '';
+      data.dados.slice(0, 3).forEach(function(e) {
+        var meses = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+        var dt = new Date(e.data);
+        html += '<div class="evento-item"><div class="evento-data"><span class="dia">' + dt.getDate() + '</span><span class="mes">' + meses[dt.getMonth()] + '</span></div><div class="evento-info"><div class="titulo">' + e.titulo + '</div><div class="local">' + (e.local || 'Local a definir') + '</div></div></div>';
+      });
+      document.getElementById('dashEventos').innerHTML = html;
+      // Tabela admin de eventos
+      var admHtml = '<table><thead><tr><th>Data</th><th>Título</th><th>Local</th><th>Visível</th></tr></thead><tbody>';
+      data.dados.forEach(function(e) {
+        admHtml += '<tr><td>' + new Date(e.data).toLocaleDateString('pt-BR') + '</td><td style="font-weight:600">' + e.titulo + '</td><td>' + (e.local || '-') + '</td><td>' + (e.visivel !== false ? '✓' : '✗') + '</td></tr>';
+      });
+      admHtml += '</tbody></table>';
+      document.getElementById('eventosAdmTabela').innerHTML = admHtml;
+    } else {
+      document.getElementById('dashConvenios').textContent = '0';
+      document.getElementById('dashEventos').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
+      document.getElementById('eventosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum evento cadastrado.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar eventos:', error);
+    document.getElementById('dashEventos').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
+    document.getElementById('eventosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum evento cadastrado.</p>';
+  }
+}
+
+async function carregarConvenios() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/convenios', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      var catColors = { 'Saúde': 'badge-green', 'Educação': 'badge-blue', 'Lazer': 'badge-yellow', 'Alimentação': 'badge-red', 'Serviços': 'badge-blue', 'Outros': 'badge-gray' };
+      var html = '';
+      data.dados.forEach(function(c) {
+        var badgeCls = catColors[c.categoria] || 'badge-gray';
+        html += '<div class="card convenio-card"><div class="card-body"><div class="icon-area">🏆</div><span class="badge ' + badgeCls + '">' + (c.categoria || 'Outros') + '</span><h3>' + c.nome + '</h3><p class="desc">' + (c.descricao || '') + '</p><div class="convenio-actions"><button class="btn btn-outline btn-sm">Detalhes</button><button class="btn btn-primary btn-sm">Resgatar</button></div></div></div>';
+      });
+      document.getElementById('conveniosGrid').innerHTML = html;
+      // Tabela admin de convênios
+      var admHtml = '<table><thead><tr><th>Nome</th><th>Categoria</th><th>Visível</th></tr></thead><tbody>';
+      data.dados.forEach(function(c) {
+        admHtml += '<tr><td style="font-weight:600">' + c.nome + '</td><td>' + (c.categoria || '-') + '</td><td>' + (c.visivel !== false ? '✓' : '✗') + '</td></tr>';
+      });
+      admHtml += '</tbody></table>';
+      document.getElementById('conveniosAdmTabela').innerHTML = admHtml;
+    } else {
+      document.getElementById('conveniosGrid').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:24px">Nenhum convênio cadastrado.</p>';
+      document.getElementById('conveniosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum convênio cadastrado.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar convênios:', error);
+    document.getElementById('conveniosGrid').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:24px">Nenhum convênio cadastrado.</p>';
+    document.getElementById('conveniosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Erro ao carregar convênios.</p>';
+  }
+}
+
+async function carregarFinanceiro() {
+  var vazioResumo = '<div class="fin-card receitas"><p class="fin-label">Receitas</p><p class="fin-valor">R$ 0,00</p></div><div class="fin-card despesas"><p class="fin-label">Despesas</p><p class="fin-valor">R$ 0,00</p></div><div class="fin-card saldo"><p class="fin-label">Saldo em Caixa</p><p class="fin-valor">R$ 0,00</p></div>';
+  var vazioTabela = '<p style="color:#9ca3af;font-size:13px;padding:16px;text-align:center">Nenhum lançamento registrado.</p>';
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/financeiro', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      var receitas = 0, despesas = 0;
+      data.dados.forEach(function(l) {
+        if (l.tipo === 'Entrada') receitas += Number(l.valor);
+        else despesas += Number(l.valor);
+      });
+      var saldo = receitas - despesas;
+      var resumoHtml = '<div class="fin-card receitas"><p class="fin-label">Receitas</p><p class="fin-valor">' + formatarMoeda(receitas) + '</p></div><div class="fin-card despesas"><p class="fin-label">Despesas</p><p class="fin-valor">' + formatarMoeda(despesas) + '</p></div><div class="fin-card saldo"><p class="fin-label">Saldo em Caixa</p><p class="fin-valor">' + formatarMoeda(saldo) + '</p></div>';
+      document.getElementById('finResumo').innerHTML = resumoHtml;
+      document.getElementById('finResumoTransp').innerHTML = resumoHtml;
+      
+      var tabelaHtml = '<table><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Responsável</th></tr></thead><tbody>';
+      data.dados.forEach(function(l) {
+        var cls = l.tipo === 'Entrada' ? 'valor-positivo' : 'valor-negativo';
+        var sinal = l.tipo === 'Entrada' ? '+' : '-';
+        tabelaHtml += '<tr><td style="color:#6b7280">' + new Date(l.data).toLocaleDateString('pt-BR') + '</td><td style="font-weight:600">' + l.descricao + '</td><td class="' + cls + '">' + sinal + ' ' + formatarMoeda(l.valor) + '</td><td style="color:#6b7280;font-style:italic">' + (l.responsavel || '-') + '</td></tr>';
+      });
+      tabelaHtml += '</tbody></table>';
+      document.getElementById('finTabela').innerHTML = tabelaHtml;
+      document.getElementById('finTabelaTransp').innerHTML = tabelaHtml;
+    } else {
+      document.getElementById('finResumo').innerHTML = vazioResumo;
+      document.getElementById('finResumoTransp').innerHTML = vazioResumo;
+      document.getElementById('finTabela').innerHTML = vazioTabela;
+      document.getElementById('finTabelaTransp').innerHTML = vazioTabela;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar financeiro:', error);
+    document.getElementById('finResumo').innerHTML = vazioResumo;
+    document.getElementById('finResumoTransp').innerHTML = vazioResumo;
+    document.getElementById('finTabela').innerHTML = vazioTabela;
+    document.getElementById('finTabelaTransp').innerHTML = vazioTabela;
+  }
+}
+
+var todosAssociados = [];
+
+async function carregarAssociados() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/associados', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.associados) {
+      todosAssociados = data.associados;
+      var total = data.associados.length;
+      var completo = data.associados.filter(function(a) { return a.cadastroCompleto; }).length;
+      var pendente = total - completo;
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statCompleto').textContent = completo;
+      document.getElementById('statPendente').textContent = pendente;
+      filtrarAssociados();
+    }
+  } catch (error) {
+    console.error('Erro ao carregar associados:', error);
+    document.getElementById('assocLista').innerHTML = '<p style="color:#dc2626">Erro ao carregar associados.</p>';
+  }
+}
+
+function filtrarAssociados() {
+  var busca = (document.getElementById('assocBusca').value || '').toLowerCase();
+  var perfil = document.getElementById('assocFiltroPerfil').value;
+  var mostrarInativos = document.getElementById('assocMostrarInativos').checked;
+  
+  var lista = todosAssociados.filter(function(a) {
+    var nome = (a.nome || a.nomeCompleto || '').toLowerCase();
+    var cpf = (a.cpf || '').toLowerCase();
+    var cargo = (a.cargo || '').toLowerCase();
+    var matchBusca = !busca || nome.includes(busca) || cpf.includes(busca) || cargo.includes(busca);
+    var matchPerfil = !perfil || (a.perfil || '').toLowerCase() === perfil;
+    var matchAtivo = mostrarInativos || !a.situacao || a.situacao.toLowerCase() !== 'inativo';
+    return matchBusca && matchPerfil && matchAtivo;
+  });
+
+  renderizarAssociados(lista);
+}
+
+function renderizarAssociados(lista) {
+  if (lista.length === 0) {
+    document.getElementById('assocLista').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:32px">Nenhum associado encontrado.</p>';
+    return;
+  }
+  var html = '';
+  lista.forEach(function(a) {
+    var nome = a.nome || a.nomeCompleto || '';
+    var ini = nome ? nome.split(' ').filter(function(n){return n.length>0;}).map(function(n){return n[0];}).join('').substring(0,2).toUpperCase() : '??';
+    var cpfFormatado = a.cpf ? a.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '';
+    var cargoInfo = a.cargo ? a.cargo : '';
+    var subInfo = cpfFormatado + (cargoInfo ? ' • ' + cargoInfo : '');
+    
+    var statusBadge = '';
+    if (a.cadastroCompleto) {
+      statusBadge = '<span style="background:#dcfce7;color:#16a34a;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">✓ Completo</span>';
+    } else {
+      var campos = a.camposPreenchidos || 0;
+      statusBadge = '<span style="background:#fef3c7;color:#d97706;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">⚠ Pendente (' + campos + '/6)</span>';
+    }
+
+    var whatsBtn = '';
+    if (a.cpf) {
+      whatsBtn = '<button onclick="abrirWhatsAssociado(\'' + a.id + '\')" style="background:#25d366;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Zap</button>';
+    }
+
+    html += '<div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f3f4f6;gap:14px;transition:background .15s" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'transparent\'">';
+    html += '<div style="width:40px;height:40px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#6b7280;flex-shrink:0">' + ini + '</div>';
+    html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + nome + '</div><div style="font-size:12px;color:#6b7280;margin-top:2px">' + subInfo + '</div></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">' + statusBadge + whatsBtn + '<button onclick="editarAssociado(' + a.id + ')" style="background:#1e3a5f;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Editar</button></div>';
+    html += '</div>';
+  });
+  document.getElementById('assocLista').innerHTML = '<div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff">' + html + '</div>';
+}
+
+function abrirWhatsAssociado(id) {
+  var a = todosAssociados.find(function(x) { return x.id == id; });
+  if (a && a.whatsapp) {
+    var num = a.whatsapp.replace(/\D/g, '');
+    if (num.length <= 11) num = '55' + num;
+    window.open('https://wa.me/' + num, '_blank');
+  } else {
+    alert('WhatsApp não cadastrado para este associado.');
+  }
+}
+
+function editarAssociado(id) {
+  var a = todosAssociados.find(function(x) { return x.id == id; });
+  if (!a) return alert('Associado não encontrado');
+  
+  // Buscar dados completos do associado
+  var token = localStorage.getItem('token');
+  fetch('/api/associados/' + id, { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var d = data.sucesso ? data.dados : a;
+      document.getElementById('editId').value = d.id || id;
+      document.getElementById('editNome').value = d.nomeCompleto || d.nome || '';
+      document.getElementById('editPerfil').value = d.perfil || '';
+      document.getElementById('editSexo').value = d.sexo || '';
+      document.getElementById('editCpf').value = d.cpf ? d.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '';
+      document.getElementById('editRg').value = d.rg || '';
+      document.getElementById('editExpeditor').value = d.expeditor || '';
+      document.getElementById('editMatricula').value = d.matricula || '';
+      document.getElementById('editCargo').value = d.cargo || '';
+      document.getElementById('editWhatsapp').value = d.whatsapp || '';
+      document.getElementById('editEmail').value = d.email || '';
+      document.getElementById('modalEditAssociado').style.display = 'flex';
+    })
+    .catch(function() {
+      document.getElementById('editId').value = id;
+      document.getElementById('editNome').value = a.nome || '';
+      document.getElementById('editPerfil').value = a.perfil || '';
+      document.getElementById('editSexo').value = '';
+      document.getElementById('editCpf').value = a.cpf ? a.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '';
+      document.getElementById('editRg').value = '';
+      document.getElementById('editExpeditor').value = '';
+      document.getElementById('editMatricula').value = a.matricula || '';
+      document.getElementById('editCargo').value = a.cargo || '';
+      document.getElementById('editWhatsapp').value = a.whatsapp || '';
+      document.getElementById('editEmail').value = '';
+      document.getElementById('modalEditAssociado').style.display = 'flex';
+    });
+}
+
+function fecharModalEdit() {
+  document.getElementById('modalEditAssociado').style.display = 'none';
+}
+
+async function salvarEdicaoAssociado() {
+  var id = document.getElementById('editId').value;
+  var token = localStorage.getItem('token');
+  var dados = {
+    nomeCompleto: document.getElementById('editNome').value,
+    perfil: document.getElementById('editPerfil').value,
+    sexo: document.getElementById('editSexo').value,
+    cpf: document.getElementById('editCpf').value.replace(/\D/g, ''),
+    rg: document.getElementById('editRg').value,
+    expeditor: document.getElementById('editExpeditor').value,
+    matricula: document.getElementById('editMatricula').value,
+    cargo: document.getElementById('editCargo').value,
+    whatsapp: document.getElementById('editWhatsapp').value,
+    email: document.getElementById('editEmail').value
+  };
+
+  try {
+    var response = await fetch('/api/associados/' + id, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+    var result = await response.json();
+    if (result.sucesso) {
+      fecharModalEdit();
+      carregarAssociados();
+    } else {
+      alert('Erro: ' + (result.erro || 'Falha ao salvar'));
+    }
+  } catch (e) {
+    alert('Erro ao salvar: ' + e.message);
+  }
+}
+
+async function carregarLogs() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/logs', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      var html = '<table><thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Detalhes</th></tr></thead><tbody>';
+      data.dados.forEach(function(l) {
+        html += '<tr><td style="color:#6b7280">' + new Date(l.createdAt).toLocaleString('pt-BR') + '</td><td style="font-weight:600">' + (l.usuario || '-') + '</td><td>' + l.acao + '</td><td style="color:#6b7280;font-style:italic">' + (l.detalhes || '') + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('logsTabela').innerHTML = html;
+    } else {
+      document.getElementById('logsTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum log registrado.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar logs:', error);
+    document.getElementById('logsTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum log registrado.</p>';
+  }
+}
+
+async function carregarVotacoes() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/votacoes', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados) {
+      var html = '';
+      if (data.dados.length === 0) {
+        html = '<p style="color:#9ca3af;font-size:13px">Nenhuma votação cadastrada.</p>';
+      } else {
+        data.dados.forEach(function(v) {
+          var statusCls = v.status === 'Aberta' ? 'badge-green' : 'badge-gray';
+          html += '<div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center"><div><h3 style="font-size:15px;font-weight:700;color:#1f2937">' + v.titulo + '</h3><p style="font-size:12px;color:#6b7280">Encerra em: ' + (v.dataFim || 'Sem data') + '</p></div><div style="text-align:right"><span class="badge ' + statusCls + '">' + v.status + '</span><p style="font-size:12px;color:#6b7280;margin-top:4px">' + v.votos + ' votos</p></div></div></div>';
+        });
+      }
+      document.getElementById('votacoesList').innerHTML = html;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar votações:', error);
+  }
+}
+
+async function carregarGestoes() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/gestoes', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados && data.dados.length > 0) {
+      var html = '';
+      data.dados.forEach(function(g) {
+        var ativaCls = g.ativa ? 'badge-green' : 'badge-gray';
+        var membrosHtml = '';
+        if (g.membros && g.membros.length > 0) {
+          membrosHtml = '<div style="margin-top:12px;border-top:1px solid #e5e7eb;padding-top:12px"><p style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:8px">DIRETORIA:</p>';
+          g.membros.forEach(function(m) {
+            membrosHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span style="font-weight:600">' + m.nome + '</span><span style="color:#6b7280">' + m.cargo + '</span></div>';
+          });
+          membrosHtml += '</div>';
+        }
+        html += '<div class="card" style="margin-bottom:16px"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center"><div><h3 style="font-size:16px;font-weight:700">' + g.nome + '</h3><p style="font-size:12px;color:#6b7280">Início: ' + (g.inicio ? new Date(g.inicio).toLocaleDateString('pt-BR') : '-') + ' | Fim: ' + (g.fim ? new Date(g.fim).toLocaleDateString('pt-BR') : '-') + '</p></div><span class="badge ' + ativaCls + '">' + (g.ativa ? 'Ativa' : 'Inativa') + '</span></div>' + membrosHtml + '</div></div>';
+      });
+      document.getElementById('gestoesContent').innerHTML = html;
+    } else {
+      document.getElementById('gestoesContent').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhuma gestão cadastrada.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar gestões:', error);
+    document.getElementById('gestoesContent').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhuma gestão cadastrada.</p>';
+  }
+}
+
+async function salvarAtualizacao(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const dados = {
+    cpf: document.getElementById('atCpf').value,
+    rg: document.getElementById('atRg').value,
+    expeditor: document.getElementById('atExpeditor').value,
+    matricula: document.getElementById('atMatricula').value,
+    cargo: document.getElementById('atCargo').value,
+    whatsapp: document.getElementById('atWhatsapp').value,
+    email: document.getElementById('atEmail').value
+  };
+  
+  try {
+    const response = await fetch('/api/auth/perfil', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dados)
+    });
+    const data = await response.json();
+    if (data.sucesso) {
+      document.getElementById('atStatus').innerHTML = '<span style="color:#16a34a">✓ Dados atualizados com sucesso!</span>';
+    } else {
+      document.getElementById('atStatus').innerHTML = '<span style="color:#dc2626">✗ Erro ao atualizar: ' + (data.erro || 'Erro desconhecido') + '</span>';
+    }
+  } catch (error) {
+    document.getElementById('atStatus').innerHTML = '<span style="color:#dc2626">✗ Erro de conexão</span>';
+  }
+}
+
+function abrirModalLanc(tipo) { alert('Funcionalidade em desenvolvimento'); }
+function abrirModalEvento() { alert('Funcionalidade em desenvolvimento'); }
+function abrirModalConvenio() { alert('Funcionalidade em desenvolvimento'); }
+
+// ===== CARTEIRINHAS: CONFIG + EXPORT =====
+var crtFrameConfig = { left: 7.5, top: 14.2, width: 29.4, height: 24.1 };
+var crtCamposConfig = {
+  crtNome:         { left: 45, top: 14,  fontSize: 1.8, color: '#1a1a1a', fontWeight: 700 },
+  crtMatricula:    { left: 50, top: 25,  fontSize: 1.7, color: '#1a1a1a', fontWeight: 700 },
+  crtCargo:        { left: 43, top: 31,  fontSize: 1.6, color: '#1a1a1a', fontWeight: 700 },
+  crtCpf:          { left: 40, top: 45,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700 },
+  crtRg:           { left: 40, top: 51,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700 },
+  crtEmissao:      { left: 40, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 },
+  crtValidade:     { left: 60, top: 39,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700 },
+  crtLblNome:      { left: 32, top: 14,  fontSize: 1.6, color: '#1a1a1a', fontWeight: 700, text: 'ASSOCIADO:' },
+  crtLblMatricula: { left: 32, top: 25,  fontSize: 1.5, color: '#1a1a1a', fontWeight: 700, text: 'MATRÍCULA:' },
+  crtLblCargo:     { left: 32, top: 31,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700, text: 'CARGO:' },
+  crtLblEmissao:   { left: 30, top: 39,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700, text: 'EMISSÃO:' },
+  crtLblValidade:  { left: 50, top: 39,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700, text: 'VALIDADE:' },
+  crtLblDadosPessoais: { left: 30, top: 30,  fontSize: 1.6, color: '#1a1a1a', fontWeight: 700, text: 'DADOS PESSOAIS' },
+  crtLblCpf:       { left: 30, top: 45,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700, text: 'CPF:' },
+  crtLblRg:        { left: 30, top: 51,  fontSize: 1.4, color: '#1a1a1a', fontWeight: 700, text: 'RG:' }
+};
+var crtKeyMap = {
+  crtNome:'cardNome', crtMatricula:'cardMatricula', crtCargo:'cardCargo',
+  crtCpf:'cardCpf', crtRg:'cardRg', crtEmissao:'cardEmissao', crtValidade:'cardValidade',
+  crtLblNome:'cardLblNome', crtLblMatricula:'cardLblMatricula', crtLblCargo:'cardLblCargo',
+  crtLblEmissao:'cardLblEmissao', crtLblValidade:'cardLblValidade',
+  crtLblDadosPessoais:'cardLblDadosPessoais', crtLblCpf:'cardLblCpf', crtLblRg:'cardLblRg'
+};
+var crtKeyMapInv = {}; for(var k in crtKeyMap) crtKeyMapInv[crtKeyMap[k]] = k;
+var crtListaAssoc = [];
+var crtTemplateFrenteUrl = null;
+var crtTemplateVersoUrl = null;
+
+function crtSyncFromRange(rangeId, numId) {
+  document.getElementById(numId).value = parseFloat(document.getElementById(rangeId).value).toFixed(1);
+}
+function crtSyncFromNum(numId, rangeId) {
+  var v = parseFloat(document.getElementById(numId).value);
+  if (isNaN(v)) return;
+  var r = document.getElementById(rangeId);
+  v = Math.max(parseFloat(r.min), Math.min(parseFloat(r.max), v));
+  r.value = v; document.getElementById(numId).value = v.toFixed(1);
+}
+function crtSyncFrameFromRange(rangeId, numId, prop) {
+  var val = parseFloat(document.getElementById(rangeId).value);
+  document.getElementById(numId).value = val.toFixed(1);
+  crtFrameConfig[prop] = val;
+  crtAplicarFrame();
+}
+function crtSyncFrameFromNum(numId, rangeId, prop) {
+  var v = parseFloat(document.getElementById(numId).value);
+  if (isNaN(v)) return;
+  var r = document.getElementById(rangeId);
+  v = Math.max(parseFloat(r.min), Math.min(parseFloat(r.max), v));
+  r.value = v; document.getElementById(numId).value = v.toFixed(1);
+  crtFrameConfig[prop] = v;
+  crtAplicarFrame();
+}
+
+async function crtCarregarConfig() {
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/carteirinhas/config', { headers: { 'Authorization': 'Bearer ' + token } });
+    var r = await resp.json();
+    if (r && r.config) {
+      try {
+        var cfg = JSON.parse(r.config);
+        if (cfg.frame) crtFrameConfig = cfg.frame;
+        if (cfg.campos) {
+          for (var savedId in cfg.campos) {
+            var localId = crtKeyMapInv[savedId];
+            if (localId && crtCamposConfig[localId]) crtCamposConfig[localId] = cfg.campos[savedId];
+          }
+        }
+      } catch(e){}
+    }
+    if (r && r.templateFrente) {
+      crtTemplateFrenteUrl = r.templateFrente;
+      document.getElementById('crtBg').src = r.templateFrente;
+    }
+    if (r && r.templateVerso) {
+      crtTemplateVersoUrl = r.templateVerso;
+      document.getElementById('crtBgVerso').src = r.templateVerso;
+    }
+    crtAplicarFrame();
+    crtSincronizarFrameUI();
+    crtAplicarTodosCampos();
+    crtSelecionarCampo('crtNome');
+  } catch(e) { console.error('Erro ao carregar config carteirinha:', e); }
+}
+
+function crtAplicarFrame() {
+  var f = document.getElementById('crtPhotoFrame');
+  if (!f) return;
+  f.style.left = crtFrameConfig.left + '%';
+  f.style.top = crtFrameConfig.top + '%';
+  f.style.width = crtFrameConfig.width + '%';
+  f.style.height = crtFrameConfig.height + '%';
+}
+function crtSincronizarFrameUI() {
+  document.getElementById('crtFrameLeft').value = crtFrameConfig.left;
+  document.getElementById('crtFrameTop').value = crtFrameConfig.top;
+  document.getElementById('crtFrameW').value = crtFrameConfig.width;
+  document.getElementById('crtFrameH').value = crtFrameConfig.height;
+  document.getElementById('crtFrameLeftVal').value = crtFrameConfig.left.toFixed(1);
+  document.getElementById('crtFrameTopVal').value = crtFrameConfig.top.toFixed(1);
+  document.getElementById('crtFrameWVal').value = crtFrameConfig.width.toFixed(1);
+  document.getElementById('crtFrameHVal').value = crtFrameConfig.height.toFixed(1);
+}
+function crtAplicarCampoConfig(id) {
+  var cfg = crtCamposConfig[id]; var el = document.getElementById(id);
+  if (!el || !cfg) return;
+  el.style.left = cfg.left + '%'; el.style.top = cfg.top + '%';
+  el.style.fontSize = cfg.fontSize + 'mm'; el.style.color = cfg.color; el.style.fontWeight = cfg.fontWeight;
+  if (cfg.text !== undefined && cfg.text !== null) el.textContent = cfg.text;
+}
+function crtAplicarTodosCampos() { for (var id in crtCamposConfig) crtAplicarCampoConfig(id); }
+function crtSelecionarCampo(id) {
+  var cfg = crtCamposConfig[id]; if (!cfg) return;
+  document.getElementById('crtCampoX').value = cfg.left;
+  document.getElementById('crtCampoY').value = cfg.top;
+  document.getElementById('crtCampoSize').value = cfg.fontSize;
+  document.getElementById('crtCampoCor').value = cfg.color;
+  document.getElementById('crtCampoBold').value = cfg.fontWeight;
+  document.getElementById('crtCampoXVal').value = cfg.left.toFixed(1);
+  document.getElementById('crtCampoYVal').value = cfg.top.toFixed(1);
+  document.getElementById('crtCampoSizeVal').value = cfg.fontSize.toFixed(1);
+  document.getElementById('crtCampoCorVal').value = cfg.color;
+  var isLabel = id.indexOf('Lbl') !== -1;
+  var textoWrapper = document.getElementById('crtCampoTextoWrapper');
+  if (isLabel) { textoWrapper.style.display = 'block'; document.getElementById('crtCampoTexto').value = cfg.text || ''; }
+  else { textoWrapper.style.display = 'none'; }
+  var overlays = document.querySelectorAll('.crt-overlay');
+  for (var i = 0; i < overlays.length; i++) overlays[i].classList.toggle('crt-campo-hl', overlays[i].id === id);
+}
+function crtAtualizarCampo() {
+  var id = document.getElementById('crtCampoSel').value;
+  var cfg = crtCamposConfig[id]; if (!cfg) return;
+  cfg.left = parseFloat(document.getElementById('crtCampoX').value);
+  cfg.top = parseFloat(document.getElementById('crtCampoY').value);
+  cfg.fontSize = parseFloat(document.getElementById('crtCampoSize').value);
+  cfg.color = document.getElementById('crtCampoCor').value;
+  cfg.fontWeight = parseInt(document.getElementById('crtCampoBold').value);
+  if (id.indexOf('Lbl') !== -1) cfg.text = document.getElementById('crtCampoTexto').value;
+  document.getElementById('crtCampoXVal').value = cfg.left.toFixed(1);
+  document.getElementById('crtCampoYVal').value = cfg.top.toFixed(1);
+  document.getElementById('crtCampoSizeVal').value = cfg.fontSize.toFixed(1);
+  document.getElementById('crtCampoCorVal').value = cfg.color;
+  crtAplicarCampoConfig(id);
+}
+
+async function crtSalvarLayout() {
+  var btn = document.getElementById('crtBtnSalvar'); btn.disabled = true;
+  var el = document.getElementById('crtMsgLayout'); el.innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  var savedCampos = {};
+  for (var localId in crtCamposConfig) { savedCampos[crtKeyMap[localId] || localId] = crtCamposConfig[localId]; }
+  var configJson = JSON.stringify({ frame: crtFrameConfig, campos: savedCampos });
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/carteirinhas/config', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: configJson })
+    });
+    var r = await resp.json();
+    btn.disabled = false;
+    if (r.erro) el.innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>';
+    else el.innerHTML = '<span style="color:#16a34a">Layout salvo com sucesso!</span>';
+  } catch(e) { btn.disabled = false; el.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+}
+
+async function crtSalvarTemplates() {
+  var msg = document.getElementById('crtMsgTemplate');
+  var fileFrente = document.getElementById('crtTemplateFrente').files[0];
+  var fileVerso = document.getElementById('crtTemplateVerso').files[0];
+  if (!fileFrente && !fileVerso) { msg.innerHTML = '<span style="color:#dc2626">Selecione ao menos um arquivo.</span>'; return; }
+  msg.innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  var token = localStorage.getItem('token');
+  try {
+    if (fileFrente) {
+      var fd = new FormData();
+      fd.append('lado', 'frente');
+      fd.append('template', fileFrente);
+      var resp = await fetch('/api/carteirinhas/template', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd });
+      var r = await resp.json();
+      if (r.sucesso && r.path) { crtTemplateFrenteUrl = r.path; document.getElementById('crtBg').src = r.path + '?t=' + Date.now(); }
+    }
+    if (fileVerso) {
+      var fd2 = new FormData();
+      fd2.append('lado', 'verso');
+      fd2.append('template', fileVerso);
+      var resp2 = await fetch('/api/carteirinhas/template', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd2 });
+      var r2 = await resp2.json();
+      if (r2.sucesso && r2.path) { crtTemplateVersoUrl = r2.path; document.getElementById('crtBgVerso').src = r2.path + '?t=' + Date.now(); }
+    }
+    msg.innerHTML = '<span style="color:#16a34a">Template(s) salvo(s)!</span>';
+  } catch(e) { msg.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+}
+
+async function crtExcluirTemplate(lado) {
+  if (!confirm('Tem certeza que deseja excluir o template ' + lado + '?')) return;
+  var msg = document.getElementById('crtMsgTemplate');
+  msg.innerHTML = '<span style="color:#2563eb">Excluindo...</span>';
+  var token = localStorage.getItem('token');
+  try {
+    var resp = await fetch('/api/carteirinhas/template/' + lado, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    var r = await resp.json();
+    if (r.sucesso) {
+      if (lado === 'frente') {
+        crtTemplateFrenteUrl = null;
+        document.getElementById('crtBg').src = '';
+        document.getElementById('crtTemplateFrente').value = '';
+      } else {
+        crtTemplateVersoUrl = null;
+        document.getElementById('crtBgVerso').src = '';
+        document.getElementById('crtTemplateVerso').value = '';
+      }
+      msg.innerHTML = '<span style="color:#16a34a">Template ' + lado + ' excluído!</span>';
+    } else {
+      msg.innerHTML = '<span style="color:#dc2626">Erro: ' + (r.erro || 'Erro desconhecido') + '</span>';
+    }
+  } catch(e) { msg.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+}
+
+async function crtCarregarPreview() {
+  var cpf = document.getElementById('crtPreviewSel').value;
+  var msgEl = document.getElementById('crtMsgLayout');
+  if (!cpf) {
+    document.getElementById('crtNome').textContent = 'NOME DO ASSOCIADO';
+    document.getElementById('crtMatricula').textContent = '12345678';
+    document.getElementById('crtCargo').textContent = 'Cargo';
+    document.getElementById('crtCpf').textContent = '000.000.000-00';
+    document.getElementById('crtRg').textContent = '0000000';
+    var hoje = new Date();
+    document.getElementById('crtEmissao').textContent = crtFormatarData(hoje);
+    var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+    document.getElementById('crtValidade').textContent = crtFormatarData(val);
+    document.getElementById('crtPhotoImg').style.display = 'none';
+    document.getElementById('crtPhotoPlaceholder').style.display = '';
+    return;
+  }
+  msgEl.innerHTML = '<span style="color:#2563eb">Carregando preview...</span>';
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/carteirinhas/preview/' + encodeURIComponent(cpf), { headers: { 'Authorization': 'Bearer ' + token } });
+    var r = await resp.json();
+    if (r.erro) { msgEl.innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    msgEl.innerHTML = '';
+    var d = r.dados;
+    document.getElementById('crtNome').textContent = d.nomeCompleto || '';
+    document.getElementById('crtMatricula').textContent = d.matricula || '';
+    document.getElementById('crtCargo').textContent = d.cargo || '';
+    document.getElementById('crtCpf').textContent = d.cpf || '';
+    document.getElementById('crtRg').textContent = d.rg || '';
+    var hoje2 = new Date();
+    document.getElementById('crtEmissao').textContent = crtFormatarData(hoje2);
+    var val2 = new Date(hoje2); val2.setFullYear(val2.getFullYear() + 4);
+    document.getElementById('crtValidade').textContent = crtFormatarData(val2);
+    var fotoSrc = r.fotoBase64 || d.fotoCarteirinhaUrl || d.fotoUrl;
+    if (fotoSrc) {
+      var img = document.getElementById('crtPhotoImg');
+      img.src = fotoSrc;
+      img.style.display = 'block';
+      document.getElementById('crtPhotoPlaceholder').style.display = 'none';
+      var fCfg = null;
+      try { if (d.fotoConfig) fCfg = JSON.parse(d.fotoConfig); } catch(e){}
+      if (fCfg && fCfg.zoom) {
+        img.style.objectFit = '';
+        img.style.position = 'absolute';
+        img.onload = function() {
+          var frame = document.getElementById('crtPhotoFrame');
+          var frameWpx = frame.offsetWidth, frameHpx = frame.offsetHeight;
+          var savedFrameW = fCfg.frameW || frameWpx;
+          var savedFrameH = fCfg.frameH || frameHpx;
+          var ratioW = frameWpx / savedFrameW;
+          var ratioH = frameHpx / savedFrameH;
+          var imgW = img.naturalWidth * fCfg.zoom * ratioW;
+          var imgH = img.naturalHeight * fCfg.zoom * ratioH;
+          img.style.width = imgW + 'px'; img.style.height = imgH + 'px';
+          img.style.left = ((fCfg.x || 0) * ratioW) + 'px';
+          img.style.top = ((fCfg.y || 0) * ratioH) + 'px';
+        };
+        if (img.complete) img.onload();
+      } else {
+        img.style.objectFit = 'cover'; img.style.position = '';
+        img.style.width = '100%'; img.style.height = '100%';
+        img.style.left = ''; img.style.top = '';
+      }
+    } else {
+      document.getElementById('crtPhotoImg').style.display = 'none';
+      document.getElementById('crtPhotoPlaceholder').style.display = '';
+    }
+  } catch(e) { msgEl.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+}
+
+async function crtCarregarLista() {
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/associados', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    if (data.sucesso && data.associados) {
+      crtListaAssoc = data.associados.map(function(a) {
+        return { cpf: a.cpf, nome: a.nome || a.nomeCompleto, cargo: a.cargo, temFoto: a.temFoto };
+      });
+      crtRenderLista(crtListaAssoc);
+      crtPopularPreviewSel();
+    } else {
+      document.getElementById('crtLista').innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af">Nenhum associado encontrado.</div>';
+    }
+  } catch(e) {
+    document.getElementById('crtLista').innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af">Erro ao carregar associados.</div>';
+  }
+}
+
+function crtPopularPreviewSel() {
+  var sel = document.getElementById('crtPreviewSel');
+  sel.innerHTML = '<option value="">— Dados de exemplo —</option>';
+  for (var i = 0; i < crtListaAssoc.length; i++) {
+    sel.innerHTML += '<option value="' + crtListaAssoc[i].cpf + '">' + crtListaAssoc[i].nome + '</option>';
+  }
+}
+
+function crtRenderLista(lista) {
+  var el = document.getElementById('crtLista');
+  if (!lista.length) { el.innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af">Nenhum associado.</div>'; return; }
+  var h = '<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="background:#f3f4f6;position:sticky;top:0;z-index:1">';
+  h += '<th style="padding:8px 12px;text-align:left;width:36px"><input type="checkbox" id="crtCheckAll" onchange="crtSelTodos(this.checked)"></th>';
+  h += '<th style="padding:8px 12px;text-align:left">Nome</th><th style="padding:8px 12px;text-align:left">CPF</th>';
+  h += '<th style="padding:8px 12px;text-align:left">Cargo</th><th style="padding:8px 12px;text-align:center;width:36px">📷</th></tr></thead><tbody>';
+  for (var i = 0; i < lista.length; i++) {
+    var a = lista[i];
+    h += '<tr class="crt-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" data-foto="' + (a.temFoto?'1':'0') + '" data-cargo="' + ((a.cargo||'').toLowerCase()) + '" style="border-bottom:1px solid #f3f4f6">';
+    h += '<td style="padding:6px 12px"><input type="checkbox" class="crt-check" value="' + a.cpf + '" onchange="crtContador()"></td>';
+    h += '<td style="padding:6px 12px;font-weight:600">' + a.nome + '</td>';
+    h += '<td style="padding:6px 12px;color:#6b7280">' + a.cpf + '</td>';
+    h += '<td style="padding:6px 12px;color:#6b7280">' + (a.cargo||'—') + '</td>';
+    h += '<td style="padding:6px 12px;text-align:center">' + (a.temFoto ? '✅' : '❌') + '</td></tr>';
+  }
+  h += '</tbody></table>'; el.innerHTML = h; crtContador();
+}
+
+function crtFiltrar() {
+  var b = (document.getElementById('crtBusca').value || '').toLowerCase().trim();
+  var ff = document.getElementById('crtFiltroFoto').value;
+  var rows = document.querySelectorAll('.crt-row');
+  for (var i = 0; i < rows.length; i++) {
+    var n = rows[i].getAttribute('data-nome')||'', c = rows[i].getAttribute('data-cpf')||'';
+    var foto = rows[i].getAttribute('data-foto')||'';
+    var show = true;
+    if (b && n.indexOf(b) === -1 && c.indexOf(b) === -1) show = false;
+    if (ff === 'comFoto' && foto !== '1') show = false;
+    if (ff === 'semFoto' && foto !== '0') show = false;
+    rows[i].style.display = show ? '' : 'none';
+  }
+  crtContador();
+}
+
+function crtSelTodos(checked) {
+  var cks = document.querySelectorAll('.crt-check');
+  for (var i = 0; i < cks.length; i++) { var r = cks[i].closest('.crt-row'); if (r && r.style.display !== 'none') cks[i].checked = checked; }
+  var ca = document.getElementById('crtCheckAll'); if (ca) ca.checked = checked; crtContador();
+}
+function crtContador() {
+  var n = document.querySelectorAll('.crt-check:checked').length;
+  document.getElementById('crtSelecionados').textContent = n + ' selecionado' + (n !== 1 ? 's' : '');
+}
+function crtFormatarData(d) { return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear(); }
+
+async function crtExportarPdf() {
+  var cks = document.querySelectorAll('.crt-check:checked'); var cpfs = [];
+  for (var i = 0; i < cks.length; i++) cpfs.push(cks[i].value);
+  if (!cpfs.length) { document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Selecione pelo menos um associado.</span>'; return; }
+  var btn = document.getElementById('crtBtnPdf'); btn.disabled = true;
+  document.getElementById('crtProgresso').style.display = 'block';
+  document.getElementById('crtBarra').style.width = '0%';
+  document.getElementById('crtProgTexto').textContent = 'Buscando dados...';
+  document.getElementById('crtMsgExport').innerHTML = '<span style="color:#2563eb">Preparando ' + cpfs.length + ' carteirinha(s)...</span>';
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/carteirinhas/export', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cpfs: cpfs })
+    });
+    var r = await resp.json();
+    if (r.erro) { btn.disabled = false; document.getElementById('crtProgresso').style.display = 'none'; document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">' + r.erro + '</span>'; return; }
+    crtGerarPdf(r.carteirinhas, r.templateBase64Frente, r.templateBase64Verso);
+  } catch(e) {
+    btn.disabled = false; document.getElementById('crtProgresso').style.display = 'none';
+    document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+  }
+}
+
+var crtTemplateBase64FrenteCache = null;
+var crtTemplateBase64VersoCache = null;
+function crtGerarPdf(carteirinhas, templateBase64Frente, templateBase64Verso) {
+  crtTemplateBase64FrenteCache = templateBase64Frente;
+  crtTemplateBase64VersoCache = templateBase64Verso;
+  var imagens = [];
+  for (var i = 0; i < carteirinhas.length; i++) {
+    imagens.push({ imgBase64: null, dados: carteirinhas[i].dados, fotoBase64: carteirinhas[i].fotoBase64 });
+  }
+  crtMontarPdfComImagens(imagens);
+}
+
+function crtMontarPdfComImagens(imagens) {
+  document.getElementById('crtBarra').style.width = '70%';
+  document.getElementById('crtProgTexto').textContent = 'Gerando PDF...';
+  try {
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    var cW=85, cH=54, cols=2, rows=4, gapX=10, gapY=8;
+    var mX=(210-cols*cW-(cols-1)*gapX)/2, mY=(297-rows*cH-(rows-1)*gapY)/2, pp=cols*rows;
+    var processados = 0;
+    var canvasesFrente = [];
+    var canvasesVerso = [];
+    var area = document.getElementById('crtPdfArea');
+
+    function processarProxima() {
+      if (processados >= imagens.length) { finalizarPdf(); return; }
+      document.getElementById('crtBarra').style.width = (70 + Math.round((processados/imagens.length)*25)) + '%';
+      var item = imagens[processados];
+      crtRenderCard(item, area, 'frente', function(canvasFrente) {
+        canvasesFrente.push(canvasFrente);
+        crtRenderCard(item, area, 'verso', function(canvasVerso) {
+          canvasesVerso.push(canvasVerso);
+          processados++;
+          processarProxima();
+        });
+      });
+    }
+
+    function finalizarPdf() {
+      var validosFrente = canvasesFrente.filter(function(c){return c});
+      var validosVerso = canvasesVerso.filter(function(c){return c});
+      var totalPares = Math.min(validosFrente.length, validosVerso.length);
+      var totalPaginas = 0;
+      var totalBlocos = Math.ceil(totalPares / pp);
+      for (var bloco = 0; bloco < totalBlocos; bloco++) {
+        var inicio = bloco * pp;
+        var fim = Math.min(inicio + pp, totalPares);
+        if (totalPaginas > 0) pdf.addPage('a4', 'portrait');
+        totalPaginas++;
+        for (var i = inicio; i < fim; i++) {
+          var pi = i - inicio;
+          var col = pi % cols, row = Math.floor(pi / cols);
+          var x = mX + col * (cW + gapX), y = mY + row * (cH + gapY);
+          pdf.addImage(validosFrente[i].toDataURL('image/jpeg', 0.95), 'JPEG', x, y, cW, cH);
+          pdf.setDrawColor(200); pdf.setLineWidth(0.2); pdf.rect(x, y, cW, cH);
+        }
+        pdf.addPage('a4', 'portrait');
+        totalPaginas++;
+        for (var j = inicio; j < fim; j++) {
+          var pj = j - inicio;
+          var col2 = pj % cols, row2 = Math.floor(pj / cols);
+          var x2 = mX + col2 * (cW + gapX), y2 = mY + row2 * (cH + gapY);
+          pdf.addImage(validosVerso[j].toDataURL('image/jpeg', 0.95), 'JPEG', x2, y2, cW, cH);
+          pdf.setDrawColor(200); pdf.setLineWidth(0.2); pdf.rect(x2, y2, cW, cH);
+        }
+      }
+      document.getElementById('crtBarra').style.width = '100%';
+      document.getElementById('crtProgTexto').textContent = 'Concluído!';
+      pdf.save('Carteirinhas_ASPGE_' + crtFormatarData(new Date()).replace(/\//g,'-') + '.pdf');
+      document.getElementById('crtMsgExport').innerHTML = '<span style="color:#16a34a">PDF gerado! ' + totalPares + ' carteirinha(s) em ' + totalPaginas + ' página(s).</span>';
+      document.getElementById('crtBtnPdf').disabled = false;
+    }
+    processarProxima();
+  } catch(e) {
+    document.getElementById('crtMsgExport').innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>';
+    document.getElementById('crtBtnPdf').disabled = false;
+  }
+}
+
+function crtRenderCard(item, area, lado, callback) {
+  var isFrente = (lado === 'frente');
+  var fc = { left: crtFrameConfig.left, top: crtFrameConfig.top, width: crtFrameConfig.width, height: crtFrameConfig.height };
+  var cc = {};
+  for (var localId in crtCamposConfig) { cc[crtKeyMap[localId] || localId] = crtCamposConfig[localId]; }
+  var cardW = 323, cardH = 205, scale = 2.5;
+  var d = item.dados;
+  var hoje = new Date(), val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+  var emStr = crtFormatarData(hoje), valStr = crtFormatarData(val);
+
+  var div = document.createElement('div');
+  div.style.cssText = 'position:relative;width:' + cardW + 'px;height:' + cardH + 'px;overflow:hidden;background:#f5f5f5';
+  var bg = document.createElement('img'); bg.style.cssText = 'width:100%;height:100%;display:block';
+  if (isFrente) { bg.src = crtTemplateBase64FrenteCache || crtTemplateFrenteUrl || ''; }
+  else { bg.src = crtTemplateBase64VersoCache || crtTemplateVersoUrl || ''; }
+  div.appendChild(bg);
+
+  if (isFrente && item.fotoBase64) {
+    var ff = document.createElement('div');
+    ff.style.cssText = 'position:absolute;left:'+fc.left+'%;top:'+fc.top+'%;width:'+fc.width+'%;height:'+fc.height+'%;overflow:hidden';
+    var fi = document.createElement('img'); fi.src = item.fotoBase64;
+    var fCfg = null;
+    try { if (d.fotoConfig) fCfg = JSON.parse(d.fotoConfig); } catch(e){}
+    if (fCfg && fCfg.zoom) {
+      fi.style.cssText = 'position:absolute;pointer-events:none';
+      fi.setAttribute('data-fotocfg', d.fotoConfig);
+    } else {
+      fi.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    }
+    ff.appendChild(fi); div.appendChild(ff);
+  }
+
+  var camposFrente = {
+    cardNome: d.nomeCompleto || '', cardMatricula: d.matricula || '', cardCargo: d.cargo || '',
+    cardEmissao: emStr, cardValidade: valStr,
+    cardLblNome: (cc['cardLblNome'] && cc['cardLblNome'].text) || 'ASSOCIADO:',
+    cardLblMatricula: (cc['cardLblMatricula'] && cc['cardLblMatricula'].text) || 'MATRÍCULA:',
+    cardLblCargo: (cc['cardLblCargo'] && cc['cardLblCargo'].text) || 'CARGO:',
+    cardLblEmissao: (cc['cardLblEmissao'] && cc['cardLblEmissao'].text) || 'EMISSÃO:',
+    cardLblValidade: (cc['cardLblValidade'] && cc['cardLblValidade'].text) || 'VALIDADE:'
+  };
+  var camposVerso = {
+    cardCpf: d.cpf || '', cardRg: d.rg || '',
+    cardLblDadosPessoais: (cc['cardLblDadosPessoais'] && cc['cardLblDadosPessoais'].text) || 'DADOS PESSOAIS',
+    cardLblCpf: (cc['cardLblCpf'] && cc['cardLblCpf'].text) || 'CPF:',
+    cardLblRg: (cc['cardLblRg'] && cc['cardLblRg'].text) || 'RG:'
+  };
+  var campos = isFrente ? camposFrente : camposVerso;
+
+  for (var id in campos) {
+    var cfg = cc[id]; if (!cfg) continue;
+    var s = document.createElement('span');
+    var ws = (id === 'cardNome' || id === 'cardCargo') ? 'normal' : 'nowrap';
+    var extra = (id === 'cardNome' || id === 'cardCargo') ? 'max-width:55%;line-height:1.2;' : '';
+    s.style.cssText = 'position:absolute;left:'+cfg.left+'%;top:'+cfg.top+'%;font-size:'+cfg.fontSize+'mm;color:'+cfg.color+';font-weight:'+cfg.fontWeight+';font-family:Arial,Helvetica,sans-serif;white-space:'+ws+';'+extra;
+    s.textContent = campos[id];
+    div.appendChild(s);
+  }
+
+  area.appendChild(div);
+  var imgs = div.querySelectorAll('img'), ic = imgs.length, il = 0;
+  function ready() {
+    il++;
+    if (il >= ic) {
+      var cfgImgs = div.querySelectorAll('img[data-fotocfg]');
+      for (var ci = 0; ci < cfgImgs.length; ci++) {
+        try {
+          var cfgI = cfgImgs[ci];
+          var fCfg2 = JSON.parse(cfgI.getAttribute('data-fotocfg'));
+          var frameEl = cfgI.parentElement;
+          var frameWpx = frameEl.offsetWidth, frameHpx = frameEl.offsetHeight;
+          var zoom = fCfg2.zoom;
+          if (fCfg2.naturalWidth && fCfg2.naturalWidth !== cfgI.naturalWidth) zoom = zoom * (fCfg2.naturalWidth / cfgI.naturalWidth);
+          var savedFrameW = fCfg2.frameW || frameWpx;
+          var savedFrameH = fCfg2.frameH || frameHpx;
+          var ratioW = frameWpx / savedFrameW;
+          var ratioH = frameHpx / savedFrameH;
+          cfgI.style.width = (cfgI.naturalWidth * zoom * ratioW) + 'px';
+          cfgI.style.height = (cfgI.naturalHeight * zoom * ratioH) + 'px';
+          cfgI.style.left = ((fCfg2.x || 0) * ratioW) + 'px';
+          cfgI.style.top = ((fCfg2.y || 0) * ratioH) + 'px';
+        } catch(e){}
+      }
+      capturar();
+    }
+  }
+  function capturar() {
+    html2canvas(div, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: null })
+      .then(function(canvas) { area.removeChild(div); callback(canvas); })
+      .catch(function() { area.removeChild(div); callback(null); });
+  }
+  if (ic === 0) { capturar(); return; }
+  for (var k = 0; k < imgs.length; k++) { if (imgs[k].complete) ready(); else { imgs[k].onload = ready; imgs[k].onerror = ready; } }
+}
+
+// ===== MINHA CARTEIRINHA (Usuário) =====
+var myCardFotoFile = null;
+var myCardFotoBase64 = null;
+var myCardPhotoCfg = { x: 0, y: 0, zoom: 1, naturalWidth: 0, frameW: 0, frameH: 0 };
+var myCardDragging = false, myCardDragStart = { x:0, y:0 }, myCardImgStart = { x:0, y:0 };
+
+function myCardInit() {
+  if (!usuarioAtual) return;
+  var token = localStorage.getItem('token');
+  fetch('/api/carteirinhas/config', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.templateFrente) document.getElementById('myCardBg').src = data.templateFrente + '?t=' + Date.now();
+      if (data.templateVerso) document.getElementById('myCardBgVerso').src = data.templateVerso + '?t=' + Date.now();
+      if (data.config) {
+        try {
+          var cfg = JSON.parse(data.config);
+          if (cfg.frame) {
+            var f = document.getElementById('myPhotoFrame');
+            f.style.left = cfg.frame.left + '%'; f.style.top = cfg.frame.top + '%';
+            f.style.width = cfg.frame.width + '%'; f.style.height = cfg.frame.height + '%';
+          }
+          if (cfg.campos) {
+            var mapLocal = { cardNome:'myCardNome', cardMatricula:'myCardMatricula', cardCargo:'myCardCargo',
+              cardEmissao:'myCardEmissao', cardValidade:'myCardValidade',
+              cardLblNome:'myCardLblNome', cardLblMatricula:'myCardLblMatricula', cardLblCargo:'myCardLblCargo',
+              cardLblEmissao:'myCardLblEmissao', cardLblValidade:'myCardLblValidade',
+              cardLblDadosPessoais:'myCardLblDadosPessoais', cardLblCpf:'myCardLblCpf', cardLblRg:'myCardLblRg',
+              cardCpf:'myCardCpf', cardRg:'myCardRg' };
+            for (var sid in cfg.campos) {
+              var lid = mapLocal[sid]; if (!lid) continue;
+              var el = document.getElementById(lid); if (!el) continue;
+              var c = cfg.campos[sid];
+              el.style.left = c.left+'%'; el.style.top = c.top+'%';
+              el.style.fontSize = c.fontSize+'mm'; el.style.color = c.color; el.style.fontWeight = c.fontWeight;
+              if (c.text) el.textContent = c.text;
+            }
+          }
+        } catch(e){}
+      }
+      var d = usuarioAtual;
+      document.getElementById('myCardNome').textContent = d.nomeCompleto || '';
+      document.getElementById('myCardMatricula').textContent = d.matricula || '';
+      document.getElementById('myCardCargo').textContent = d.cargo || '';
+      document.getElementById('myCardCpf').textContent = d.cpf || '';
+      document.getElementById('myCardRg').textContent = d.rg || '';
+      var hoje = new Date();
+      document.getElementById('myCardEmissao').textContent = crtFormatarData(hoje);
+      var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+      document.getElementById('myCardValidade').textContent = crtFormatarData(val);
+      if (d.fotoCarteirinhaUrl || d.fotoUrl) {
+        var img = document.getElementById('myPhotoImg');
+        img.src = d.fotoCarteirinhaUrl || d.fotoUrl;
+        img.style.display = 'block';
+        document.getElementById('myPhotoPlaceholder').style.display = 'none';
+        document.getElementById('myPosControls').style.display = 'block';
+        try {
+          if (d.fotoConfig) {
+            var fc = JSON.parse(d.fotoConfig);
+            myCardPhotoCfg = fc;
+            document.getElementById('myZoomSlider').value = fc.zoom || 1;
+            document.getElementById('myZoomLabel').textContent = Math.round((fc.zoom||1)*100) + '%';
+            img.onload = function() { myCardAplicarFoto(); };
+            if (img.complete) myCardAplicarFoto();
+          } else {
+            img.style.width = '100%'; img.style.height = '100%';
+            img.style.left = '0px'; img.style.top = '0px';
+          }
+        } catch(e) {
+          img.style.width = '100%'; img.style.height = '100%';
+        }
+      }
+      // Vincular inputs para atualização ao vivo na carteirinha
+      ['atMatricula','atCargo','atCpf','atRg'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', myCardAtualizarTextos);
+      });
+    })
+    .catch(function(e) { console.error('Erro ao carregar minha carteirinha:', e); });
+}
+
+function myCardAtualizarTextos() {
+  document.getElementById('myCardNome').textContent = document.getElementById('atNome').value || '';
+  document.getElementById('myCardMatricula').textContent = document.getElementById('atMatricula').value || '';
+  document.getElementById('myCardCargo').textContent = document.getElementById('atCargo').value || '';
+  document.getElementById('myCardCpf').textContent = document.getElementById('atCpf').value || '';
+  document.getElementById('myCardRg').textContent = document.getElementById('atRg').value || '';
+}
+
+function myCardAplicarFoto() {
+  var img = document.getElementById('myPhotoImg');
+  var frame = document.getElementById('myPhotoFrame');
+  if (!img || !frame) return;
+  var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+  var zoom = myCardPhotoCfg.zoom || 1;
+  var savedFrameW = myCardPhotoCfg.frameW || frameW;
+  var savedFrameH = myCardPhotoCfg.frameH || frameH;
+  var ratioW = frameW / savedFrameW;
+  var ratioH = frameH / savedFrameH;
+  var imgW = img.naturalWidth * zoom * ratioW;
+  var imgH = img.naturalHeight * zoom * ratioH;
+  img.style.width = imgW + 'px'; img.style.height = imgH + 'px';
+  img.style.left = ((myCardPhotoCfg.x || 0) * ratioW) + 'px';
+  img.style.top = ((myCardPhotoCfg.y || 0) * ratioH) + 'px';
+}
+
+function myCardOnFoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if (file.size > 5 * 1024 * 1024) { document.getElementById('myMsgFoto').innerHTML = '<span style="color:#dc2626">Arquivo muito grande (máx 5MB)</span>'; return; }
+  myCardFotoFile = file;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    myCardFotoBase64 = e.target.result;
+    var img = document.getElementById('myPhotoImg');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('myPhotoPlaceholder').style.display = 'none';
+    document.getElementById('myPosControls').style.display = 'block';
+    img.onload = function() {
+      var frame = document.getElementById('myPhotoFrame');
+      var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+      var scaleW = frameW / img.naturalWidth, scaleH = frameH / img.naturalHeight;
+      var zoom = Math.max(scaleW, scaleH);
+      myCardPhotoCfg = { x: 0, y: 0, zoom: zoom, naturalWidth: img.naturalWidth, frameW: frameW, frameH: frameH };
+      img.style.width = (img.naturalWidth * zoom) + 'px'; img.style.height = (img.naturalHeight * zoom) + 'px';
+      // Centralizar
+      img.style.left = ((frameW - img.naturalWidth * zoom) / 2) + 'px';
+      img.style.top = ((frameH - img.naturalHeight * zoom) / 2) + 'px';
+      myCardPhotoCfg.x = parseInt(img.style.left) || 0;
+      myCardPhotoCfg.y = parseInt(img.style.top) || 0;
+      document.getElementById('myZoomSlider').value = zoom;
+      document.getElementById('myZoomLabel').textContent = Math.round(zoom * 100) + '%';
+    };
+  };
+  reader.readAsDataURL(file);
+  document.getElementById('myUploadArea').innerHTML = '<div style="font-size:32px">✅</div><p style="margin:5px 0;font-weight:600;font-size:13px">Foto carregada!</p><p style="margin:0;font-size:12px;color:#666">Clique para trocar</p>';
+  document.getElementById('myMsgFoto').innerHTML = '<span style="color:#229954">Arraste a foto para ajustar a posição.</span>';
+}
+
+function myCardSetZoom(val) {
+  var z = parseFloat(val); if (isNaN(z)) return;
+  myCardPhotoCfg.zoom = z;
+  document.getElementById('myZoomSlider').value = z;
+  document.getElementById('myZoomLabel').textContent = Math.round(z * 100) + '%';
+  var img = document.getElementById('myPhotoImg');
+  if (!img || !img.naturalWidth) return;
+  var frame = document.getElementById('myPhotoFrame');
+  var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+  img.style.width = (img.naturalWidth * z) + 'px';
+  img.style.height = (img.naturalHeight * z) + 'px';
+  // Re-centralizar
+  myCardPhotoCfg.x = (frameW - img.naturalWidth * z) / 2;
+  myCardPhotoCfg.y = (frameH - img.naturalHeight * z) / 2;
+  img.style.left = myCardPhotoCfg.x + 'px';
+  img.style.top = myCardPhotoCfg.y + 'px';
+}
+function myCardAjustarZoom(delta) { myCardSetZoom(parseFloat(document.getElementById('myZoomSlider').value) + delta); }
+
+function myCardMover(dx, dy) {
+  var img = document.getElementById('myPhotoImg');
+  if (!img || img.style.display === 'none') return;
+  myCardPhotoCfg.x = (myCardPhotoCfg.x || 0) + dx;
+  myCardPhotoCfg.y = (myCardPhotoCfg.y || 0) + dy;
+  img.style.left = myCardPhotoCfg.x + 'px';
+  img.style.top = myCardPhotoCfg.y + 'px';
+}
+
+function myCardStartDrag(e) {
+  e.preventDefault();
+  var img = document.getElementById('myPhotoImg');
+  if (!img || img.style.display === 'none') return;
+  myCardDragging = true;
+  var pt = e.touches ? e.touches[0] : e;
+  myCardDragStart = { x: pt.clientX, y: pt.clientY };
+  myCardImgStart = { x: parseInt(img.style.left) || 0, y: parseInt(img.style.top) || 0 };
+  function move(ev) {
+    if (!myCardDragging) return;
+    var p = ev.touches ? ev.touches[0] : ev;
+    img.style.left = (myCardImgStart.x + (p.clientX - myCardDragStart.x)) + 'px';
+    img.style.top = (myCardImgStart.y + (p.clientY - myCardDragStart.y)) + 'px';
+  }
+  function up() {
+    myCardDragging = false;
+    myCardPhotoCfg.x = parseInt(img.style.left) || 0;
+    myCardPhotoCfg.y = parseInt(img.style.top) || 0;
+    myCardPhotoCfg.frameW = document.getElementById('myPhotoFrame').offsetWidth;
+    myCardPhotoCfg.frameH = document.getElementById('myPhotoFrame').offsetHeight;
+    myCardPhotoCfg.naturalWidth = img.naturalWidth;
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', up);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', up);
+  }
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up);
+  document.addEventListener('touchmove', move);
+  document.addEventListener('touchend', up);
+}
+
+async function myCardSalvar() {
+  var msgEl = document.getElementById('myMsgSalvarCard');
+  var btn = document.getElementById('myBtnSalvarCard'); btn.disabled = true;
+  msgEl.innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  var token = localStorage.getItem('token');
+  try {
+    var fotoUrl = usuarioAtual.fotoCarteirinhaUrl;
+    if (myCardFotoFile) {
+      var fd = new FormData();
+      fd.append('foto', myCardFotoFile);
+      fd.append('tipo', 'carteirinha');
+      var upResp = await fetch('/api/associados/' + usuarioAtual.id + '/foto', {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd
+      });
+      var upData = await upResp.json();
+      if (upData.sucesso && upData.url) fotoUrl = upData.url;
+    }
+    var dados = {
+      matricula: document.getElementById('atMatricula').value,
+      cargo: document.getElementById('atCargo').value,
+      rg: document.getElementById('atRg').value,
+      expeditor: document.getElementById('atExpeditor').value,
+      whatsapp: document.getElementById('atWhatsapp').value,
+      email: document.getElementById('atEmail').value,
+      fotoCarteirinhaUrl: fotoUrl,
+      fotoConfig: JSON.stringify(myCardPhotoCfg)
+    };
+    var resp = await fetch('/api/associados/' + usuarioAtual.id, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+    var r = await resp.json();
+    btn.disabled = false;
+    if (r.sucesso) msgEl.innerHTML = '<span style="color:#229954">Dados e foto salvos com sucesso!</span>';
+    else msgEl.innerHTML = '<span style="color:#dc2626">' + (r.erro || 'Erro ao salvar') + '</span>';
+  } catch(e) { btn.disabled = false; msgEl.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+}
+
+// ===== SITE CONFIG =====
+async function carregarSiteConfig() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/site-config', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados) {
+      const config = data.dados;
+      document.getElementById('scSobre').value = config.sobreTexto || '';
+      document.getElementById('scMissao').value = config.missao || '';
+      document.getElementById('scVisao').value = config.visao || '';
+      document.getElementById('scValores').value = config.valores || '';
+      document.getElementById('scEstatutos').value = config.estatutos || '';
+      document.getElementById('scBannerUrl').value = config.bannerUrl || '';
+      document.getElementById('scBannerAlt').value = config.bannerAlt || '';
+      document.getElementById('scMostrarEnquetes').checked = config.mostrarEnquetes;
+      document.getElementById('scMostrarNoticias').checked = config.mostrarNoticias;
+      document.getElementById('scMostrarEventos').checked = config.mostrarEventos;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar configurações do site:', error);
+  }
+}
+
+document.getElementById('siteConfigForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const dados = {
+    sobreTexto: document.getElementById('scSobre').value,
+    missao: document.getElementById('scMissao').value,
+    visao: document.getElementById('scVisao').value,
+    valores: document.getElementById('scValores').value,
+    estatutos: document.getElementById('scEstatutos').value,
+    bannerUrl: document.getElementById('scBannerUrl').value,
+    bannerAlt: document.getElementById('scBannerAlt').value,
+    mostrarEnquetes: document.getElementById('scMostrarEnquetes').checked,
+    mostrarNoticias: document.getElementById('scMostrarNoticias').checked,
+    mostrarEventos: document.getElementById('scMostrarEventos').checked
+  };
+  try {
+    const response = await fetch('/api/site-config', {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+    const data = await response.json();
+    if (data.sucesso) {
+      alert('Configurações salvas com sucesso!');
+    } else {
+      alert('Erro ao salvar: ' + (data.erro || 'Erro desconhecido'));
+    }
+  } catch (error) {
+    alert('Erro ao salvar configurações: ' + error.message);
+  }
+});
+
+// ===== NOTÍCIAS =====
+async function carregarNoticias() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/noticias/admin/todas', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso && data.dados) {
+      const noticias = data.dados;
+      let html = '<table><thead><tr><th>Data</th><th>Título</th><th>Visível</th><th>Ações</th></tr></thead><tbody>';
+      noticias.forEach(function(n) {
+        html += '<tr><td>' + new Date(n.dataPublicacao).toLocaleDateString('pt-BR') + '</td><td style="font-weight:600">' + n.titulo + '</td><td>' + (n.visivel ? '✓' : '✗') + '</td><td><button onclick="excluirNoticia(' + n.id + ')" class="btn btn-danger btn-sm">Excluir</button></td></tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('noticiasTabela').innerHTML = html;
+    } else {
+      document.getElementById('noticiasTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhuma notícia cadastrada.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar notícias:', error);
+    document.getElementById('noticiasTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Erro ao carregar notícias.</p>';
+  }
+}
+
+document.getElementById('noticiaForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const dados = {
+    titulo: document.getElementById('notTitulo').value,
+    descricao: document.getElementById('notDescricao').value,
+    conteudo: document.getElementById('notConteudo').value,
+    dataPublicacao: document.getElementById('notData').value || new Date().toISOString(),
+    visivel: document.getElementById('notVisivel').checked
+  };
+  try {
+    const response = await fetch('/api/noticias', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+    const data = await response.json();
+    if (data.sucesso) {
+      alert('Notícia publicada com sucesso!');
+      document.getElementById('noticiaForm').reset();
+      carregarNoticias();
+    } else {
+      alert('Erro ao publicar: ' + (data.erro || 'Erro desconhecido'));
+    }
+  } catch (error) {
+    alert('Erro ao publicar notícia: ' + error.message);
+  }
+});
+
+async function excluirNoticia(id) {
+  if (!confirm('Tem certeza que deseja excluir esta notícia?')) return;
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch('/api/noticias/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.sucesso) {
+      alert('Notícia excluída com sucesso!');
+      carregarNoticias();
+    } else {
+      alert('Erro ao excluir: ' + (data.erro || 'Erro desconhecido'));
+    }
+  } catch (error) {
+    alert('Erro ao excluir notícia: ' + error.message);
+  }
+}
+
+// ===== INICIALIZAÇÃO =====
+document.addEventListener('DOMContentLoaded', function() {
+  carregarDadosUsuario();
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Modal Editar Associado -->
+<div id="modalEditAssociado" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #e5e7eb">
+      <h3 style="font-size:18px;font-weight:800;color:#1f2937">📋 Editar Associado</h3>
+      <button onclick="fecharModalEdit()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;padding:4px 8px">&times;</button>
+    </div>
+    <div style="padding:24px">
+      <input type="hidden" id="editId">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Nome Completo</label>
+        <input type="text" id="editNome" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" readonly>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Perfil</label>
+          <input type="text" id="editPerfil" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Sexo</label>
+          <input type="text" id="editSexo" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">CPF</label>
+          <input type="text" id="editCpf" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">RG</label>
+          <input type="text" id="editRg" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Expeditor</label>
+          <input type="text" id="editExpeditor" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Matrícula Funcional</label>
+          <input type="text" id="editMatricula" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Cargo</label>
+          <input type="text" id="editCargo" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">WhatsApp</label>
+          <input type="text" id="editWhatsapp" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+        </div>
+      </div>
+      <div style="margin-bottom:24px">
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">E-mail</label>
+        <input type="email" id="editEmail" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button onclick="fecharModalEdit()" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#374151">Cancelar</button>
+        <button onclick="salvarEdicaoAssociado()" style="padding:10px 20px;border:none;border-radius:8px;background:#1e3a5f;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

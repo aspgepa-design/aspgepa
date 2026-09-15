@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico de Versões - ASPGE-PA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #667eea;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .version {
+      margin-bottom: 30px;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 16px;
+      border-left: 4px solid #667eea;
+    }
+    .version-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 4px;
+    }
+    .version-date {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+    .version h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .version ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .version li {
+      font-size: 14px;
+      color: #4b5563;
+      padding: 8px 0 8px 28px;
+      position: relative;
+    }
+    .version li::before {
+      content: "•";
+      color: #667eea;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .version li.added::before {
+      content: "+";
+      color: #10b981;
+    }
+    .version li.changed::before {
+      content: "~";
+      color: #f59e0b;
+    }
+    .version li.fixed::before {
+      content: "✓";
+      color: #3b82f6;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 2px solid #e5e7eb;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    .footer strong {
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">← Voltar ao Portal</a>
+    
+    <div class="header">
+      <h1>ASPGE-PA — Histórico de Versões</h1>
+      <p>Associação dos Servidores da Procuradoria Geral do Estado do Pará</p>
+    </div>
+
+    <div class="version">
+      <div class="version-number">v2.0.0</div>
+      <div class="version-date">Maio de 2026</div>
+      <h3>Novidades</h3>
+      <ul>
+        <li class="added">Nova arquitetura Node.js/Express + PostgreSQL</li>
+        <li class="added">Sistema de autenticação com CPF e senha (JWT)</li>
+        <li class="added">API REST completa para integração</li>
+        <li class="added">Armazenamento local de fotos e documentos</li>
+        <li class="added">Sistema de carteirinhas digitais com frente e verso</li>
+        <li class="added">Configuração de layout de carteirinhas com posicionamento de campos</li>
+        <li class="added">Labels configuráveis (texto, posição, tamanho, cor)</li>
+        <li class="added">Exportação de PDF com 8 carteirinhas por folha (frente e verso alternados)</li>
+        <li class="added">Controle de enquadramento de foto com ajuste fino</li>
+        <li class="added">Templates separados para frente e verso da carteirinha</li>
+      </ul>
+      <h3>Correções</h3>
+      <ul>
+        <li class="fixed">Correção do filtro de cargo "Com cargo definido" e "Sem cargo definido"</li>
+        <li class="fixed">Ajuste na sincronização do enquadramento da foto</li>
+        <li class="fixed">Migração de Google Apps Script para VPS dedicado</li>
+      </ul>
+    </div>
+
+    <div class="version">
+      <div class="version-number">v1.5.0</div>
+      <div class="version-date">Abril de 2026</div>
+      <h3>Novidades</h3>
+      <ul>
+        <li class="added">Módulo de gerenciamento de eventos</li>
+        <li class="added">Sistema de votações online</li>
+        <li class="added">Convênios e parcerias</li>
+      </ul>
+    </div>
+
+    <div class="version">
+      <div class="version-number">v1.0.0</div>
+      <div class="version-date">Janeiro de 2026</div>
+      <h3>Lançamento Inicial</h3>
+      <ul>
+        <li class="added">Portal do associado com autenticação por CPF</li>
+        <li class="added">Cadastro e atualização de dados pessoais</li>
+        <li class="added">Painel administrativo para gestão de associados</li>
+        <li class="added">Controle de perfis e permissões</li>
+        <li class="added">Sistema de logs de auditoria</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p><strong>ASPGE-PA</strong> — Associação dos Servidores da Procuradoria Geral do Estado do Pará</p>
+      <p>Diretoria Executiva · <%= new Date().getFullYear() %></p>
+    </div>
+  </div>
+</body>
+</html>

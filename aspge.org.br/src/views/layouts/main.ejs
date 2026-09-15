@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body>
+  <% if (typeof showHeader !== 'undefined' && showHeader) { %>
+    <%- include('../partials/header') %>
+  <% } %>
+  
+  <% if (typeof showSidebar !== 'undefined' && showSidebar && typeof user !== 'undefined' && user) { %>
+    <%- include('../partials/sidebar') %>
+    <main class="main-content">
+      <%- body %>
+    </main>
+  <% } else { %>
+    <main>
+      <%- body %>
+    </main>
+  <% } %>
+  
+  <style>
+    .main-content {
+      margin-left: 256px;
+      padding: 20px;
+      min-height: 100vh;
+      background: #f3f4f6;
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+      }
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+    }
+  </style>
+</body>
+</html>

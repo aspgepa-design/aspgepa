@@ -1,0 +1,72 @@
+<header class="main-header">
+  <div class="header-brand">
+    <div class="header-logo">ASPGE</div>
+    <span class="header-title">Portal do Associado</span>
+  </div>
+  <% if (user) { %>
+  <div class="header-user">
+    <span class="user-name"><%= user.nome %></span>
+    <div class="user-avatar"><%= user.iniciais %></div>
+  </div>
+  <% } %>
+</header>
+
+<style>
+.main-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 60px;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+}
+.header-title {
+  font-weight: 700;
+  color: #1e3a5f;
+  font-size: 16px;
+}
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-name {
+  font-size: 14px;
+  color: #6b7280;
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+</style>
