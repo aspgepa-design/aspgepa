@@ -16,7 +16,7 @@ async function listar(req, res) {
 
     const resultado = lancamentos.map(l => {
       const valor = parseFloat(l.valor);
-      const tipo = l.tipo.toLowerCase() === 'entrada' ? 'entrada' : 'saida';
+      const tipo = (l.tipo || '').toLowerCase() === 'entrada' ? 'entrada' : 'saida';
       
       if (tipo === 'entrada') {
         receitas += valor;

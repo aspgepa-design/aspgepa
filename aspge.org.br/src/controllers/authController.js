@@ -28,7 +28,8 @@ async function login(req, res) {
     });
 
     if (!associado) {
-      return res.status(401).json({ erro: 'CPF não encontrado' });
+      // Mensagem genérica para não permitir enumeração de CPFs
+      return res.status(401).json({ erro: 'CPF ou senha inválidos' });
     }
 
     // Verificar senha
@@ -56,7 +57,7 @@ async function login(req, res) {
         logger.error('Erro ao criar log:', logError);
       }
       
-      return res.status(401).json({ erro: 'Senha incorreta' });
+      return res.status(401).json({ erro: 'CPF ou senha inválidos' });
     }
 
     // Gerar token

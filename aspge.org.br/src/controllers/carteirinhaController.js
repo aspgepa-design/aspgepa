@@ -209,9 +209,9 @@ async function excluirTemplate(req, res) {
       return res.status(404).json({ erro: 'Template não encontrado' });
     }
 
-    // Remover arquivo do sistema
+    // Remover arquivo do sistema (templatePath é '/uploads/templates/x.png' — extrair só o nome)
     const uploadDir = process.env.UPLOAD_DIR || './public/uploads';
-    const fullPath = path.join(uploadDir, templatePath);
+    const fullPath = path.join(uploadDir, 'templates', path.basename(templatePath));
     
     if (fs.existsSync(fullPath)) {
       fs.unlinkSync(fullPath);
@@ -375,9 +375,11 @@ async function obterDadosExport(req, res) {
     let templateBase64Frente = null;
     let templateBase64Verso = null;
 
+    const uploadDir = process.env.UPLOAD_DIR || './public/uploads';
+
     if (config?.templateFrente) {
       try {
-        const templatePath = path.join(process.cwd(), 'public', config.templateFrente);
+        const templatePath = path.join(uploadDir, 'templates', path.basename(config.templateFrente));
         if (fs.existsSync(templatePath)) {
           const buffer = fs.readFileSync(templatePath);
           const ext = path.extname(templatePath).slice(1);
@@ -390,7 +392,7 @@ async function obterDadosExport(req, res) {
 
     if (config?.templateVerso) {
       try {
-        const templatePath = path.join(process.cwd(), 'public', config.templateVerso);
+        const templatePath = path.join(uploadDir, 'templates', path.basename(config.templateVerso));
         if (fs.existsSync(templatePath)) {
           const buffer = fs.readFileSync(templatePath);
           const ext = path.extname(templatePath).slice(1);

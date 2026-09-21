@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
 
@@ -16,6 +17,10 @@ const votacaoController = {
 
   async criar(req, res) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
+      }
       const { titulo, status, dataFim, votos } = req.body;
       const votacao = await prisma.votacao.create({
         data: { titulo, status: status || 'Aberta', dataFim, votos: votos || 0 }
@@ -29,8 +34,18 @@ const votacaoController = {
 
   async atualizar(req, res) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
+      }
       const { id } = req.params;
       const { titulo, status, dataFim, votos } = req.body;
+
+      const existente = await prisma.votacao.findUnique({ where: { id: parseInt(id) } });
+      if (!existente) {
+        return res.status(404).json({ erro: 'Votação não encontrada' });
+      }
+
       const votacao = await prisma.votacao.update({
         where: { id: parseInt(id) },
         data: { titulo, status, dataFim, votos }
@@ -45,6 +60,10 @@ const votacaoController = {
   async excluir(req, res) {
     try {
       const { id } = req.params;
+      const existente = await prisma.votacao.findUnique({ where: { id: parseInt(id) } });
+      if (!existente) {
+        return res.status(404).json({ erro: 'Votação não encontrada' });
+      }
       await prisma.votacao.delete({ where: { id: parseInt(id) } });
       res.json({ sucesso: true });
     } catch (error) {

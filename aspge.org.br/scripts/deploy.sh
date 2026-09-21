@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Script de Deploy ASPGE-PA no VPS Ubuntu
+# Script de PROVISIONAMENTO do VPS Ubuntu para a ASPGE-PA
+# Instala dependências, PostgreSQL, Nginx e firewall.
+# Para deploy do código, use git pull + npm install + prisma migrate deploy + pm2 reload.
 # Uso: ./scripts/deploy.sh
 
 set -e
@@ -16,9 +18,10 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Variáveis
-APP_DIR="/var/www/aspge"
+APP_DIR="/var/www/aspge/app"
 APP_NAME="aspge-api"
 NODE_VERSION="18"
+SSH_PORT="22022"  # Porta SSH customizada do VPS (não é a 22!)
 
 # Verificar se está rodando como root
 if [ "$EUID" -ne 0 ]; then 
@@ -29,7 +32,7 @@ fi
 echo ""
 echo -e "${YELLOW}1. Instalando dependências do sistema...${NC}"
 apt-get update
-apt-get install -y curl wget git nginx postgresql postgresql-contrib redis-server
+apt-get install -y curl wget git nginx postgresql postgresql-contrib
 
 echo ""
 echo -e "${YELLOW}2. Instalando Node.js ${NODE_VERSION}...${NC}"
@@ -83,13 +86,13 @@ server {
     }
 
     location /uploads {
-        alias /var/www/aspge/public/uploads;
+        alias /var/www/aspge/app/public/uploads;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
 
     location /public {
-        alias /var/www/aspge/public;
+        alias /var/www/aspge/app/public;
         expires 1d;
     }
 }
@@ -110,7 +113,9 @@ systemctl enable nginx
 
 echo ""
 echo -e "${YELLOW}7. Configurando Firewall...${NC}"
-ufw allow OpenSSH
+# ATENÇÃO: o SSH do VPS roda na porta 22022, não na 22.
+# Sem esta regra, habilitar o UFW trancaria o acesso remoto.
+ufw allow ${SSH_PORT}/tcp comment 'SSH customizado'
 ufw allow 'Nginx Full'
 ufw --force enable
 

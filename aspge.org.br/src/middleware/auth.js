@@ -2,7 +2,12 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_dev_only';
+// Em produção, JWT_SECRET é obrigatório — falhar no boot em vez de usar fallback inseguro
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'fallback_secret_dev_only');
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET não configurado. Defina a variável de ambiente JWT_SECRET.');
+}
 
 /**
  * Middleware de autenticação JWT

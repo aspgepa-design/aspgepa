@@ -1,7 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../config/database');
 const logger = require('../config/logger');
-
-const prisma = new PrismaClient();
 
 // Buscar configurações do site
 async function getConfig(req, res) {

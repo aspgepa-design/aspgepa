@@ -27,8 +27,14 @@ router.delete('/template/:lado',
   carteirinhaController.excluirTemplate
 );
 
-// Preview de carteirinha (todos autenticados)
-router.get('/preview/:cpf', carteirinhaController.obterPreview);
+// Preview de carteirinha (próprio CPF ou diretoria)
+router.get('/preview/:cpf', (req, res, next) => {
+  const isAdmin = ['presidente', 'diretor'].includes(req.user.role);
+  const cpfParam = (req.params.cpf || '').replace(/\D/g, '');
+  const cpfUser = (req.user.cpf || '').replace(/\D/g, '');
+  if (isAdmin || cpfParam === cpfUser) return next();
+  return res.status(403).json({ erro: 'Acesso negado' });
+}, carteirinhaController.obterPreview);
 
 // Obter dados para exportação (diretor sociocultural)
 router.post('/export', authorize('presidente', 'diretor'), carteirinhaController.obterDadosExport);

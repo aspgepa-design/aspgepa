@@ -3,6 +3,10 @@ const { body } = require('express-validator');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const { authMiddleware, authorize } = require('../middleware/auth');
+const { rateLimit } = require('../middleware/rateLimit');
+
+// Proteção contra brute-force no login
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: 'Muitas tentativas de login. Tente novamente em alguns minutos.' });
 
 // Validações
 const loginValidation = [
@@ -29,7 +33,7 @@ const definirSenhaValidation = [
 ];
 
 // Rotas públicas
-router.post('/login', loginValidation, authController.login);
+router.post('/login', loginLimiter, loginValidation, authController.login);
 
 // Rotas protegidas
 router.get('/perfil', authMiddleware, authController.obterPerfil);

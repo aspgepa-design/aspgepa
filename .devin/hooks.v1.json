@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "description": "Hooks de automacao do ASPGE-PA. Guard bloqueia comandos destrutivos; validate roda verificacao de custo zero.",
+  "hooks": [
+    {
+      "id": "hook-guard",
+      "description": "Bloqueia comandos destrutivos e operacoes proibidas antes de executar",
+      "event": "before_command",
+      "action": "block",
+      "patterns": [
+        "rm -rf /",
+        "rm -rf /var/www/aspge",
+        "DROP TABLE",
+        "DROP DATABASE",
+        "TRUNCATE ",
+        "prisma migrate reset",
+        "prisma db push",
+        "git push --force",
+        "git push -f ",
+        "git reset --hard origin",
+        "pm2 delete",
+        "pm2 kill"
+      ],
+      "message": "Comando potencialmente destrutivo bloqueado pelo hook-guard. Requer confirmacao explicita do usuario.",
+      "exceptions": [
+        "Comandos com flag de confirmacao explicita do usuario na sessao"
+      ]
+    },
+    {
+      "id": "hook-guard-gas",
+      "description": "Bloqueia qualquer escrita no diretorio GAS/ (piloto legado, somente leitura)",
+      "event": "before_edit",
+      "action": "block",
+      "paths": ["GAS/**"],
+      "message": "GAS/ e referencia historica somente leitura. Codigo de producao vai em aspge.org.br/."
+    },
+    {
+      "id": "hook-guard-secrets",
+      "description": "Bloqueia commit/edicao de arquivos sensiveis",
+      "event": "before_edit",
+      "action": "block",
+      "paths": ["**/.env", "**/.env.*", "**/*.pem", "**/*.key"],
+      "message": "Arquivos de segredo nao devem ser editados ou commitados."
+    },
+    {
+      "id": "hook-validate",
+      "description": "Validacao de sintaxe de custo zero: node --check em JS + prisma validate",
+      "event": "after_edit",
+      "action": "run",
+      "paths": ["aspge.org.br/**/*.js", "aspge.org.br/prisma/schema.prisma"],
+      "command": "./.agents/hooks/validate-syntax.sh",
+      "command_windows": ".\\.agents\\hooks\\validate-syntax.ps1",
+      "message": "Validacao de sintaxe falhou - corrija antes de reportar."
+    },
+    {
+      "id": "hook-activity-log",
+      "description": "Registrar atividade no portfolio API apos commit (ver ATIVIDADES.md)",
+      "event": "after_commit",
+      "action": "remind",
+      "message": "Commit concluido: registrar atividade na API do portfolio conforme ATIVIDADES.md (curl.exe + JSON UTF-8 + X-Admin-Key)."
+    }
+  ]
+}

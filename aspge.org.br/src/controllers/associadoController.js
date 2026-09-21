@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const { validationResult } = require('express-validator');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
@@ -110,6 +111,7 @@ async function buscarPorCpf(req, res) {
     const { cpf } = req.params;
     const cpfLimpo = cpf.replace(/\D/g, '');
 
+    // Rota pública: retorna apenas os campos necessários à página de atualização cadastral (LGPD)
     const associado = await prisma.associado.findFirst({
       where: {
         OR: [
@@ -117,9 +119,36 @@ async function buscarPorCpf(req, res) {
           { cpf: cpf }
         ]
       },
-      include: {
-        gestoes: true,
-        documentos: true
+      select: {
+        id: true,
+        nomeCompleto: true,
+        cpf: true,
+        rg: true,
+        expeditor: true,
+        matricula: true,
+        cargo: true,
+        whatsapp: true,
+        email: true,
+        sexo: true,
+        dataNascimento: true,
+        naturalidade: true,
+        estadoCivil: true,
+        graduacao: true,
+        posGraduacao: true,
+        areaAtuacao: true,
+        lotacao: true,
+        cep: true,
+        endereco: true,
+        numero: true,
+        complemento: true,
+        bairro: true,
+        cidade: true,
+        estado: true,
+        tipoResidencia: true,
+        fotoUrl: true,
+        fotoCarteirinhaUrl: true,
+        senhaAlterada: true,
+        cadastroCompleto: true
       }
     });
 
@@ -127,12 +156,9 @@ async function buscarPorCpf(req, res) {
       return res.status(404).json({ erro: 'Associado não encontrado' });
     }
 
-    // Remover senha do retorno
-    const { senha, ...dados } = associado;
-
     res.json({
       sucesso: true,
-      dados
+      dados: associado
     });
   } catch (error) {
     logger.error('Erro ao buscar associado:', error);
@@ -212,6 +238,9 @@ async function criar(req, res) {
       data: {
         ...dados,
         cpf: cpfLimpo,
+        // Senha sempre hasheada; padrão = CPF (primeiro acesso)
+        senha: await bcrypt.hash(dados.senha || cpfLimpo, 10),
+        dataNascimento: dados.dataNascimento ? new Date(dados.dataNascimento) : null,
         camposPreenchidos,
         cadastroCompleto
       }
@@ -303,9 +332,15 @@ async function atualizar(req, res) {
       if (dados.senha.length < 6) {
         return res.status(400).json({ erro: 'Senha deve ter no mínimo 6 caracteres' });
       }
-      const bcrypt = require('bcrypt');
       dadosAtualizacao.senha = await bcrypt.hash(dados.senha, 10);
       dadosAtualizacao.senhaAlterada = true;
+    }
+
+    // Normalizar data (string vazia quebraria o Prisma)
+    if (dadosAtualizacao.dataNascimento !== undefined) {
+      dadosAtualizacao.dataNascimento = dadosAtualizacao.dataNascimento
+        ? new Date(dadosAtualizacao.dataNascimento)
+        : null;
     }
 
     // Recalcular completude
@@ -376,7 +411,9 @@ async function atualizarCadastro(req, res) {
     }
 
     // Verificar senha
-    const bcrypt = require('bcrypt');
+    if (!associadoExistente.senha) {
+      return res.status(401).json({ erro: 'Senha não configurada. Contate a diretoria.' });
+    }
     const senhaValida = await bcrypt.compare(senha, associadoExistente.senha);
     if (!senhaValida) {
       return res.status(401).json({ erro: 'Senha incorreta' });
@@ -408,6 +445,13 @@ async function atualizarCadastro(req, res) {
       }
       dadosAtualizacao.senha = await bcrypt.hash(dados.novaSenha, 10);
       dadosAtualizacao.senhaAlterada = true;
+    }
+
+    // Normalizar data (string vazia quebraria o Prisma)
+    if (dadosAtualizacao.dataNascimento !== undefined) {
+      dadosAtualizacao.dataNascimento = dadosAtualizacao.dataNascimento
+        ? new Date(dadosAtualizacao.dataNascimento)
+        : null;
     }
 
     // Recalcular completude
@@ -550,7 +594,9 @@ function calcularCompletude(dados) {
 
   CAMPOS_OBRIGATORIOS.forEach(campo => {
     const valor = dados[campo];
-    if (valor && valor.trim() !== '' && valor.toLowerCase() !== 'não') {
+    // Campos DateTime (ex.: dataNascimento) chegam como Date — converter antes de trim()
+    const valorStr = valor instanceof Date ? valor.toISOString() : String(valor || '');
+    if (valorStr.trim() !== '' && valorStr.toLowerCase() !== 'não') {
       camposPreenchidos++;
     } else {
       camposFaltando.push(campo);
@@ -563,6 +609,89 @@ function calcularCompletude(dados) {
   };
 }
 
+/**
+ * Inscrição pública (ficha de inscrição - sem autenticação)
+ * Cria associado com situação 'Pendente' para aprovação da diretoria
+ */
+async function inscricaoPublica(req, res) {
+  try {
+    const dados = req.body;
+
+    if (!dados.nomeCompleto || !dados.cpf) {
+      return res.status(400).json({ erro: 'Nome completo e CPF são obrigatórios' });
+    }
+
+    const cpfLimpo = String(dados.cpf).replace(/\D/g, '');
+    if (cpfLimpo.length !== 11) {
+      return res.status(400).json({ erro: 'CPF inválido' });
+    }
+
+    const existente = await prisma.associado.findFirst({
+      where: {
+        OR: [
+          { cpf: cpfLimpo },
+          { cpf: dados.cpf }
+        ]
+      }
+    });
+
+    if (existente) {
+      return res.status(400).json({ erro: 'CPF já cadastrado' });
+    }
+
+    // Whitelist de campos — nunca confiar no body inteiro em rota pública
+    const camposPermitidos = [
+      'nomeCompleto', 'rg', 'expeditor', 'matricula', 'cargo', 'whatsapp', 'email',
+      'sexo', 'naturalidade', 'estadoCivil', 'graduacao', 'posGraduacao',
+      'areaAtuacao', 'lotacao', 'cep', 'endereco', 'numero', 'complemento',
+      'bairro', 'cidade', 'estado', 'tipoResidencia'
+    ];
+
+    const dadosCriacao = {};
+    camposPermitidos.forEach(campo => {
+      if (dados[campo] !== undefined && dados[campo] !== '') {
+        dadosCriacao[campo] = dados[campo];
+      }
+    });
+
+    dadosCriacao.cpf = cpfLimpo;
+    dadosCriacao.perfil = 'Associado';
+    dadosCriacao.situacao = 'Pendente';
+    dadosCriacao.senha = await bcrypt.hash(cpfLimpo, 10); // senha inicial = CPF
+    dadosCriacao.dataNascimento = dados.dataNascimento ? new Date(dados.dataNascimento) : null;
+
+    const { camposPreenchidos, cadastroCompleto } = calcularCompletude(dadosCriacao);
+    dadosCriacao.camposPreenchidos = camposPreenchidos;
+    dadosCriacao.cadastroCompleto = cadastroCompleto;
+
+    const associado = await prisma.associado.create({ data: dadosCriacao });
+
+    try {
+      await prisma.log.create({
+        data: {
+          acao: 'Inscrição Pública',
+          detalhes: `Nome: ${associado.nomeCompleto}`,
+          associadoId: associado.id,
+          ip: req.ip,
+          userAgent: req.headers['user-agent']
+        }
+      });
+    } catch (logError) {
+      logger.error('Erro ao criar log:', logError);
+    }
+
+    logger.info(`Inscrição pública recebida: ${associado.nomeCompleto} (${associado.cpf})`);
+
+    res.status(201).json({
+      sucesso: true,
+      mensagem: 'Inscrição enviada com sucesso! Aguarde a aprovação da diretoria.'
+    });
+  } catch (error) {
+    logger.error('Erro na inscrição pública:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
 module.exports = {
   listarTodos,
   listarResumido,
@@ -571,6 +700,7 @@ module.exports = {
   criar,
   atualizar,
   atualizarCadastro,
+  inscricaoPublica,
   excluir,
   uploadFoto
 };

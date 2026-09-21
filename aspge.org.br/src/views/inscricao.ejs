@@ -314,7 +314,7 @@
       const data = Object.fromEntries(formData);
       
       try {
-        const response = await fetch('/api/associados', {
+        const response = await fetch('/api/associados/inscricao', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)

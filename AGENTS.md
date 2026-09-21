@@ -1,45 +1,60 @@
-# 🗺️ Diretrizes e Memória do Projeto ASPGE-PA
+# ASPGE-PA — Índice Agêntico
 
-## 🎯 Objetivo Geral
-Sistema de gestão da ASPGE-PA (Associação dos Servidores da PGE-PA): portal do associado, carteirinha digital, transparência financeira, convênios, votações, notícias e gestão administrativa.
+Sistema de gestão da ASPGE-PA: portal do associado, carteirinha digital, transparência financeira, convênios, votações, notícias e gestão administrativa.
 
-- **Sistema em produção (alvo do trabalho):** `aspge.org.br/` — API Node.js/Express v2.0
-- **Projeto piloto (referência, somente leitura):** `GAS/` — Google Apps Script legado usado como base funcional. **Nunca editar.**
+- **Produção (alvo):** `aspge.org.br/` — API Node.js/Express v2.0
+- **Piloto (somente leitura):** `GAS/` — Google Apps Script legado. **Nunca editar.**
 
-## 🛠️ Stack & Ambiente
-- **Linguagem / Framework:** JavaScript (CommonJS) / Node.js / Express 4
-- **Banco:** PostgreSQL via Prisma ORM (`aspge.org.br/prisma/schema.prisma`)
-- **Views:** EJS (`aspge.org.br/src/views/`, layout `layouts/main.ejs` + `partials/`)
-- **Auth:** JWT + bcrypt, roles `presidente`, `diretor`, `tesoureiro`, `associado`
-- **Produção:** VPS Ubuntu, PM2 (`ecosystem.config.cjs`), Nginx reverse proxy → `localhost:3000`, app em `/var/www/aspge/app`, domínio `aspgepa.org.br`
+## Stack & Comandos (rodar em `aspge.org.br/`)
 
-## 💻 Comandos Principais (rodar em `aspge.org.br/`)
-- Dev: `npm run dev` (nodemon)
-- Produção local: `npm start`
-- Migração: `npm run db:migrate` | Generate: `npm run db:generate` | Seed: `npm run db:seed`
-- Validação de sintaxe (custo zero): `./.agents/hooks/validate-syntax.sh` (Git Bash/WSL) ou `.\.agents\hooks\validate-syntax.ps1` (PowerShell)
+- **Stack:** JavaScript (CommonJS) / Node.js / Express 4 / EJS / Prisma + PostgreSQL / JWT + bcrypt
+- **Roles:** `presidente`, `diretor`, `tesoureiro`, `associado`
+- **Produção:** VPS HostGator (`129.121.49.246:22022`, root, chave `~/.ssh/aspge_vps`), PM2 `aspge-api`, Nginx → `localhost:3000`, app em `/var/www/aspge/app`, domínio `aspgepa.org.br`
+- **Dev:** `npm run dev` | **Prod local:** `npm start`
+- **DB:** `npm run db:migrate` | `npm run db:generate` | `npm run db:seed`
+- **Validação (custo zero):** `./.agents/hooks/validate-syntax.sh` (bash) ou `.\.agents\hooks\validate-syntax.ps1` (PowerShell)
+- **Convenções detalhadas:** `dev/DESENVOLVIMENTO.md` e `dev/ARQUITETURA.md`
 
-## 👥 Subagentes Disponíveis (.agents/subagents/)
-Consulte o Frontmatter do subagente antes de invocá-lo:
-- **Orquestrador:** `.agents/subagents/orchestrator.md` — decompõe tarefas e delega em paralelo
-- **Backend:** `.agents/subagents/backend-developer.md` — rotas, controllers, middleware, validação
-- **Frontend EJS:** `.agents/subagents/frontend-ejs.md` — views, layouts, partials
-- **Banco/Prisma:** `.agents/subagents/database-prisma.md` — schema, migrations, seeds
-- **DevOps:** `.agents/subagents/devops-deploy.md` — deploy VPS, PM2, Nginx, backups
-- **Revisor:** `.agents/subagents/code-reviewer.md` — revisão de segurança, RBAC e convenções
-- **Analista GAS:** `.agents/subagents/gas-legacy-analyst.md` — lê o piloto `GAS/` para paridade de regras de negócio (somente leitura)
+## Agentes (`.devin/agents/`)
 
-## 🧰 Habilidades do Projeto (.agents/skills/)
-- `.agents/skills/create-endpoint/skill.md` — criar rota + controller + validação + registro no `server.js`
-- `.agents/skills/prisma-migration/skill.md` — alterar schema e gerar migration com segurança
-- `.agents/skills/ejs-view/skill.md` — criar view EJS seguindo layout/partials existentes
-- `.agents/skills/auth-rbac/skill.md` — aplicar `authMiddleware`/`authorize` e roles corretas
-- `.agents/skills/deploy-vps/skill.md` — procedimento de deploy no VPS (PM2/Nginx)
-- `.agents/skills/gas-parity-check/skill.md` — conferir paridade funcional com o piloto `GAS/`
+| Perfil | Domínio | Escreve? |
+|--------|---------|----------|
+| `orchestrator` | Decompõe demanda, delega em paralelo, consolida | Não |
+| `backend-developer` | Rotas, controllers, middleware, validação (`src/routes|controllers|middleware|config|services`, `server.js`) | Sim |
+| `frontend-ejs` | Views, layouts, partials (`src/views/`, `public/`) | Sim |
+| `database-prisma` | Schema, migrations, seeds (`prisma/`, `scripts/` de dados) | Sim |
+| `devops-deploy` | VPS, PM2, Nginx, SSL, backups (`ecosystem.config.cjs`, `deploy.sh`, `nginx-config.conf`) | Sim |
+| `qa-reviewer` | Sintaxe, convenções, validação de entrada, padrão MVC | **Não** |
+| `security-reviewer` | JWT, RBAC, injeção, dados pessoais, segredos | **Não** |
+| `docs-curator` | Docs alinhadas ao código (`AGENTS.md`, `README*`, `dev/`, `docs/`, `reports/`) | Sim |
+| `gas-legacy-analyst` | Regras de negócio do piloto `GAS/` | **Não** |
 
-## ⚠️ Regras de Execução para Agentes
-1. **Lazy Loading:** nunca carregue todas as skills de uma vez. Leia a descrição no Frontmatter e acione apenas a necessária.
-2. **Delegação Paralela:** tarefas independentes devem ser delegadas a subagentes em janelas de contexto separadas.
-3. **Custo Zero:** execute scripts de verificação em `.agents/hooks/` em vez de inspecionar código linha por linha com a LLM.
-4. **Escopo de escrita:** código de produção só em `aspge.org.br/`. `GAS/` é referência histórica — leitura apenas.
-5. **Segredos:** nunca commitar `.env`, `JWT_SECRET`, credenciais ou dumps com dados pessoais (CPF etc.).
+## Skills (`.agents/skills/<nome>/SKILL.md`)
+
+| Skill | Quando usar |
+|-------|-------------|
+| `create-endpoint` | Rota + controller + validação + registro no `server.js` |
+| `prisma-migration` | Alterar schema e gerar migration com segurança |
+| `ejs-view` | Criar view EJS seguindo layout/partials |
+| `auth-rbac` | Aplicar `authMiddleware`/`authorize` e roles |
+| `deploy-vps` | Deploy no VPS (PM2/Nginx) |
+| `gas-parity-check` | Paridade funcional com o piloto `GAS/` |
+
+## Automação
+
+- **Hooks:** `.devin/hooks.v1.json` — `hook-guard` (comandos destrutivos), `hook-guard-gas` (bloqueia escrita em `GAS/`), `hook-guard-secrets`, `hook-validate`, `hook-activity-log`
+- **MCP:** `.devin/mcp_config.json` — filesystem + PostgreSQL (`${DATABASE_URL}`)
+- **Schedules:** `.agents/schedules/cron.yaml` — relatório semanal de paridade (`weekly-parity-report`)
+- **Cron runner:** `scripts/run-cron.sh` / `run-cron.ps1`
+
+## Regras de execução
+
+1. **Lazy loading** — leia a `description` do perfil/skill e invoque só o necessário.
+2. **Arquivos disjuntos** — ao delegar em paralelo, liste no prompt o que cada agente PODE e NÃO PODE tocar.
+3. **Prompt auto-contido** — o subagente não vê a conversa; inclua paths absolutos, arquivo:linha, convenções e comando de validação.
+4. **Revisores nunca editam** — reportam achados; quem corrige é o desenvolvedor do domínio.
+5. **Custo zero** — scripts em `.agents/hooks/` em vez de inspecionar código linha por linha.
+6. **Escopo de escrita** — código de produção só em `aspge.org.br/`; `GAS/` é leitura apenas.
+7. **Segredos** — nunca commitar `.env`, `JWT_SECRET`, credenciais ou dumps com dados pessoais.
+8. **Pós-commit** — registrar atividade na API do portfólio conforme `ATIVIDADES.md`.
+9. **Pós-mudança** — `docs-curator` alinha a documentação.

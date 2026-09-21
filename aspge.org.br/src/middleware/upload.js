@@ -20,9 +20,10 @@ const fotoStorage = multer.diskStorage({
     cb(null, path.join(UPLOAD_DIR, 'fotos'));
   },
   filename: (req, file, cb) => {
-    const cpf = req.body.cpf || req.user.cpf;
+    // Nome do arquivo = ID do associado da rota (/:id/foto), não o CPF de quem envia
+    const identificador = String(req.params.id || 'sem-id').replace(/\D/g, '');
     const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
-    cb(null, `${cpf.replace(/\D/g, '')}${ext}`);
+    cb(null, `${identificador}${ext}`);
   }
 });
 

@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
 
@@ -30,6 +31,10 @@ const gestaoController = {
 
   async criar(req, res) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
+      }
       const { nome, inicio, fim } = req.body;
       const gestao = await prisma.gestao.create({
         data: { nome, inicio: inicio ? new Date(inicio) : null, fim: fim ? new Date(fim) : null, ativa: false }
@@ -55,10 +60,10 @@ const gestaoController = {
         include: { membros: true }
       });
 
-      // Atualizar perfis dos associados
+      // Atualizar perfis dos associados (case-sensitive no Postgres: cobrir ambas as grafias)
       await prisma.associado.updateMany({
-        where: { perfil: { notIn: ['associado'] } },
-        data: { perfil: 'associado' }
+        where: { perfil: { notIn: ['associado', 'Associado'] } },
+        data: { perfil: 'Associado' }
       });
 
       for (const membro of gestao.membros) {
@@ -84,8 +89,18 @@ const gestaoController = {
 
   async adicionarMembro(req, res) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
+      }
       const { id } = req.params;
       const { cpf, nome, cargo } = req.body;
+
+      const gestao = await prisma.gestao.findUnique({ where: { id: parseInt(id) } });
+      if (!gestao) {
+        return res.status(404).json({ erro: 'Gestão não encontrada' });
+      }
+
       const membro = await prisma.diretoriaGestao.create({
         data: { gestaoId: parseInt(id), cpf, nome, cargo }
       });

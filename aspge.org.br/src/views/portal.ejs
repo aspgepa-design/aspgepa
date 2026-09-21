@@ -1405,8 +1405,14 @@ async function salvarAtualizacao(e) {
     email: document.getElementById('atEmail').value
   };
   
+  if (!usuarioAtual || !usuarioAtual.id) {
+    document.getElementById('atStatus').textContent = 'Erro: usuário não carregado. Recarregue a página.';
+    return;
+  }
+
+  const atStatus = document.getElementById('atStatus');
   try {
-    const response = await fetch('/api/auth/perfil', {
+    const response = await fetch('/api/associados/' + usuarioAtual.id, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1416,12 +1422,15 @@ async function salvarAtualizacao(e) {
     });
     const data = await response.json();
     if (data.sucesso) {
-      document.getElementById('atStatus').innerHTML = '<span style="color:#16a34a">✓ Dados atualizados com sucesso!</span>';
+      atStatus.style.color = '#16a34a';
+      atStatus.textContent = '✓ Dados atualizados com sucesso!';
     } else {
-      document.getElementById('atStatus').innerHTML = '<span style="color:#dc2626">✗ Erro ao atualizar: ' + (data.erro || 'Erro desconhecido') + '</span>';
+      atStatus.style.color = '#dc2626';
+      atStatus.textContent = '✗ Erro ao atualizar: ' + (data.erro || 'Erro desconhecido');
     }
   } catch (error) {
-    document.getElementById('atStatus').innerHTML = '<span style="color:#dc2626">✗ Erro de conexão</span>';
+    atStatus.style.color = '#dc2626';
+    atStatus.textContent = '✗ Erro de conexão';
   }
 }
 
