@@ -79,6 +79,9 @@ async function login(req, res) {
 
     logger.info(`Login realizado: ${associado.nomeCompleto} (${associado.cpf})`);
 
+    // Verificar se cadastro está completo
+    const precisaAtualizarCadastro = !associado.cadastroCompleto || !associado.senhaAlterada;
+
     res.json({
       sucesso: true,
       token,
@@ -89,7 +92,10 @@ async function login(req, res) {
         perfil: associado.perfil,
         role: obterRole(associado.perfil),
         situacao: associado.situacao || 'Associado',
-        iniciais: obterIniciais(associado.nomeCompleto)
+        iniciais: obterIniciais(associado.nomeCompleto),
+        cadastroCompleto: associado.cadastroCompleto,
+        senhaAlterada: associado.senhaAlterada,
+        precisaAtualizarCadastro
       }
     });
   } catch (error) {

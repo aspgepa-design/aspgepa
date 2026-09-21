@@ -104,7 +104,7 @@ app.get('/inscricao', (req, res) => {
 });
 
 // Atualização cadastral (público)
-app.get('/atualizar', (req, res) => {
+app.get('/atualizacao', (req, res) => {
   res.render('atualizacao', { title: 'Atualização Cadastral - ASPGE-PA' });
 });
 

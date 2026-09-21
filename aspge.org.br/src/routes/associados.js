@@ -5,7 +5,14 @@ const associadoController = require('../controllers/associadoController');
 const { authMiddleware, authorize } = require('../middleware/auth');
 const { uploadFoto, handleUploadError } = require('../middleware/upload');
 
-// Todas as rotas são protegidas
+// Buscar por CPF (público - usado na página de atualização cadastral)
+router.get('/cpf/:cpf', associadoController.buscarPorCpf);
+
+// Atualizar cadastro próprio (público - página de atualização cadastral)
+// Requer CPF e senha no body para autenticação
+router.post('/:id/atualizar-cadastro', associadoController.atualizarCadastro);
+
+// Todas as rotas abaixo são protegidas
 router.use(authMiddleware);
 
 // Listar todos (apenas diretoria)
@@ -13,9 +20,6 @@ router.get('/', authorize('presidente', 'diretor', 'tesoureiro'), associadoContr
 
 // Listar resumido (todos autenticados - para seleção de carteirinhas)
 router.get('/resumido', associadoController.listarResumido);
-
-// Buscar por CPF
-router.get('/cpf/:cpf', associadoController.buscarPorCpf);
 
 // Buscar por ID
 router.get('/:id', associadoController.buscarPorId);

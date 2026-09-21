@@ -90,7 +90,14 @@ async function fazerLogin() {
     }
     
     localStorage.setItem('token', data.token);
-    window.location.href = '/portal';
+    
+    // Verificar se precisa atualizar cadastro
+    if (data.dados.precisaAtualizarCadastro) {
+      // Se cadastro incompleto ou senha não alterada, redirecionar para atualização
+      window.location.href = '/atualizacao';
+    } else {
+      window.location.href = '/portal';
+    }
     
   } catch (error) {
     btn.disabled = false;

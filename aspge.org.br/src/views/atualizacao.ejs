@@ -9,7 +9,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #dc2626 0%, #16a34a 50%, #0075bf 100%);
       min-height: 100vh;
       padding: 40px 20px;
     }
@@ -28,7 +28,7 @@
     .logo {
       width: 80px;
       height: 80px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #dc2626, #0075bf);
       border-radius: 20px;
       display: flex;
       align-items: center;
@@ -67,12 +67,45 @@
     }
     .search-input button {
       padding: 14px 24px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #dc2626, #0075bf);
       color: #fff;
       border: none;
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
+    }
+    .cep-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .cep-input input {
+      flex: 1;
+    }
+    .cep-input button {
+      padding: 12px 18px;
+      background: linear-gradient(135deg, #dc2626, #0075bf);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cep-input button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .cep-loading {
+      font-size: 12px;
+      color: #0075bf;
+      margin-top: 4px;
+    }
+    .cep-erro {
+      font-size: 12px;
+      color: #dc2626;
+      margin-top: 4px;
     }
     .form-section {
       margin-bottom: 32px;
@@ -128,7 +161,7 @@
     }
     input:focus, select:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #dc2626;
     }
     input.preenchido {
       border-color: #10b981;
@@ -141,7 +174,7 @@
     .btn-submit {
       width: 100%;
       padding: 18px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #dc2626, #0075bf);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -233,7 +266,118 @@
             <label>Email <span class="tag tag-pendente" id="tagEmail">PENDENTE</span></label>
             <input type="email" id="email" name="email">
           </div>
+          <div class="form-group">
+            <label>Data de Nascimento <span class="tag tag-pendente" id="tagDataNascimento">PENDENTE</span></label>
+            <input type="date" id="dataNascimento" name="dataNascimento">
+          </div>
+          <div class="form-group">
+            <label>Estado Civil <span class="tag tag-pendente" id="tagEstadoCivil">PENDENTE</span></label>
+            <select id="estadoCivil" name="estadoCivil">
+              <option value="">Selecione</option>
+              <option value="Solteiro">Solteiro(a)</option>
+              <option value="Casado">Casado(a)</option>
+              <option value="Divorciado">Divorciado(a)</option>
+              <option value="Viúvo">Viúvo(a)</option>
+              <option value="União Estável">União Estável</option>
+            </select>
+          </div>
         </div>
+      </div>
+      
+      <div class="form-section">
+        <h2 class="section-title">Endereço Completo</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>CEP <span class="tag tag-pendente" id="tagCep">PENDENTE</span></label>
+            <div class="cep-input">
+              <input type="text" id="cep" name="cep" maxlength="9" placeholder="00000-000">
+              <button type="button" onclick="buscarCep()" id="btnBuscarCep">Buscar CEP</button>
+            </div>
+            <div id="cepStatus"></div>
+          </div>
+          <div class="form-group">
+            <label>Endereço <span class="tag tag-pendente" id="tagEndereco">PENDENTE</span></label>
+            <input type="text" id="endereco" name="endereco">
+          </div>
+          <div class="form-group">
+            <label>Número <span class="tag tag-pendente" id="tagNumero">PENDENTE</span></label>
+            <input type="text" id="numero" name="numero">
+          </div>
+          <div class="form-group">
+            <label>Complemento</label>
+            <input type="text" id="complemento" name="complemento">
+          </div>
+          <div class="form-group">
+            <label>Bairro <span class="tag tag-pendente" id="tagBairro">PENDENTE</span></label>
+            <input type="text" id="bairro" name="bairro">
+          </div>
+          <div class="form-group">
+            <label>Cidade <span class="tag tag-pendente" id="tagCidade">PENDENTE</span></label>
+            <input type="text" id="cidade" name="cidade">
+          </div>
+          <div class="form-group">
+            <label>Estado <span class="tag tag-pendente" id="tagEstado">PENDENTE</span></label>
+            <select id="estado" name="estado">
+              <option value="">Selecione</option>
+              <option value="AC">Acre</option>
+              <option value="AL">Alagoas</option>
+              <option value="AP">Amapá</option>
+              <option value="AM">Amazonas</option>
+              <option value="BA">Bahia</option>
+              <option value="CE">Ceará</option>
+              <option value="DF">Distrito Federal</option>
+              <option value="ES">Espírito Santo</option>
+              <option value="GO">Goiás</option>
+              <option value="MA">Maranhão</option>
+              <option value="MT">Mato Grosso</option>
+              <option value="MS">Mato Grosso do Sul</option>
+              <option value="MG">Minas Gerais</option>
+              <option value="PA">Pará</option>
+              <option value="PB">Paraíba</option>
+              <option value="PR">Paraná</option>
+              <option value="PE">Pernambuco</option>
+              <option value="PI">Piauí</option>
+              <option value="RJ">Rio de Janeiro</option>
+              <option value="RN">Rio Grande do Norte</option>
+              <option value="RS">Rio Grande do Sul</option>
+              <option value="RO">Rondônia</option>
+              <option value="RR">Roraima</option>
+              <option value="SC">Santa Catarina</option>
+              <option value="SP">São Paulo</option>
+              <option value="SE">Sergipe</option>
+              <option value="TO">Tocantins</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo de Residência <span class="tag tag-pendente" id="tagTipoResidencia">PENDENTE</span></label>
+            <select id="tipoResidencia" name="tipoResidencia">
+              <option value="">Selecione</option>
+              <option value="Propria">Própria</option>
+              <option value="Alugada">Alugada</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <h2 class="section-title">Alteração de Senha</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Senha Atual <span class="tag tag-pendente" id="tagSenhaAtual">OBRIGATÓRIO</span></label>
+            <input type="password" id="senhaAtual" name="senhaAtual" placeholder="Digite sua senha atual (CPF)">
+          </div>
+          <div class="form-group">
+            <label>Nova Senha <span class="tag tag-pendente" id="tagNovaSenha">OBRIGATÓRIO</span></label>
+            <input type="password" id="novaSenha" name="novaSenha" placeholder="Digite sua nova senha">
+          </div>
+          <div class="form-group">
+            <label>Confirmar Nova Senha <span class="tag tag-pendente" id="tagConfirmarNovaSenha">OBRIGATÓRIO</span></label>
+            <input type="password" id="confirmarNovaSenha" name="confirmarNovaSenha" placeholder="Confirme sua nova senha">
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:13px;color:#6b7280">
+          <strong>Atenção:</strong> Sua senha inicial é o seu CPF. Por segurança, você deve alterá-la no primeiro acesso.
+        </p>
       </div>
       
       <button type="submit" class="btn-submit" id="btnSubmit">Salvar Alterações</button>
@@ -246,6 +390,12 @@
 
   <script>
     let associadoId = null;
+    let cpfAssociado = null;
+    
+    function maskCep(value) {
+      return value.replace(/\D/g, '')
+        .replace(/(\d{5})(\d)/, '$1-$2');
+    }
     
     function maskCpf(value) {
       return value.replace(/\D/g, '')
@@ -264,9 +414,154 @@
       e.target.value = maskCpf(e.target.value);
     });
     
+    document.getElementById('cep').addEventListener('input', function(e) {
+      e.target.value = maskCep(e.target.value);
+      const cepLimpo = e.target.value.replace(/\D/g, '');
+      if (cepLimpo.length === 8) {
+        buscarCep();
+      }
+    });
+    
+    document.getElementById('cep').addEventListener('blur', function(e) {
+      const cepLimpo = e.target.value.replace(/\D/g, '');
+      if (cepLimpo.length === 8) {
+        buscarCep();
+      }
+    });
+    
     document.getElementById('whatsapp').addEventListener('input', function(e) {
       e.target.value = maskWhatsapp(e.target.value);
     });
+    
+    async function buscarCep() {
+      const cepInput = document.getElementById('cep');
+      const statusDiv = document.getElementById('cepStatus');
+      const btn = document.getElementById('btnBuscarCep');
+      const cep = cepInput.value.replace(/\D/g, '');
+      
+      if (cep.length !== 8) {
+        statusDiv.className = 'cep-erro';
+        statusDiv.textContent = 'CEP inválido. Digite 8 dígitos.';
+        return;
+      }
+      
+      btn.disabled = true;
+      statusDiv.className = 'cep-loading';
+      statusDiv.textContent = 'Buscando endereço...';
+      
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+        
+        if (data.erro) {
+          statusDiv.className = 'cep-erro';
+          statusDiv.textContent = 'CEP não encontrado. Verifique e tente novamente.';
+          btn.disabled = false;
+          return;
+        }
+        
+        // Preencher campos de endereço
+        document.getElementById('endereco').value = data.logradouro || '';
+        document.getElementById('bairro').value = data.bairro || '';
+        document.getElementById('cidade').value = data.localidade || '';
+        document.getElementById('estado').value = data.uf || '';
+        
+        // Atualizar tags de status
+        atualizarTag('endereco', data.logradouro);
+        atualizarTag('bairro', data.bairro);
+        atualizarTag('cidade', data.localidade);
+        atualizarTag('estado', data.uf);
+        
+        // Limpar status
+        statusDiv.textContent = '';
+        statusDiv.className = '';
+        
+        // Focar no campo número para continuar preenchimento
+        document.getElementById('numero').focus();
+        
+      } catch (error) {
+        statusDiv.className = 'cep-erro';
+        statusDiv.textContent = 'Erro ao buscar CEP. Tente novamente.';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    
+    // Carregar dados automaticamente se usuário estiver logado
+    async function carregarDadosLogado() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      try {
+        const response = await fetch('/api/auth/perfil', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await response.json();
+        
+        if (data.sucesso) {
+          associadoId = data.dados.id;
+          cpfAssociado = data.dados.cpf;
+          
+          document.getElementById('nomeAssociado').textContent = data.dados.nomeCompleto;
+          
+          // Preencher campos
+          document.getElementById('rg').value = data.dados.rg || '';
+          document.getElementById('expeditor').value = data.dados.expeditor || '';
+          document.getElementById('matricula').value = data.dados.matricula || '';
+          document.getElementById('cargo').value = data.dados.cargo || '';
+          document.getElementById('whatsapp').value = data.dados.whatsapp || '';
+          document.getElementById('email').value = data.dados.email || '';
+          document.getElementById('dataNascimento').value = data.dados.dataNascimento ? data.dados.dataNascimento.split('T')[0] : '';
+          document.getElementById('estadoCivil').value = data.dados.estadoCivil || '';
+          document.getElementById('cep').value = data.dados.cep || '';
+          document.getElementById('endereco').value = data.dados.endereco || '';
+          document.getElementById('numero').value = data.dados.numero || '';
+          document.getElementById('complemento').value = data.dados.complemento || '';
+          document.getElementById('bairro').value = data.dados.bairro || '';
+          document.getElementById('cidade').value = data.dados.cidade || '';
+          document.getElementById('estado').value = data.dados.estado || '';
+          document.getElementById('tipoResidencia').value = data.dados.tipoResidencia || '';
+          
+          // Atualizar tags
+          atualizarTag('rg', data.dados.rg);
+          atualizarTag('expeditor', data.dados.expeditor);
+          atualizarTag('matricula', data.dados.matricula);
+          atualizarTag('cargo', data.dados.cargo);
+          atualizarTag('whatsapp', data.dados.whatsapp);
+          atualizarTag('email', data.dados.email);
+          atualizarTag('dataNascimento', data.dados.dataNascimento);
+          atualizarTag('estadoCivil', data.dados.estadoCivil);
+          atualizarTag('cep', data.dados.cep);
+          atualizarTag('endereco', data.dados.endereco);
+          atualizarTag('numero', data.dados.numero);
+          atualizarTag('bairro', data.dados.bairro);
+          atualizarTag('cidade', data.dados.cidade);
+          atualizarTag('estado', data.dados.estado);
+          atualizarTag('tipoResidencia', data.dados.tipoResidencia);
+          
+          // Verificar se senha já foi alterada
+          if (data.dados.senhaAlterada) {
+            document.getElementById('senhaAtual').placeholder = 'Senha já alterada (opcional)';
+            document.getElementById('tagSenhaAtual').textContent = 'OK';
+            document.getElementById('tagSenhaAtual').className = 'tag tag-ok';
+            document.getElementById('novaSenha').placeholder = 'Nova senha (opcional)';
+            document.getElementById('confirmarNovaSenha').placeholder = 'Confirmar (opcional)';
+            document.getElementById('tagNovaSenha').textContent = 'OPCIONAL';
+            document.getElementById('tagNovaSenha').className = 'tag tag-ok';
+            document.getElementById('tagConfirmarNovaSenha').textContent = 'OPCIONAL';
+            document.getElementById('tagConfirmarNovaSenha').className = 'tag tag-ok';
+          }
+          
+          document.getElementById('secaoBusca').classList.add('hidden');
+          document.getElementById('formAtualizacao').classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário logado:', error);
+      }
+    }
+    
+    // Tentar carregar dados do usuário logado ao iniciar
+    carregarDadosLogado();
     
     async function buscarAssociado() {
       const cpf = document.getElementById('buscaCpf').value;
@@ -280,6 +575,7 @@
         
         if (data.sucesso) {
           associadoId = data.dados.id;
+          cpfAssociado = data.dados.cpf;
           
           document.getElementById('nomeAssociado').textContent = data.dados.nomeCompleto;
           
@@ -290,6 +586,16 @@
           document.getElementById('cargo').value = data.dados.cargo || '';
           document.getElementById('whatsapp').value = data.dados.whatsapp || '';
           document.getElementById('email').value = data.dados.email || '';
+          document.getElementById('dataNascimento').value = data.dados.dataNascimento ? data.dados.dataNascimento.split('T')[0] : '';
+          document.getElementById('estadoCivil').value = data.dados.estadoCivil || '';
+          document.getElementById('cep').value = data.dados.cep || '';
+          document.getElementById('endereco').value = data.dados.endereco || '';
+          document.getElementById('numero').value = data.dados.numero || '';
+          document.getElementById('complemento').value = data.dados.complemento || '';
+          document.getElementById('bairro').value = data.dados.bairro || '';
+          document.getElementById('cidade').value = data.dados.cidade || '';
+          document.getElementById('estado').value = data.dados.estado || '';
+          document.getElementById('tipoResidencia').value = data.dados.tipoResidencia || '';
           
           // Atualizar tags
           atualizarTag('rg', data.dados.rg);
@@ -298,6 +604,28 @@
           atualizarTag('cargo', data.dados.cargo);
           atualizarTag('whatsapp', data.dados.whatsapp);
           atualizarTag('email', data.dados.email);
+          atualizarTag('dataNascimento', data.dados.dataNascimento);
+          atualizarTag('estadoCivil', data.dados.estadoCivil);
+          atualizarTag('cep', data.dados.cep);
+          atualizarTag('endereco', data.dados.endereco);
+          atualizarTag('numero', data.dados.numero);
+          atualizarTag('bairro', data.dados.bairro);
+          atualizarTag('cidade', data.dados.cidade);
+          atualizarTag('estado', data.dados.estado);
+          atualizarTag('tipoResidencia', data.dados.tipoResidencia);
+          
+          // Verificar se senha já foi alterada
+          if (data.dados.senhaAlterada) {
+            document.getElementById('senhaAtual').placeholder = 'Senha já alterada (opcional)';
+            document.getElementById('tagSenhaAtual').textContent = 'OK';
+            document.getElementById('tagSenhaAtual').className = 'tag tag-ok';
+            document.getElementById('novaSenha').placeholder = 'Nova senha (opcional)';
+            document.getElementById('confirmarNovaSenha').placeholder = 'Confirmar (opcional)';
+            document.getElementById('tagNovaSenha').textContent = 'OPCIONAL';
+            document.getElementById('tagNovaSenha').className = 'tag tag-ok';
+            document.getElementById('tagConfirmarNovaSenha').textContent = 'OPCIONAL';
+            document.getElementById('tagConfirmarNovaSenha').className = 'tag tag-ok';
+          }
           
           document.getElementById('secaoBusca').classList.add('hidden');
           document.getElementById('formAtualizacao').classList.remove('hidden');
@@ -327,10 +655,51 @@
     }
     
     // Atualizar tags ao digitar
-    ['rg', 'expeditor', 'matricula', 'cargo', 'whatsapp', 'email'].forEach(campo => {
-      document.getElementById(campo).addEventListener('input', function() {
-        atualizarTag(campo, this.value);
-      });
+    const camposObrigatorios = ['rg', 'expeditor', 'matricula', 'cargo', 'whatsapp', 'email', 'dataNascimento', 'estadoCivil', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado', 'tipoResidencia'];
+    camposObrigatorios.forEach(campo => {
+      const elemento = document.getElementById(campo);
+      if (elemento) {
+        elemento.addEventListener('input', function() {
+          atualizarTag(campo, this.value);
+        });
+      }
+    });
+    
+    // Validar senha atual
+    document.getElementById('senhaAtual').addEventListener('input', function() {
+      const tag = document.getElementById('tagSenhaAtual');
+      if (this.value && this.value.length >= 6) {
+        tag.textContent = '✓ OK';
+        tag.className = 'tag tag-ok';
+      } else {
+        tag.textContent = 'OBRIGATÓRIO';
+        tag.className = 'tag tag-pendente';
+      }
+    });
+    
+    // Validar nova senha
+    document.getElementById('novaSenha').addEventListener('input', function() {
+      const tag = document.getElementById('tagNovaSenha');
+      if (this.value && this.value.length >= 6) {
+        tag.textContent = '✓ OK';
+        tag.className = 'tag tag-ok';
+      } else {
+        tag.textContent = 'OBRIGATÓRIO';
+        tag.className = 'tag tag-pendente';
+      }
+    });
+    
+    // Validar confirmação de nova senha
+    document.getElementById('confirmarNovaSenha').addEventListener('input', function() {
+      const tag = document.getElementById('tagConfirmarNovaSenha');
+      const novaSenha = document.getElementById('novaSenha').value;
+      if (this.value === novaSenha && this.value.length >= 6) {
+        tag.textContent = '✓ OK';
+        tag.className = 'tag tag-ok';
+      } else {
+        tag.textContent = 'OBRIGATÓRIO';
+        tag.className = 'tag tag-pendente';
+      }
     });
     
     // Submit
@@ -344,12 +713,37 @@
       btn.textContent = 'Salvando...';
       status.className = 'status';
       
+      if (!associadoId || !cpfAssociado) {
+        status.className = 'status error';
+        status.textContent = 'Busque seu CPF antes de salvar.';
+        btn.disabled = false;
+        btn.textContent = 'Salvar Alterações';
+        return;
+      }
+      
       const formData = new FormData(this);
       const data = Object.fromEntries(formData);
       
+      // Adicionar CPF ao body para autenticação
+      data.cpf = cpfAssociado;
+      
+      // Converter dataNascimento para formato ISO se existir
+      if (data.dataNascimento) {
+        data.dataNascimento = new Date(data.dataNascimento).toISOString();
+      }
+      
+      // Validar senha atual
+      if (!data.senhaAtual) {
+        status.className = 'status error';
+        status.textContent = 'Digite sua senha atual para confirmar as alterações.';
+        btn.disabled = false;
+        btn.textContent = 'Salvar Alterações';
+        return;
+      }
+      
       try {
-        const response = await fetch(`/api/associados/${associadoId}`, {
-          method: 'PUT',
+        const response = await fetch(`/api/associados/${associadoId}/atualizar-cadastro`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
@@ -358,7 +752,42 @@
         
         if (result.sucesso) {
           status.className = 'status success';
-          status.textContent = 'Dados atualizados com sucesso!';
+          status.textContent = 'Dados atualizados com sucesso! Redirecionando...';
+          
+          // Limpar senha atual do formulário
+          document.getElementById('senhaAtual').value = '';
+          
+          // Se a senha foi alterada, limpar campos de nova senha
+          if (data.novaSenha) {
+            document.getElementById('novaSenha').value = '';
+            document.getElementById('confirmarNovaSenha').value = '';
+          }
+          
+          // Redirecionar para o portal após atualização bem-sucedida
+          const token = localStorage.getItem('token');
+          if (token) {
+            window.location.href = '/portal';
+          } else {
+            // Se não tiver token, fazer login automático e depois redirecionar
+            const senhaLogin = data.novaSenha || data.senhaAtual;
+            fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cpf: cpfAssociado, senha: senhaLogin })
+            })
+            .then(r => r.json())
+            .then(loginData => {
+              if (loginData.sucesso && loginData.token) {
+                localStorage.setItem('token', loginData.token);
+                window.location.href = '/portal';
+              } else {
+                window.location.href = '/';
+              }
+            })
+            .catch(() => {
+              window.location.href = '/';
+            });
+          }
         } else {
           status.className = 'status error';
           status.textContent = result.erro || 'Erro ao atualizar.';

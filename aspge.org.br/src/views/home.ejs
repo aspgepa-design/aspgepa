@@ -129,6 +129,10 @@ html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8f
 <section class="section" id="diretoria">
   <div class="section-inner">
     <h2 class="section-title">Diretoria</h2>
+    <div style="text-align:center;margin-bottom:24px">
+      <h3 id="gestao-nome" style="font-size:24px;font-weight:700;color:#dc2626;margin-bottom:8px">Carregando...</h3>
+      <p id="gestao-periodo" style="font-size:14px;color:#6b7280"></p>
+    </div>
     <div class="grid" id="diretoria-grid">
       <p>Carregando diretoria...</p>
     </div>
@@ -215,24 +219,46 @@ async function carregarConfig() {
 
 async function carregarDiretoria() {
   try {
+    console.log('[DEBUG] carregarDiretoria() iniciado');
     const response = await fetch('/api/gestoes/ativa');
+    console.log('[DEBUG] Response status:', response.status);
     const data = await response.json();
+    console.log('[DEBUG] Response data:', data);
     
-    if (data.sucesso && data.dados && data.dados.length > 0) {
-      const gestaoAtiva = data.dados.find(g => g.ativa) || data.dados[0];
+    if (data.sucesso && data.dados) {
+      const gestaoAtiva = data.dados;
+      
+      // Exibir nome da gestão
+      const gestaoTitle = document.getElementById('gestao-nome');
+      if (gestaoTitle && gestaoAtiva.nome) {
+        gestaoTitle.textContent = gestaoAtiva.nome;
+      }
+      
+      // Exibir período da gestão
+      const gestaoPeriodo = document.getElementById('gestao-periodo');
+      if (gestaoPeriodo) {
+        const inicio = gestaoAtiva.inicio ? new Date(gestaoAtiva.inicio).toLocaleDateString('pt-BR') : '';
+        const fim = gestaoAtiva.fim ? new Date(gestaoAtiva.fim).toLocaleDateString('pt-BR') : '';
+        gestaoPeriodo.textContent = inicio && fim ? `${inicio} - ${fim}` : (inicio || fim || '');
+      }
       
       if (gestaoAtiva.membros && gestaoAtiva.membros.length > 0) {
         const grid = document.getElementById('diretoria-grid');
         grid.innerHTML = gestaoAtiva.membros.map(membro => `
           <div class="card">
             <h3>${membro.nome}</h3>
-            <p style="color:#2563eb;font-weight:600">${membro.cargo}</p>
+            <p style="color:#dc2626;font-weight:600">${membro.cargo}</p>
           </div>
         `).join('');
+      } else {
+        document.getElementById('diretoria-grid').innerHTML = '<p>Nenhum membro cadastrado na diretoria.</p>';
       }
+    } else {
+      document.getElementById('diretoria-grid').innerHTML = '<p>Nenhuma gestão ativa encontrada.</p>';
     }
   } catch (error) {
     console.error('Erro ao carregar diretoria:', error);
+    document.getElementById('diretoria-grid').innerHTML = '<p>Erro ao carregar diretoria. Tente recarregar a página.</p>';
   }
 }
 

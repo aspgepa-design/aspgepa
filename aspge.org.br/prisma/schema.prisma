@@ -8,19 +8,19 @@ datasource db {
 }
 
 model Associado {
-  id                 Int         @id @default(autoincrement())
+  id                 Int          @id @default(autoincrement())
   nomeCompleto       String
-  cpf                String      @unique
+  cpf                String       @unique
   rg                 String?
   expeditor          String?
   matricula          String?
   cargo              String?
-  perfil             String      @default("Associado")
+  perfil             String       @default("Associado")
   situacao           String?
   sexo               String?
   whatsapp           String?
   email              String?
-  senha              String
+  senha              String       // hash bcrypt
   dataNascimento     DateTime?
   naturalidade       String?
   estadoCivil        String?
@@ -28,16 +28,27 @@ model Associado {
   posGraduacao       String?
   areaAtuacao        String?
   lotacao            String?
+  cep                String?
+  endereco           String?
+  numero             String?
+  complemento        String?
+  bairro             String?
+  cidade             String?
+  estado             String?
+  tipoResidencia     String?      // 'Propria' ou 'Alugada'
   fotoUrl            String?
   fotoCarteirinhaUrl String?
-  fotoConfig         String?
-  cadastroCompleto   Boolean     @default(false)
-  camposPreenchidos  Int         @default(0)
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  documentos         Documento[]
-  logs               Log[]
-  gestoes            Gestao[]    @relation("AssociadoToGestao")
+  fotoConfig         String?      // JSON com zoom/posição
+  cadastroCompleto   Boolean      @default(false)
+  camposPreenchidos  Int          @default(0)
+  senhaAlterada      Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  // Relações
+  documentos Documento[]
+  logs       Log[]
+  gestoes    Gestao[]
 
   @@map("associados")
 }
@@ -56,13 +67,13 @@ model Evento {
 }
 
 model Convenio {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  descricao String?
-  categoria String?
-  link      String?
-  visivel   Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  categoria   String?
+  link        String?
+  visivel     Boolean  @default(true)
+  createdAt   DateTime @default(now())
 
   @@map("convenios")
 }
@@ -72,7 +83,7 @@ model Lancamento {
   data        DateTime
   descricao   String
   valor       Decimal  @db.Decimal(10, 2)
-  tipo        String
+  tipo        String   // 'entrada' ou 'saida'
   responsavel String?
   createdAt   DateTime @default(now())
 
@@ -82,7 +93,7 @@ model Lancamento {
 model Votacao {
   id        Int      @id @default(autoincrement())
   titulo    String
-  status    String   @default("Aberta")
+  status    String   @default("Aberta") // Aberta, Encerrada
   dataFim   String?
   votos     Int      @default(0)
   createdAt DateTime @default(now())
@@ -91,14 +102,14 @@ model Votacao {
 }
 
 model Gestao {
-  id         Int               @id @default(autoincrement())
-  ativa      Boolean           @default(false)
-  createdAt  DateTime          @default(now())
-  fim        DateTime?
-  inicio     DateTime?
-  nome       String
+  id        Int      @id @default(autoincrement())
+  nome      String
+  inicio    DateTime?
+  fim       DateTime?
+  ativa     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  associados Associado[]
   membros    DiretoriaGestao[]
-  associados Associado[]       @relation("AssociadoToGestao")
 
   @@map("gestoes")
 }
@@ -106,10 +117,10 @@ model Gestao {
 model DiretoriaGestao {
   id       Int    @id @default(autoincrement())
   gestaoId Int
+  gestao   Gestao @relation(fields: [gestaoId], references: [id], onDelete: Cascade)
   cpf      String
   nome     String
   cargo    String
-  gestao   Gestao @relation(fields: [gestaoId], references: [id], onDelete: Cascade)
 
   @@map("diretoria_gestao")
 }
@@ -121,8 +132,8 @@ model Documento {
   mimeType    String?
   tamanho     Int?
   associadoId Int
-  createdAt   DateTime  @default(now())
   associado   Associado @relation(fields: [associadoId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 
   @@map("documentos")
 }
@@ -132,10 +143,10 @@ model Log {
   acao        String
   detalhes    String?
   associadoId Int?
+  associado   Associado? @relation(fields: [associadoId], references: [id], onDelete: SetNull)
   ip          String?
   userAgent   String?
   createdAt   DateTime   @default(now())
-  associado   Associado? @relation(fields: [associadoId], references: [id])
 
   @@index([associadoId])
   @@index([createdAt])
@@ -144,41 +155,41 @@ model Log {
 
 model ConfigCarteirinha {
   id             Int      @id @default(autoincrement())
-  config         String
-  templateFrente String?
-  templateVerso  String?
+  config         String   @db.Text // JSON com frame e campos
+  templateFrente String?  // path do arquivo
+  templateVerso  String?  // path do arquivo
   updatedAt      DateTime @updatedAt
 
   @@map("config_carteirinhas")
 }
 
 model SiteConfig {
-  id              Int      @id @default(autoincrement())
-  sobreTexto      String?
-  missao          String?
-  visao           String?
-  valores         String?
-  estatutos       String?
-  bannerUrl       String?
-  bannerAlt       String?
+  id             Int      @id @default(autoincrement())
+  sobreTexto     String?  @db.Text
+  missao         String?  @db.Text
+  visao          String?  @db.Text
+  valores        String?  @db.Text
+  estatutos      String?  @db.Text
+  bannerUrl      String?
+  bannerAlt      String?
   mostrarEnquetes Boolean  @default(true)
   mostrarNoticias Boolean  @default(true)
-  mostrarEventos  Boolean  @default(true)
-  linksRapidos    String?
-  updatedAt       DateTime @updatedAt
+  mostrarEventos Boolean  @default(true)
+  linksRapidos   String?  @db.Text // JSON array de {titulo, url}
+  updatedAt      DateTime @updatedAt
 
   @@map("site_config")
 }
 
 model Noticia {
-  id             Int      @id @default(autoincrement())
-  titulo         String
-  descricao      String?
-  conteudo       String?
-  dataPublicacao DateTime @default(now())
-  visivel        Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  titulo          String
+  descricao       String?
+  conteudo        String?  @db.Text
+  dataPublicacao  DateTime @default(now())
+  visivel         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("noticias")
 }

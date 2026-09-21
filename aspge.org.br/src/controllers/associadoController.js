@@ -5,7 +5,9 @@ const { getFileUrl } = require('../middleware/upload');
 
 // Campos obrigatórios para cadastro completo
 const CAMPOS_OBRIGATORIOS = [
-  'whatsapp', 'email', 'matricula', 'cargo', 'cpf', 'rg'
+  'whatsapp', 'email', 'matricula', 'cargo', 'cpf', 'rg',
+  'dataNascimento', 'estadoCivil', 'cep', 'endereco', 'numero',
+  'bairro', 'cidade', 'estado', 'tipoResidencia'
 ];
 
 /**
@@ -277,6 +279,7 @@ async function atualizar(req, res) {
       'rg', 'expeditor', 'matricula', 'cargo', 'whatsapp', 'email',
       'sexo', 'dataNascimento', 'naturalidade', 'estadoCivil',
       'graduacao', 'posGraduacao', 'areaAtuacao', 'lotacao',
+      'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'tipoResidencia',
       'fotoUrl', 'fotoCarteirinhaUrl', 'fotoConfig'
     ];
 
@@ -291,6 +294,19 @@ async function atualizar(req, res) {
         dadosAtualizacao[campo] = dados[campo];
       }
     });
+
+    // Processar alteração de senha
+    if (dados.senha && dados.confirmarSenha) {
+      if (dados.senha !== dados.confirmarSenha) {
+        return res.status(400).json({ erro: 'Senhas não conferem' });
+      }
+      if (dados.senha.length < 6) {
+        return res.status(400).json({ erro: 'Senha deve ter no mínimo 6 caracteres' });
+      }
+      const bcrypt = require('bcrypt');
+      dadosAtualizacao.senha = await bcrypt.hash(dados.senha, 10);
+      dadosAtualizacao.senhaAlterada = true;
+    }
 
     // Recalcular completude
     const dadosCombinados = { ...associadoExistente, ...dadosAtualizacao };
@@ -326,6 +342,109 @@ async function atualizar(req, res) {
     });
   } catch (error) {
     logger.error('Erro ao atualizar associado:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
+/**
+ * Atualizar cadastro próprio (público - página de atualização cadastral)
+ * Requer CPF e senha no body para autenticação
+ */
+async function atualizarCadastro(req, res) {
+  try {
+    const { id } = req.params;
+    const dados = req.body;
+    const cpf = dados.cpf ? dados.cpf.replace(/\D/g, '') : null;
+    const senha = dados.senhaAtual;
+
+    if (!cpf || !senha) {
+      return res.status(400).json({ erro: 'CPF e senha atual são obrigatórios' });
+    }
+
+    const associadoExistente = await prisma.associado.findUnique({
+      where: { id: parseInt(id) }
+    });
+
+    if (!associadoExistente) {
+      return res.status(404).json({ erro: 'Associado não encontrado' });
+    }
+
+    // Verificar se CPF corresponde ao associado
+    const cpfAssociado = associadoExistente.cpf.replace(/\D/g, '');
+    if (cpf !== cpfAssociado) {
+      return res.status(403).json({ erro: 'CPF não corresponde ao associado' });
+    }
+
+    // Verificar senha
+    const bcrypt = require('bcrypt');
+    const senhaValida = await bcrypt.compare(senha, associadoExistente.senha);
+    if (!senhaValida) {
+      return res.status(401).json({ erro: 'Senha incorreta' });
+    }
+
+    // Campos que podem ser atualizados
+    const camposPermitidos = [
+      'rg', 'expeditor', 'matricula', 'cargo', 'whatsapp', 'email',
+      'sexo', 'dataNascimento', 'naturalidade', 'estadoCivil',
+      'graduacao', 'posGraduacao', 'areaAtuacao', 'lotacao',
+      'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'tipoResidencia',
+      'fotoUrl', 'fotoCarteirinhaUrl', 'fotoConfig'
+    ];
+
+    const dadosAtualizacao = {};
+    camposPermitidos.forEach(campo => {
+      if (dados[campo] !== undefined) {
+        dadosAtualizacao[campo] = dados[campo];
+      }
+    });
+
+    // Processar alteração de senha
+    if (dados.novaSenha && dados.confirmarNovaSenha) {
+      if (dados.novaSenha !== dados.confirmarNovaSenha) {
+        return res.status(400).json({ erro: 'Senhas não conferem' });
+      }
+      if (dados.novaSenha.length < 6) {
+        return res.status(400).json({ erro: 'Senha deve ter no mínimo 6 caracteres' });
+      }
+      dadosAtualizacao.senha = await bcrypt.hash(dados.novaSenha, 10);
+      dadosAtualizacao.senhaAlterada = true;
+    }
+
+    // Recalcular completude
+    const dadosCombinados = { ...associadoExistente, ...dadosAtualizacao };
+    const { camposPreenchidos, cadastroCompleto } = calcularCompletude(dadosCombinados);
+
+    dadosAtualizacao.camposPreenchidos = camposPreenchidos;
+    dadosAtualizacao.cadastroCompleto = cadastroCompleto;
+
+    const associado = await prisma.associado.update({
+      where: { id: parseInt(id) },
+      data: dadosAtualizacao
+    });
+
+    // Registrar log
+    await prisma.log.create({
+      data: {
+        acao: 'Atualizou Cadastro',
+        detalhes: 'Próprio cadastro via página pública',
+        associadoId: associado.id,
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      }
+    });
+
+    res.json({
+      sucesso: true,
+      mensagem: 'Cadastro atualizado com sucesso',
+      dados: {
+        id: associado.id,
+        nomeCompleto: associado.nomeCompleto,
+        cadastroCompleto: associado.cadastroCompleto,
+        senhaAlterada: associado.senhaAlterada
+      }
+    });
+  } catch (error) {
+    logger.error('Erro ao atualizar cadastro:', error);
     res.status(500).json({ erro: 'Erro interno no servidor' });
   }
 }
@@ -451,6 +570,7 @@ module.exports = {
   buscarPorId,
   criar,
   atualizar,
+  atualizarCadastro,
   excluir,
   uploadFoto
 };

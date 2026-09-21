@@ -973,6 +973,14 @@ async function carregarDadosUsuario() {
     if (data.sucesso) {
       usuarioAtual = data.dados;
       var d = data.dados;
+      
+      // Verificar se cadastro está completo e senha foi alterada
+      if (!d.cadastroCompleto || !d.senhaAlterada) {
+        // Redirecionar para atualização cadastral
+        window.location.href = '/atualizacao';
+        return;
+      }
+      
       var ini = d.nomeCompleto ? d.nomeCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'US';
       document.getElementById('userAvatar').textContent = ini;
       document.getElementById('headerAvatar').textContent = ini;
@@ -1068,18 +1076,20 @@ async function carregarConvenios() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
-    if (data.sucesso && data.dados && data.dados.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
+      conveniosDataCache = data;
       var catColors = { 'Saúde': 'badge-green', 'Educação': 'badge-blue', 'Lazer': 'badge-yellow', 'Alimentação': 'badge-red', 'Serviços': 'badge-blue', 'Outros': 'badge-gray' };
       var html = '';
-      data.dados.forEach(function(c) {
+      data.forEach(function(c) {
         var badgeCls = catColors[c.categoria] || 'badge-gray';
-        html += '<div class="card convenio-card"><div class="card-body"><div class="icon-area">🏆</div><span class="badge ' + badgeCls + '">' + (c.categoria || 'Outros') + '</span><h3>' + c.nome + '</h3><p class="desc">' + (c.descricao || '') + '</p><div class="convenio-actions"><button class="btn btn-outline btn-sm">Detalhes</button><button class="btn btn-primary btn-sm">Resgatar</button></div></div></div>';
+        var linkBtn = c.link && c.link !== '#' ? '<a href="' + c.link + '" target="_blank" class="btn btn-primary btn-sm">Acessar</a>' : '<button class="btn btn-outline btn-sm" disabled>Sem link</button>';
+        html += '<div class="card convenio-card"><div class="card-body"><div class="icon-area">🏆</div><span class="badge ' + badgeCls + '">' + (c.categoria || 'Outros') + '</span><h3>' + c.nome + '</h3><p class="desc">' + (c.descricao || '') + '</p><div class="convenio-actions">' + linkBtn + '</div></div></div>';
       });
       document.getElementById('conveniosGrid').innerHTML = html;
       // Tabela admin de convênios
-      var admHtml = '<table><thead><tr><th>Nome</th><th>Categoria</th><th>Visível</th></tr></thead><tbody>';
-      data.dados.forEach(function(c) {
-        admHtml += '<tr><td style="font-weight:600">' + c.nome + '</td><td>' + (c.categoria || '-') + '</td><td>' + (c.visivel !== false ? '✓' : '✗') + '</td></tr>';
+      var admHtml = '<table><thead><tr><th>Nome</th><th>Categoria</th><th>Visível</th><th style="text-align:center;width:140px">Ações</th></tr></thead><tbody>';
+      data.forEach(function(c) {
+        admHtml += '<tr><td style="font-weight:600">' + c.nome + '</td><td>' + (c.categoria || '-') + '</td><td>' + (c.visivel !== false ? '✓' : '✗') + '</td><td style="text-align:center"><button class="btn btn-sm" onclick="editarConvenio(' + c.id + ')" title="Editar">✏️</button> <button class="btn btn-sm" onclick="alternarVisConvenio(' + c.id + ')" title="Alternar visibilidade">👁️</button> <button class="btn btn-sm" style="color:#dc2626" onclick="excluirConvenio(' + c.id + ')" title="Excluir">🗑️</button></td></tr>';
       });
       admHtml += '</tbody></table>';
       document.getElementById('conveniosAdmTabela').innerHTML = admHtml;
@@ -1417,7 +1427,110 @@ async function salvarAtualizacao(e) {
 
 function abrirModalLanc(tipo) { alert('Funcionalidade em desenvolvimento'); }
 function abrirModalEvento() { alert('Funcionalidade em desenvolvimento'); }
-function abrirModalConvenio() { alert('Funcionalidade em desenvolvimento'); }
+
+// ===== CONVÊNIOS: CRUD =====
+var convenioEditandoId = null;
+var conveniosDataCache = [];
+
+function abrirModalConvenio(id) {
+  convenioEditandoId = id || null;
+  document.getElementById('modalConvenio').style.display = 'flex';
+  document.getElementById('modalConvenioTitle').textContent = id ? '✏️ Editar Convênio' : '➕ Novo Convênio';
+  if (!id) {
+    document.getElementById('convNome').value = '';
+    document.getElementById('convDescricao').value = '';
+    document.getElementById('convCategoria').value = '';
+    document.getElementById('convLink').value = '';
+    document.getElementById('convVisivel').checked = true;
+  } else {
+    var c = conveniosDataCache.find(function(x) { return x.id === id; });
+    if (c) {
+      document.getElementById('convNome').value = c.nome || '';
+      document.getElementById('convDescricao').value = c.descricao || '';
+      document.getElementById('convCategoria').value = c.categoria || '';
+      document.getElementById('convLink').value = c.link || '';
+      document.getElementById('convVisivel').checked = c.visivel !== false;
+    }
+  }
+}
+
+function fecharModalConvenio() {
+  document.getElementById('modalConvenio').style.display = 'none';
+  convenioEditandoId = null;
+}
+
+async function salvarConvenio() {
+  var token = localStorage.getItem('token');
+  var dados = {
+    nome: document.getElementById('convNome').value.trim(),
+    descricao: document.getElementById('convDescricao').value.trim(),
+    categoria: document.getElementById('convCategoria').value.trim(),
+    link: document.getElementById('convLink').value.trim(),
+    visivel: document.getElementById('convVisivel').checked
+  };
+  if (!dados.nome) { alert('Nome do convênio é obrigatório'); return; }
+
+  var url = convenioEditandoId ? '/api/convenios/' + convenioEditandoId : '/api/convenios';
+  var method = convenioEditandoId ? 'PUT' : 'POST';
+
+  try {
+    var response = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(dados)
+    });
+    var result = await response.json();
+    if (result.sucesso) {
+      fecharModalConvenio();
+      carregarConvenios();
+    } else {
+      alert(result.erro || 'Erro ao salvar convênio');
+    }
+  } catch (error) {
+    alert('Erro de conexão');
+  }
+}
+
+function editarConvenio(id) {
+  abrirModalConvenio(id);
+}
+
+async function excluirConvenio(id) {
+  if (!confirm('Tem certeza que deseja excluir este convênio?')) return;
+  var token = localStorage.getItem('token');
+  try {
+    var response = await fetch('/api/convenios/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var result = await response.json();
+    if (result.sucesso) {
+      carregarConvenios();
+    } else {
+      alert(result.erro || 'Erro ao excluir');
+    }
+  } catch (error) {
+    alert('Erro de conexão');
+  }
+}
+
+async function alternarVisConvenio(id) {
+  var token = localStorage.getItem('token');
+  try {
+    var response = await fetch('/api/convenios/' + id + '/visibilidade', {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var result = await response.json();
+    if (result.sucesso) {
+      carregarConvenios();
+    } else {
+      alert(result.erro || 'Erro ao alterar visibilidade');
+    }
+  } catch (error) {
+    alert('Erro de conexão');
+  }
+}
 
 // ===== CARTEIRINHAS: CONFIG + EXPORT =====
 var crtFrameConfig = { left: 7.5, top: 14.2, width: 29.4, height: 24.1 };
@@ -2424,6 +2537,52 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="display:flex;gap:12px;justify-content:flex-end">
         <button onclick="fecharModalEdit()" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#374151">Cancelar</button>
         <button onclick="salvarEdicaoAssociado()" style="padding:10px 20px;border:none;border-radius:8px;background:#1e3a5f;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Convênio -->
+<div id="modalConvenio" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #e5e7eb">
+      <h3 style="font-size:18px;font-weight:800;color:#1f2937" id="modalConvenioTitle">➕ Novo Convênio</h3>
+      <button onclick="fecharModalConvenio()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;padding:4px 8px">&times;</button>
+    </div>
+    <div style="padding:24px">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Nome do Convênio *</label>
+        <input type="text" id="convNome" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="Ex: Clínica Saúde Total">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Descrição</label>
+        <textarea id="convDescricao" rows="3" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;resize:vertical" placeholder="Descreva os benefícios do convênio..."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Categoria</label>
+          <select id="convCategoria" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+            <option value="">Selecione...</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Educação">Educação</option>
+            <option value="Lazer">Lazer</option>
+            <option value="Alimentação">Alimentação</option>
+            <option value="Serviços">Serviços</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Link (site/whats)</label>
+          <input type="text" id="convLink" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="https://...">
+        </div>
+      </div>
+      <div style="margin-bottom:24px;display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="convVisivel" checked style="width:18px;height:18px;cursor:pointer">
+        <label for="convVisivel" style="font-size:14px;color:#374151;cursor:pointer">Convênio visível no portal</label>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button onclick="fecharModalConvenio()" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#374151">Cancelar</button>
+        <button onclick="salvarConvenio()" style="padding:10px 20px;border:none;border-radius:8px;background:#dc2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Salvar Convênio</button>
       </div>
     </div>
   </div>
