@@ -154,6 +154,7 @@ section[id]{scroll-margin-top:84px}
     </a>
     <nav class="nav-links" aria-label="Navegação principal">
       <a href="#sobre" class="nav-link nav-link-secondary">Sobre</a>
+      <a href="/diretoria" class="nav-link nav-link-secondary">Diretoria</a>
       <a href="#convenios" id="nav-convenios" class="nav-link nav-link-secondary" style="display:none">Convênios</a>
       <a href="#noticias" id="nav-noticias" class="nav-link nav-link-secondary" style="display:none">Notícias</a>
       <a href="#enquetes" id="nav-enquetes" class="nav-link nav-link-secondary" style="display:none">Enquetes</a>
@@ -193,20 +194,6 @@ section[id]{scroll-margin-top:84px}
         <h3>Valores</h3>
         <p id="valores-text"><span class="skeleton skel-line"></span><span class="skeleton skel-line" style="width:80%"></span></p>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- DIRETORIA -->
-<section class="section" id="diretoria">
-  <div class="section-inner">
-    <h2 class="section-title">Diretoria</h2>
-    <div style="text-align:center;margin-bottom:24px">
-      <h3 id="gestao-nome" style="font-size:24px;font-weight:700;color:#dc2626;margin-bottom:8px">Carregando...</h3>
-      <p id="gestao-periodo" style="font-size:14px;color:#6b7280"></p>
-    </div>
-    <div class="grid" id="diretoria-grid">
-      <div class="skeleton skel-card"></div><div class="skeleton skel-card"></div><div class="skeleton skel-card"></div>
     </div>
   </div>
 </section>
@@ -264,6 +251,7 @@ section[id]{scroll-margin-top:84px}
           <a href="/login">Portal do Associado</a>
           <a href="/inscricao">Ficha de Inscrição</a>
           <a href="/noticias">Notícias</a>
+          <a href="/diretoria">Diretoria</a>
           <a href="/versoes">Versões do Sistema</a>
         </div>
       </div>
@@ -323,49 +311,6 @@ async function carregarConfig() {
     // Fallback p/ não ficar "Carregando..." indefinidamente
     var fb = { 'missao-text':'Nossa missão.', 'visao-text':'Nossa visão.', 'valores-text':'Nossos valores.' };
     for (var id in fb) { var el = document.getElementById(id); if (el && el.textContent === 'Carregando...') el.textContent = fb[id]; }
-  }
-}
-
-async function carregarDiretoria() {
-  try {
-    const response = await fetch('/api/gestoes/ativa');
-    const data = await response.json();
-    
-    if (data.sucesso && data.dados) {
-      const gestaoAtiva = data.dados;
-      
-      // Exibir nome da gestão
-      const gestaoTitle = document.getElementById('gestao-nome');
-      if (gestaoTitle && gestaoAtiva.nome) {
-        gestaoTitle.textContent = gestaoAtiva.nome;
-      }
-      
-      // Exibir período da gestão
-      const gestaoPeriodo = document.getElementById('gestao-periodo');
-      if (gestaoPeriodo) {
-        const inicio = gestaoAtiva.inicio ? new Date(gestaoAtiva.inicio).toLocaleDateString('pt-BR') : '';
-        const fim = gestaoAtiva.fim ? new Date(gestaoAtiva.fim).toLocaleDateString('pt-BR') : '';
-        gestaoPeriodo.textContent = inicio && fim ? `${inicio} - ${fim}` : (inicio || fim || '');
-      }
-      
-      if (gestaoAtiva.membros && gestaoAtiva.membros.length > 0) {
-        const grid = document.getElementById('diretoria-grid');
-        grid.innerHTML = gestaoAtiva.membros.map(function(membro){
-          var ini = (membro.nome||'?').trim().split(/\s+/).map(function(p){return p[0];}).slice(0,2).join('').toUpperCase();
-          var foto = membro.fotoUrl
-            ? '<img src="' + esc(membro.fotoUrl) + '" alt="' + esc(membro.nome) + '" class="dir-foto" loading="lazy" onerror="this.style.display=\'none\'">'
-            : '<div class="dir-avatar">' + esc(ini) + '</div>';
-          return '<div class="card dir-card">' + foto + '<h3>' + esc(membro.nome) + '</h3><p class="dir-cargo">' + esc(membro.cargo) + '</p></div>';
-        }).join('');
-      } else {
-        document.getElementById('diretoria-grid').innerHTML = '<p>Nenhum membro cadastrado na diretoria.</p>';
-      }
-    } else {
-      document.getElementById('diretoria-grid').innerHTML = '<p>Nenhuma gestão ativa encontrada.</p>';
-    }
-  } catch (error) {
-    console.error('Erro ao carregar diretoria:', error);
-    document.getElementById('diretoria-grid').innerHTML = '<p>Erro ao carregar diretoria. Tente recarregar a página.</p>';
   }
 }
 
@@ -445,7 +390,6 @@ async function carregarConvenios() {
 // Carregar dados ao iniciar
 document.getElementById('footer-ano').textContent = new Date().getFullYear();
 carregarConfig();
-carregarDiretoria();
 carregarNoticias();
 carregarEnquetes();
 carregarConvenios();

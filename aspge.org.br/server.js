@@ -130,6 +130,11 @@ app.get('/versoes', (req, res) => {
   res.render('versoes', { title: 'Histórico de Versões - ASPGE-PA', versoes, marcos });
 });
 
+// Diretoria (público)
+app.get('/diretoria', (req, res) => {
+  res.render('diretoria', { title: 'Diretoria - ASPGE-PA' });
+});
+
 // Notícias (público): lista e detalhe
 app.get('/noticias', (req, res) => {
   res.render('noticias', { title: 'Notícias - ASPGE-PA', noticiaId: null });

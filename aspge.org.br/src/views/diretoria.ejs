@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= title %></title>
+<meta name="description" content="Diretoria da ASPGE-PA — Associação dos Procuradores do Estado do Pará.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/public/icons/icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6}
+.header{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-img{width:44px;height:44px;object-fit:contain}
+.logo-text{font-weight:900;color:#dc2626;font-size:20px;letter-spacing:-.5px}
+.nav-link{padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;background:#0075bf;color:#fff}
+.nav-link:hover{background:#005a91}
+.wrap{max-width:1100px;margin:0 auto;padding:48px 24px}
+.page-title{font-size:34px;font-weight:900;color:#dc2626;margin-bottom:8px;text-align:center}
+.page-sub{color:#6b7280;margin-bottom:8px;text-align:center}
+.gestao-nome{text-align:center;font-size:18px;font-weight:700;color:#0075bf;margin-top:4px}
+.gestao-periodo{text-align:center;font-size:14px;color:#9ca3af;margin-bottom:36px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px}
+.card{background:#fff;border-radius:16px;padding:32px 24px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.dir-foto{width:96px;height:96px;border-radius:50%;object-fit:cover;margin:0 auto 14px;border:3px solid #fee2e2;display:block}
+.dir-avatar{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#0075bf);color:#fff;font-weight:800;font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.card h3{font-size:18px;font-weight:700;color:#1f2937;margin-bottom:4px}
+.dir-cargo{color:#dc2626;font-weight:600;font-size:14px}
+.empty{text-align:center;color:#9ca3af;padding:48px 0}
+.skeleton{position:relative;overflow:hidden;background:#e5e7eb;border-radius:16px;height:200px}
+.skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:sk 1.4s infinite}
+@keyframes sk{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.footer{background:#1e3a5f;color:#fff;padding:32px 24px;text-align:center;font-size:13px;opacity:.9;margin-top:48px}
+@media(max-width:640px){.page-title{font-size:26px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo"><img src="/public/logo.png" alt="ASPGE-PA" class="logo-img" width="44" height="44"><div class="logo-text">ASPGE-PA</div></a>
+    <a href="/portal" class="nav-link">Acesso Associados</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 class="page-title">Diretoria</h1>
+  <p class="page-sub">Conheça os membros da gestão da ASPGE-PA.</p>
+  <p class="gestao-nome" id="gestao-nome"></p>
+  <p class="gestao-periodo" id="gestao-periodo"></p>
+  <div class="grid" id="diretoria-grid">
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</main>
+
+<footer class="footer">© <span id="ano"></span> ASPGE-PA — Associação dos Procuradores do Estado do Pará</footer>
+
+<script>
+document.getElementById('ano').textContent = new Date().getFullYear();
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function fmtData(d){ var dt=d?new Date(d):null; return (dt&&!isNaN(dt))?dt.toLocaleDateString('pt-BR'):''; }
+
+async function init(){
+  var grid=document.getElementById('diretoria-grid');
+  try{
+    var r=await fetch('/api/gestoes/ativa'); var j=await r.json();
+    var g=j.dados;
+    if(!j.sucesso||!g){ grid.innerHTML='<p class="empty">Nenhuma gestão ativa encontrada.</p>'; return; }
+    if(g.nome) document.getElementById('gestao-nome').textContent=g.nome;
+    var ini=fmtData(g.inicio), fim=fmtData(g.fim);
+    document.getElementById('gestao-periodo').textContent=(ini&&fim)?('Gestão '+ini+' — '+fim):(ini||fim||'');
+    var membros=g.membros||[];
+    if(!membros.length){ grid.innerHTML='<p class="empty">Nenhum membro cadastrado na diretoria.</p>'; return; }
+    grid.innerHTML=membros.map(function(m){
+      var ini2=(m.nome||'?').trim().split(/\s+/).map(function(p){return p[0];}).slice(0,2).join('').toUpperCase();
+      var foto=m.fotoUrl
+        ? '<img src="'+esc(m.fotoUrl)+'" alt="'+esc(m.nome)+'" class="dir-foto" loading="lazy" onerror="this.style.display=\'none\'">'
+        : '<div class="dir-avatar">'+esc(ini2)+'</div>';
+      return '<div class="card">'+foto+'<h3>'+esc(m.nome)+'</h3><p class="dir-cargo">'+esc(m.cargo)+'</p></div>';
+    }).join('');
+  }catch(e){ grid.innerHTML='<p class="empty">Erro ao carregar a diretoria. Tente recarregar a página.</p>'; }
+}
+init();
+</script>
+</body>
+</html>
