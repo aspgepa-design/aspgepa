@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T13:33:58.219Z",
+  "geradoEm": "2026-09-24T14:02:50.745Z",
   "versoes": [
+    {
+      "versao": "v2.10.0",
+      "data": "24 de set de 2026",
+      "hash": "dd46375",
+      "titulo": "feat: gerente edita foto da carteirinha por associado na emissao - arrastar, zoom 1%%, salvar fotoConfig",
+      "tipo": "added",
+      "itens": [
+        "feat: gerente edita foto da carteirinha por associado na emissao - arrastar, zoom 1%%, salvar fotoConfig"
+      ]
+    },
     {
       "versao": "v2.9.0",
       "data": "24 de set de 2026",

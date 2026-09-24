@@ -4,10 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ASPGE-PA - Associação dos Procuradores do Estado do Pará</title>
+<meta name="description" content="ASPGE-PA — Associação dos Procuradores do Estado do Pará. Portal do associado, carteirinha digital, convênios, notícias e transparência.">
+<meta property="og:title" content="ASPGE-PA — Associação dos Procuradores do Estado do Pará">
+<meta property="og:description" content="Portal do associado, carteirinha digital, convênios, notícias e transparência.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/public/logo.png">
+<meta property="og:locale" content="pt_BR">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6}
+html{scroll-behavior:smooth}
+section[id]{scroll-margin-top:84px}
+:focus-visible{outline:2px solid #0075bf;outline-offset:2px;border-radius:4px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 
 /* HEADER */
 .header{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
@@ -96,10 +108,10 @@ html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8f
       <img src="/public/logo.png" alt="ASPGE-PA Logo" class="logo-img">
       <div class="logo-text">ASPGE-PA</div>
     </a>
-    <nav class="nav-links">
+    <nav class="nav-links" aria-label="Navegação principal">
       <a href="#sobre" class="nav-link nav-link-secondary">Sobre</a>
-      <a href="#noticias" class="nav-link nav-link-secondary">Notícias</a>
-      <a href="#enquetes" class="nav-link nav-link-secondary">Enquetes</a>
+      <a href="#noticias" id="nav-noticias" class="nav-link nav-link-secondary" style="display:none">Notícias</a>
+      <a href="#enquetes" id="nav-enquetes" class="nav-link nav-link-secondary" style="display:none">Enquetes</a>
       <a href="/login" class="nav-link nav-link-primary">Acesso Associados</a>
     </nav>
   </div>
@@ -192,12 +204,15 @@ html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8f
       </div>
     </div>
     <div class="footer-bottom">
-      © 2026 ASPGE-PA. Todos os direitos reservados.
+      © <span id="footer-ano">2026</span> ASPGE-PA. Todos os direitos reservados.
     </div>
   </div>
 </footer>
 
 <script>
+// Escapa HTML p/ evitar XSS ao injetar dados via innerHTML
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
 async function carregarConfig() {
   try {
     const response = await fetch('/api/site-config');
@@ -212,30 +227,32 @@ async function carregarConfig() {
       if (config.visao) document.getElementById('visao-text').textContent = config.visao;
       if (config.valores) document.getElementById('valores-text').textContent = config.valores;
       
-      // Mostrar/ocultar seções
-      if (config.mostrarNoticias) document.getElementById('noticias').style.display = 'block';
-      if (config.mostrarEnquetes) document.getElementById('enquetes').style.display = 'block';
+      // Mostrar/ocultar seções (e os respectivos links do menu)
+      if (config.mostrarNoticias) { document.getElementById('noticias').style.display = 'block'; document.getElementById('nav-noticias').style.display = ''; }
+      if (config.mostrarEnquetes) { document.getElementById('enquetes').style.display = 'block'; document.getElementById('nav-enquetes').style.display = ''; }
       
       // Links rápidos
       if (config.linksRapidos && config.linksRapidos.length > 0) {
         const linksContainer = document.getElementById('links-rapidos');
-        linksContainer.innerHTML = config.linksRapidos.map(link => 
-          `<a href="${link.url}">${link.titulo}</a>`
-        ).join('');
+        linksContainer.innerHTML = config.linksRapidos.map(function(link){
+          var url = String(link.url || '#');
+          if (/^\s*javascript:/i.test(url)) url = '#'; // bloqueia javascript:
+          return '<a href="' + esc(url) + '">' + esc(link.titulo) + '</a>';
+        }).join('');
       }
     }
   } catch (error) {
     console.error('Erro ao carregar configurações:', error);
+    // Fallback p/ não ficar "Carregando..." indefinidamente
+    var fb = { 'missao-text':'Nossa missão.', 'visao-text':'Nossa visão.', 'valores-text':'Nossos valores.' };
+    for (var id in fb) { var el = document.getElementById(id); if (el && el.textContent === 'Carregando...') el.textContent = fb[id]; }
   }
 }
 
 async function carregarDiretoria() {
   try {
-    console.log('[DEBUG] carregarDiretoria() iniciado');
     const response = await fetch('/api/gestoes/ativa');
-    console.log('[DEBUG] Response status:', response.status);
     const data = await response.json();
-    console.log('[DEBUG] Response data:', data);
     
     if (data.sucesso && data.dados) {
       const gestaoAtiva = data.dados;
@@ -256,12 +273,9 @@ async function carregarDiretoria() {
       
       if (gestaoAtiva.membros && gestaoAtiva.membros.length > 0) {
         const grid = document.getElementById('diretoria-grid');
-        grid.innerHTML = gestaoAtiva.membros.map(membro => `
-          <div class="card">
-            <h3>${membro.nome}</h3>
-            <p style="color:#dc2626;font-weight:600">${membro.cargo}</p>
-          </div>
-        `).join('');
+        grid.innerHTML = gestaoAtiva.membros.map(function(membro){
+          return '<div class="card"><h3>' + esc(membro.nome) + '</h3><p style="color:#dc2626;font-weight:600">' + esc(membro.cargo) + '</p></div>';
+        }).join('');
       } else {
         document.getElementById('diretoria-grid').innerHTML = '<p>Nenhum membro cadastrado na diretoria.</p>';
       }
@@ -281,13 +295,16 @@ async function carregarNoticias() {
     
     if (data.sucesso && data.dados && data.dados.length > 0) {
       const grid = document.getElementById('noticias-grid');
-      grid.innerHTML = data.dados.map(noticia => `
-        <div class="card news-card">
-          <h3>${noticia.titulo}</h3>
-          <span class="news-date">${new Date(noticia.dataPublicacao).toLocaleDateString('pt-BR')}</span>
-          <p class="news-desc">${noticia.descricao || noticia.conteudo?.substring(0, 150) + '...'}</p>
-        </div>
-      `).join('');
+      grid.innerHTML = data.dados.map(function(noticia){
+        var conteudo = String(noticia.conteudo || '');
+        var desc = noticia.descricao || conteudo.substring(0, 150);
+        if (!noticia.descricao && conteudo.length > 150) desc += '...';
+        var d = noticia.dataPublicacao ? new Date(noticia.dataPublicacao) : null;
+        var dataTxt = (d && !isNaN(d)) ? d.toLocaleDateString('pt-BR') : '';
+        return '<div class="card news-card"><h3>' + esc(noticia.titulo) + '</h3>' +
+               (dataTxt ? '<span class="news-date">' + dataTxt + '</span>' : '') +
+               '<p class="news-desc">' + esc(desc) + '</p></div>';
+      }).join('');
     } else {
       document.getElementById('noticias-grid').innerHTML = '<p>Nenhuma notícia publicada.</p>';
     }
@@ -306,24 +323,27 @@ async function carregarEnquetes() {
       
       if (enquetesAbertas.length > 0) {
         const grid = document.getElementById('enquetes-grid');
-        grid.innerHTML = enquetesAbertas.map(enquete => `
-          <div class="card poll-card">
-            <span class="poll-status">${enquete.status}</span>
-            <h3>${enquete.titulo}</h3>
-            <p style="color:#92400e;font-size:14px;margin-top:8px">${enquete.votos} votos</p>
-            <a href="/login" style="display:inline-block;margin-top:12px;padding:8px 16px;background:#fff;color:#92400e;text-decoration:none;border-radius:8px;font-weight:600;font-size:12px">Participar</a>
-          </div>
-        `).join('');
+        grid.innerHTML = enquetesAbertas.map(function(enquete){
+          var votos = (enquete.votos != null ? enquete.votos : (enquete.totalVotos != null ? enquete.totalVotos : 0));
+          return '<div class="card poll-card"><span class="poll-status">' + esc(enquete.status) + '</span>' +
+                 '<h3>' + esc(enquete.titulo) + '</h3>' +
+                 '<p style="color:#92400e;font-size:14px;margin-top:8px">' + votos + ' votos</p>' +
+                 '<a href="/login" style="display:inline-block;margin-top:12px;padding:8px 16px;background:#fff;color:#92400e;text-decoration:none;border-radius:8px;font-weight:600;font-size:12px">Participar</a></div>';
+        }).join('');
       } else {
         document.getElementById('enquetes-grid').innerHTML = '<p>Nenhuma enquete aberta no momento.</p>';
       }
+    } else {
+      document.getElementById('enquetes-grid').innerHTML = '<p>Nenhuma enquete disponível.</p>';
     }
   } catch (error) {
     console.error('Erro ao carregar enquetes:', error);
+    document.getElementById('enquetes-grid').innerHTML = '<p>Erro ao carregar enquetes.</p>';
   }
 }
 
 // Carregar dados ao iniciar
+document.getElementById('footer-ano').textContent = new Date().getFullYear();
 carregarConfig();
 carregarDiretoria();
 carregarNoticias();
