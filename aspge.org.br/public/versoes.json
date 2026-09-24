@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T11:38:15.305Z",
+  "geradoEm": "2026-09-24T11:47:57.749Z",
   "versoes": [
+    {
+      "versao": "v2.7.3",
+      "data": "24 de set de 2026",
+      "hash": "44cfe79",
+      "titulo": "style: melhora visualizacao mobile do portal - dashboard empilha, carteirinha centralizada, widgets legiveis",
+      "tipo": "changed",
+      "itens": [
+        "style: melhora visualizacao mobile do portal - dashboard empilha, carteirinha centralizada, widgets legiveis"
+      ]
+    },
     {
       "versao": "v2.7.2",
       "data": "24 de set de 2026",

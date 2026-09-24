@@ -38,6 +38,10 @@ html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,san
 .header h1{font-size:20px;font-weight:900;color:#111827;text-transform:capitalize}
 .header-right{display:flex;align-items:center;gap:16px}
 .header-avatar{width:40px;height:40px;background:linear-gradient(135deg,#dc2626,#0075bf);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.header-left{display:flex;align-items:center;gap:12px;min-width:0}
+.menu-btn{display:none;background:none;border:none;color:#1f2937;cursor:pointer;padding:6px;border-radius:8px;line-height:1;align-items:center;justify-content:center}
+.menu-btn:hover{background:#f3f4f6}
+.sidebar-overlay{display:none}
 
 /* ===== MAIN CONTENT ===== */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
@@ -153,6 +157,9 @@ tbody tr:hover{background:#f9fafb}
   .header h1{font-size:16px}
   .card-body{padding:16px}
   .widget-stat .value{font-size:26px}
+  .menu-btn{display:inline-flex}
+  .sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:45;opacity:0;pointer-events:none;transition:opacity .25s}
+  .sidebar-overlay.show{opacity:1;pointer-events:auto}
 }
 @media(max-width:480px){
   .content{padding:12px}
@@ -189,6 +196,7 @@ tbody tr:hover{background:#f9fafb}
 <!-- APP SCREEN -->
 <div class="app">
   <div class="app-body">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharMenu()"></div>
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-brand">
@@ -222,7 +230,12 @@ tbody tr:hover{background:#f9fafb}
     <div class="main">
       <!-- HEADER -->
       <header class="header">
-        <h1 id="headerTitle">Início</h1>
+        <div class="header-left">
+          <button class="menu-btn" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 id="headerTitle">Início</h1>
+        </div>
         <div class="header-right">
           <div class="header-avatar" id="headerAvatar">US</div>
         </div>
@@ -1067,6 +1080,21 @@ function navegarPara(tabId) {
     financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', dependentes: 'Dependentes', documentos: 'Meus Documentos', associados_adm: 'Associados', inscricoes_adm: 'Inscrições', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs', site_config_adm: 'Configurar Site', noticias_adm: 'Notícias' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
   if (tabId === 'inicio') dashCardFit();
+  fecharMenu();
+}
+
+function toggleMenu() {
+  var sb = document.querySelector('.sidebar');
+  var ov = document.getElementById('sidebarOverlay');
+  if (!sb) return;
+  var open = sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('show', open);
+}
+function fecharMenu() {
+  var sb = document.querySelector('.sidebar');
+  var ov = document.getElementById('sidebarOverlay');
+  if (sb) sb.classList.remove('open');
+  if (ov) ov.classList.remove('show');
 }
 
 // ===== CARREGAR DADOS =====
