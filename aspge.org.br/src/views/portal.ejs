@@ -1188,7 +1188,6 @@ async function carregarEventos() {
     });
     const data = await response.json();
     if (data.sucesso && data.dados && data.dados.length > 0) {
-      document.getElementById('dashConvenios').textContent = data.dados.length || '0';
       var html = '';
       data.dados.slice(0, 3).forEach(function(e) {
         var meses = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
@@ -1215,7 +1214,6 @@ async function carregarEventos() {
       });
       document.getElementById('eventosList').innerHTML = memHtml || '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
     } else {
-      document.getElementById('dashConvenios').textContent = '0';
       document.getElementById('dashEventos').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
       document.getElementById('eventosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum evento cadastrado.</p>';
       document.getElementById('eventosList').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
@@ -1432,35 +1430,55 @@ async function rejeitarInscricao(id) {
 async function carregarConvenios() {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/convenios', {
+    // incluirOcultos=true: admin recebe TODOS (para a tabela de gerência); associado recebe só os visíveis (backend ignora o flag p/ não-admin)
+    const response = await fetch('/api/convenios?incluirOcultos=true', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
-    if (Array.isArray(data) && data.length > 0) {
-      conveniosDataCache = data;
-      var catColors = { 'Saúde': 'badge-green', 'Educação': 'badge-blue', 'Lazer': 'badge-yellow', 'Alimentação': 'badge-red', 'Serviços': 'badge-blue', 'Outros': 'badge-gray' };
-      var html = '';
-      data.forEach(function(c) {
-        var badgeCls = catColors[c.categoria] || 'badge-gray';
-        var linkBtn = c.link && c.link !== '#' ? '<a href="' + c.link + '" target="_blank" class="btn btn-primary btn-sm">Acessar</a>' : '<button class="btn btn-outline btn-sm" disabled>Sem link</button>';
-        html += '<div class="card convenio-card"><div class="card-body"><div class="icon-area">🏆</div><span class="badge ' + badgeCls + '">' + (c.categoria || 'Outros') + '</span><h3>' + c.nome + '</h3><p class="desc">' + (c.descricao || '') + '</p><div class="convenio-actions">' + linkBtn + '</div></div></div>';
-      });
-      document.getElementById('conveniosGrid').innerHTML = html;
-      // Tabela admin de convênios
-      var admHtml = '<table><thead><tr><th>Nome</th><th>Categoria</th><th>Visível</th><th style="text-align:center;width:140px">Ações</th></tr></thead><tbody>';
-      data.forEach(function(c) {
-        admHtml += '<tr><td style="font-weight:600">' + c.nome + '</td><td>' + (c.categoria || '-') + '</td><td>' + (c.visivel !== false ? '✓' : '✗') + '</td><td style="text-align:center"><button class="btn btn-sm" onclick="editarConvenio(' + c.id + ')" title="Editar">✏️</button> <button class="btn btn-sm" onclick="alternarVisConvenio(' + c.id + ')" title="Alternar visibilidade">👁️</button> <button class="btn btn-sm" style="color:#dc2626" onclick="excluirConvenio(' + c.id + ')" title="Excluir">🗑️</button></td></tr>';
-      });
-      admHtml += '</tbody></table>';
-      document.getElementById('conveniosAdmTabela').innerHTML = admHtml;
-    } else {
-      document.getElementById('conveniosGrid').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:24px">Nenhum convênio cadastrado.</p>';
-      document.getElementById('conveniosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum convênio cadastrado.</p>';
+    var lista = Array.isArray(data) ? data : [];
+    conveniosDataCache = lista;
+
+    // Associado: apenas convênios visíveis no grid + contador do dashboard
+    var visiveis = lista.filter(function(c) { return c.visivel !== false; });
+    var dashEl = document.getElementById('dashConvenios');
+    if (dashEl) dashEl.textContent = visiveis.length;
+
+    var gridEl = document.getElementById('conveniosGrid');
+    if (gridEl) {
+      if (visiveis.length > 0) {
+        var catColors = { 'Saúde': 'badge-green', 'Educação': 'badge-blue', 'Lazer': 'badge-yellow', 'Alimentação': 'badge-red', 'Serviços': 'badge-blue', 'Outros': 'badge-gray' };
+        var html = '';
+        visiveis.forEach(function(c) {
+          var badgeCls = catColors[c.categoria] || 'badge-gray';
+          var linkBtn = c.link && c.link !== '#' ? '<a href="' + c.link + '" target="_blank" class="btn btn-primary btn-sm">Acessar</a>' : '<button class="btn btn-outline btn-sm" disabled>Sem link</button>';
+          html += '<div class="card convenio-card"><div class="card-body"><div class="icon-area">🏆</div><span class="badge ' + badgeCls + '">' + (c.categoria || 'Outros') + '</span><h3>' + c.nome + '</h3><p class="desc">' + (c.descricao || '') + '</p><div class="convenio-actions">' + linkBtn + '</div></div></div>';
+        });
+        gridEl.innerHTML = html;
+      } else {
+        gridEl.innerHTML = '<p style="color:#9ca3af;text-align:center;padding:24px">Nenhum convênio cadastrado.</p>';
+      }
+    }
+
+    // Gerência: TODOS os convênios (visíveis e ocultos) para permitir editar/excluir/re-exibir
+    var admEl = document.getElementById('conveniosAdmTabela');
+    if (admEl) {
+      if (lista.length > 0) {
+        var admHtml = '<table><thead><tr><th>Nome</th><th>Categoria</th><th>Visível</th><th style="text-align:center;width:140px">Ações</th></tr></thead><tbody>';
+        lista.forEach(function(c) {
+          admHtml += '<tr><td style="font-weight:600">' + c.nome + '</td><td>' + (c.categoria || '-') + '</td><td>' + (c.visivel !== false ? '✓' : '✗') + '</td><td style="text-align:center"><button class="btn btn-sm" onclick="editarConvenio(' + c.id + ')" title="Editar">✏️</button> <button class="btn btn-sm" onclick="alternarVisConvenio(' + c.id + ')" title="Alternar visibilidade">👁️</button> <button class="btn btn-sm" style="color:#dc2626" onclick="excluirConvenio(' + c.id + ')" title="Excluir">🗑️</button></td></tr>';
+        });
+        admHtml += '</tbody></table>';
+        admEl.innerHTML = admHtml;
+      } else {
+        admEl.innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum convênio cadastrado.</p>';
+      }
     }
   } catch (error) {
     console.error('Erro ao carregar convênios:', error);
-    document.getElementById('conveniosGrid').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:24px">Nenhum convênio cadastrado.</p>';
-    document.getElementById('conveniosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Erro ao carregar convênios.</p>';
+    var gridEl = document.getElementById('conveniosGrid');
+    if (gridEl) gridEl.innerHTML = '<p style="color:#9ca3af;text-align:center;padding:24px">Erro ao carregar convênios.</p>';
+    var admEl = document.getElementById('conveniosAdmTabela');
+    if (admEl) admEl.innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Erro ao carregar convênios.</p>';
   }
 }
 
