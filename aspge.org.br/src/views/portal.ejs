@@ -221,7 +221,7 @@ tbody tr:hover{background:#f9fafb}
           </button>
         </div>
         <div style="text-align:center;margin-top:12px">
-          <a href="/versoes" style="font-size:11px;color:#9ca3af;text-decoration:none">Versão 2.0.0</a>
+          <a href="/versoes" style="font-size:11px;color:#9ca3af;text-decoration:none">Versão <%= (typeof versaoAtual !== 'undefined' && versaoAtual ? versaoAtual : 'v2.0.0').replace(/^v/, '') %></a>
         </div>
       </div>
     </aside>

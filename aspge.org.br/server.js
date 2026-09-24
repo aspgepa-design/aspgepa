@@ -109,7 +109,9 @@ app.get('/login', (req, res) => {
 
 // Portal (protegido — dados do usuário carregados via JS/API)
 app.get('/portal', (req, res) => {
-  res.render('portal', { title: 'Portal do Associado - ASPGE-PA' });
+  let versaoAtual = 'v2.0.0';
+  try { const v = obterVersoes().versoes; if (v && v[0] && v[0].versao) versaoAtual = v[0].versao; } catch (e) {}
+  res.render('portal', { title: 'Portal do Associado - ASPGE-PA', versaoAtual });
 });
 
 // Inscrição (público)

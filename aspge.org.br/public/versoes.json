@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T16:05:09.013Z",
+  "geradoEm": "2026-09-24T16:21:39.016Z",
   "versoes": [
+    {
+      "versao": "v2.11.0",
+      "data": "24 de set de 2026",
+      "hash": "ba9894e",
+      "titulo": "feat(home): secao convenios, CTA associe-se, footer completo, diretoria c/ fotos, noticias clicaveis + pagina /noticias, skeletons, modal PWA, hero 2 cores",
+      "tipo": "added",
+      "itens": [
+        "feat(home): secao convenios, CTA associe-se, footer completo, diretoria c/ fotos, noticias clicaveis + pagina /noticias, skeletons, modal PWA, hero 2 cores"
+      ]
+    },
     {
       "versao": "v2.10.1",
       "data": "24 de set de 2026",
