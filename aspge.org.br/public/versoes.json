@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T10:41:25.867Z",
+  "geradoEm": "2026-09-24T10:48:33.312Z",
   "versoes": [
+    {
+      "versao": "v2.6.0",
+      "data": "24 de set de 2026",
+      "hash": "2ac1b90",
+      "titulo": "feat: botao Instalar/Acessar Aplicativo na home com deteccao de instalacao PWA",
+      "tipo": "added",
+      "itens": [
+        "feat: botao Instalar/Acessar Aplicativo na home com deteccao de instalacao PWA"
+      ]
+    },
     {
       "versao": "v2.5.0",
       "data": "24 de set de 2026",

@@ -1,9 +1,10 @@
 /* ASPGE-PA Service Worker — cache de assets estáticos + fallback offline.
    API (/api/) nunca é cacheada: sempre vai à rede. */
-const CACHE = 'aspge-pwa-v2';
+const CACHE = 'aspge-pwa-v3';
 const ASSETS = [
   '/',
   '/login',
+  '/portal',
   '/manifest.webmanifest',
   '/public/logo.png',
   '/public/icons/icon-192.png',

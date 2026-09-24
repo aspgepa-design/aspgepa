@@ -354,7 +354,7 @@ async function pwaJaInstalado() {
 }
 
 function instalarOuAcessar() {
-  if (btnInstalar.dataset.modo === 'acessar') { window.location.href = '/carteirinha'; return; }
+  if (btnInstalar.dataset.modo === 'acessar') { window.location.href = '/portal'; return; }
   if (pwaDeferredPrompt) {
     pwaDeferredPrompt.prompt();
     pwaDeferredPrompt.userChoice.then(function (choice) {

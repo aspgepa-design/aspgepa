@@ -128,10 +128,7 @@ app.get('/versoes', (req, res) => {
   res.render('versoes', { title: 'Histórico de Versões - ASPGE-PA', versoes, marcos });
 });
 
-// Carteirinha digital
-app.get('/carteirinha', (req, res) => {
-  res.render('carteirinha', { title: 'Carteirinha Digital - ASPGE-PA' });
-});
+// Carteirinha digital agora é renderizada dentro do /portal (aba Início)
 
 // API Info
 app.get('/api', (req, res) => {
