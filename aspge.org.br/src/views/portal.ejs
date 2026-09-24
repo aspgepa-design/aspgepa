@@ -24,6 +24,13 @@ html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,san
 .nav-btn:hover{background:#f9fafb;color:#4b5563}
 .nav-btn.active{background:#eff6ff;color:#0075bf;box-shadow:0 1px 3px rgba(0,117,191,.08)}
 .nav-btn svg{width:18px;height:18px;flex-shrink:0}
+.nav-group{margin:2px 0}
+.nav-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af;user-select:none}
+.nav-group>summary::-webkit-details-marker{display:none}
+.nav-group>summary::after{content:'\25B8';font-size:12px;color:#c7cbd1;transition:transform .2s}
+.nav-group[open]>summary::after{transform:rotate(90deg)}
+.nav-group>summary:hover{color:#4b5563}
+.nav-group-items{display:flex;flex-direction:column}
 .sidebar-user{padding:16px;margin-top:auto}
 .user-card{background:#f9fafb;padding:16px;border-radius:16px;border:1px solid #f3f4f6}
 .user-info{display:flex;align-items:center;gap:12px;margin-bottom:12px}
@@ -1040,43 +1047,50 @@ const ICONS = {
   seguranca: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
 };
 
-// ===== NAVEGAÇÃO POR PERFIL =====
-function getNav(role) {
-  var nav = [];
-  // Menu base para todos os perfis
-  nav.push({ id: 'inicio', label: 'Início' });
-  nav.push({ id: 'transparencia', label: 'Transparência' });
-  nav.push({ id: 'convenios', label: 'Convênios' });
-  nav.push({ id: 'votacoes', label: 'Votações' });
-  nav.push({ id: 'eventos', label: 'Eventos' });
-  nav.push({ id: 'atualizacao', label: 'Meu Cadastro' });
-  nav.push({ id: 'dependentes', label: 'Dependentes' });
-  nav.push({ id: 'documentos', label: 'Meus Documentos' });
-  nav.push({ id: 'seguranca', label: 'Segurança' });
+// ===== NAVEGAÇÃO POR PERFIL (agrupada e colapsável) =====
+function getNavGroups(role) {
+  var groups = [];
+  groups.push({ label: null, items: [{ id: 'inicio', label: 'Início' }] });
+  groups.push({ label: 'Minha Conta', open: true, items: [
+    { id: 'atualizacao', label: 'Meu Cadastro' },
+    { id: 'dependentes', label: 'Dependentes' },
+    { id: 'documentos', label: 'Meus Documentos' },
+    { id: 'seguranca', label: 'Segurança' }
+  ]});
+  groups.push({ label: 'Portal', open: true, items: [
+    { id: 'transparencia', label: 'Transparência' },
+    { id: 'convenios', label: 'Convênios' },
+    { id: 'votacoes', label: 'Votações' },
+    { id: 'eventos', label: 'Eventos' }
+  ]});
 
-  // Tesoureiro: + Associados
+  // Administração (colapsado por padrão)
+  var admin = [];
   if (role === 'tesoureiro' || role === 'diretor' || role === 'presidente') {
-    nav.push({ id: 'associados_adm', label: 'Associados' });
+    admin.push({ id: 'associados_adm', label: 'Associados' });
   }
-
-  // Diretor: + Gerir Eventos, Carteirinhas, Gerir Convênios, Gestões, Logs, Site Config, Notícias
   if (role === 'diretor' || role === 'presidente') {
-    nav.push({ id: 'inscricoes_adm', label: 'Inscrições' });
-    nav.push({ id: 'eventos_adm', label: 'Gerir Eventos' });
-    nav.push({ id: 'carteirinhas_adm', label: 'Carteirinhas' });
-    nav.push({ id: 'convenios_adm', label: 'Gerir Convênios' });
-    nav.push({ id: 'gestoes_adm', label: 'Gestões' });
-    nav.push({ id: 'logs_adm', label: 'Logs' });
-    nav.push({ id: 'site_config_adm', label: 'Configurar Site' });
-    nav.push({ id: 'noticias_adm', label: 'Notícias' });
+    admin.push({ id: 'inscricoes_adm', label: 'Inscrições' });
+    admin.push({ id: 'eventos_adm', label: 'Gerir Eventos' });
+    admin.push({ id: 'carteirinhas_adm', label: 'Carteirinhas' });
+    admin.push({ id: 'convenios_adm', label: 'Gerir Convênios' });
+    admin.push({ id: 'gestoes_adm', label: 'Gestões' });
+    admin.push({ id: 'noticias_adm', label: 'Notícias' });
   }
-
-  // Tesoureiro: + Financeiro (separado)
   if (role === 'presidente' || role === 'tesoureiro') {
-    nav.push({ id: 'financeiro', label: 'Financeiro' });
+    admin.push({ id: 'financeiro', label: 'Financeiro' });
   }
+  if (admin.length) groups.push({ label: 'Administração', open: false, items: admin });
 
-  return nav;
+  // Sistema (colapsado por padrão)
+  var sistema = [];
+  if (role === 'diretor' || role === 'presidente') {
+    sistema.push({ id: 'logs_adm', label: 'Logs' });
+    sistema.push({ id: 'site_config_adm', label: 'Configurar Site' });
+  }
+  if (sistema.length) groups.push({ label: 'Sistema', open: false, items: sistema });
+
+  return groups;
 }
 
 // ===== MÁSCARAS =====
@@ -1138,13 +1152,22 @@ async function alterarMinhaSenha() {
 
 // ===== SIDEBAR NAVIGATION =====
 function montarNavegacao(role) {
-  var nav = getNav(role);
+  var groups = getNavGroups(role);
   var html = '';
-  for (var i = 0; i < nav.length; i++) {
-    var n = nav[i];
-    html += '<button class="nav-btn" data-tab="' + n.id + '" onclick="navegarPara(\'' + n.id + '\')">';
-    html += '<span style="display:flex;align-items:center">' + (ICONS[n.id] || '') + '</span>';
-    html += n.label + '</button>';
+  for (var i = 0; i < groups.length; i++) {
+    var g = groups[i];
+    var btns = '';
+    for (var j = 0; j < g.items.length; j++) {
+      var n = g.items[j];
+      btns += '<button class="nav-btn" data-tab="' + n.id + '" onclick="navegarPara(\'' + n.id + '\')">';
+      btns += '<span style="display:flex;align-items:center">' + (ICONS[n.id] || '') + '</span>';
+      btns += n.label + '</button>';
+    }
+    if (g.label) {
+      html += '<details class="nav-group"' + (g.open ? ' open' : '') + '><summary>' + g.label + '</summary><div class="nav-group-items">' + btns + '</div></details>';
+    } else {
+      html += btns;
+    }
   }
   document.getElementById('sidebarNav').innerHTML = html;
 }
@@ -1159,6 +1182,9 @@ function navegarPara(tabId) {
   for (var j = 0; j < btns.length; j++) {
     btns[j].classList.toggle('active', btns[j].getAttribute('data-tab') === tabId);
   }
+  // Abre o grupo colapsável que contém a aba ativa
+  var activeBtn = document.querySelector('.nav-btn[data-tab="' + tabId + '"]');
+  if (activeBtn) { var grp = activeBtn.closest('details'); if (grp) grp.open = true; }
   var labels = { inicio: 'Início', transparencia: 'Transparência', convenios: 'Convênios', votacoes: 'Votações', eventos: 'Eventos',
     financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', dependentes: 'Dependentes', documentos: 'Meus Documentos', seguranca: 'Segurança', associados_adm: 'Associados', inscricoes_adm: 'Inscrições', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs', site_config_adm: 'Configurar Site', noticias_adm: 'Notícias' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
