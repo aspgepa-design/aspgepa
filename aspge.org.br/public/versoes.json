@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T10:48:33.312Z",
+  "geradoEm": "2026-09-24T11:00:44.229Z",
   "versoes": [
+    {
+      "versao": "v2.7.0",
+      "data": "24 de set de 2026",
+      "hash": "c20e598",
+      "titulo": "feat: carteirinha flip (toque p/ virar) embutida no Inicio do portal; remove pagina /carteirinha e botao",
+      "tipo": "added",
+      "itens": [
+        "feat: carteirinha flip (toque p/ virar) embutida no Inicio do portal; remove pagina /carteirinha e botao"
+      ]
+    },
     {
       "versao": "v2.6.0",
       "data": "24 de set de 2026",

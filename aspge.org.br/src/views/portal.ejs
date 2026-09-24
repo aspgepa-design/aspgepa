@@ -1088,10 +1088,6 @@ async function carregarDadosUsuario() {
       document.getElementById('userName').textContent = d.nomeCompleto || 'Usuário';
       document.getElementById('userRole').textContent = d.cargoGestao || d.perfil || 'associado';
       
-      document.getElementById('dashNome').textContent = d.nomeCompleto || '--';
-      document.getElementById('dashCargo').textContent = (d.cargo || 'Servidor') + (d.matricula ? ' • Mat. ' + d.matricula : '');
-      document.getElementById('dashStatus').textContent = d.cargoGestao || d.situacao || 'Associado';
-      
       var campos = [d.cpf, d.rg, d.matricula, d.cargo, d.whatsapp, d.email];
       var preenchidos = campos.filter(function(c) { return c && c.trim() !== '' && c.toLowerCase() !== 'não'; }).length;
       document.getElementById('dashSituacao').textContent = preenchidos + '/' + campos.length + ' campos';
@@ -3095,5 +3091,6 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 </body>
+</html>
 </html>
 </html>
