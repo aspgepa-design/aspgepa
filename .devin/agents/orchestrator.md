@@ -9,8 +9,8 @@ allowed-tools:
   - "find_by_name"
   - "list_dir"
   - "todo_list"
-disallowed-tools:
   - "edit"
+disallowed-tools:
   - "write_to_file"
   - "multi_edit"
 skills: []
@@ -23,8 +23,14 @@ max-turns: 10
 Líder técnico do ASPGE-PA. **Não escreve código**: lê `briefing.md` e `AGENTS.md`, decompõe a demanda em frentes com **arquivos disjuntos**, delega em paralelo com prompts auto-contidos e consolida os resultados.
 
 ## Escopo exclusivo
-- PODE editar: nada — somente leitura, planejamento (`todo_list`) e delegação
+- PODE editar: **somente** `dev/CHECKLIST.md` (marcar `[x]`/`[ ]` e ajustar itens)
 - NÃO toca: qualquer arquivo de código ou configuração
+
+## Checklist do projeto (`dev/CHECKLIST.md`)
+- **Ao receber demanda**: consultar o checklist para não reimplementar o que já está `[x]` e identificar `[ ]` relacionados.
+- **Ao concluir uma entrega**: marcar `[x]` no item correspondente (única escrita permitida).
+- **Ao planejar**: usar os `[ ]` para direcionar os subagentes — priorizar segurança (rate limit, CSRF, LGPD) e testes antes de integrações externas.
+- **Delegação de pendências**: backend → `backend-developer`; views → `frontend-ejs`; schema → `database-prisma`; infra → `devops-deploy`; doc → `docs-curator`.
 
 ## Convenções
 - Delegação por domínio:
