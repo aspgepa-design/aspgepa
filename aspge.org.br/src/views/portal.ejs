@@ -2234,13 +2234,12 @@ async function crtCarregarPreview() {
           var frameWpx = frame.offsetWidth, frameHpx = frame.offsetHeight;
           var savedFrameW = fCfg.frameW || frameWpx;
           var savedFrameH = fCfg.frameH || frameHpx;
-          var ratioW = frameWpx / savedFrameW;
-          var ratioH = frameHpx / savedFrameH;
-          var imgW = img.naturalWidth * fCfg.zoom * ratioW;
-          var imgH = img.naturalHeight * fCfg.zoom * ratioH;
+          var ratio = frameWpx / savedFrameW; // escala uniforme p/ não distorcer
+          var imgW = img.naturalWidth * fCfg.zoom * ratio;
+          var imgH = img.naturalHeight * fCfg.zoom * ratio;
           img.style.width = imgW + 'px'; img.style.height = imgH + 'px';
-          img.style.left = ((fCfg.x || 0) * ratioW) + 'px';
-          img.style.top = ((fCfg.y || 0) * ratioH) + 'px';
+          img.style.left = ((fCfg.x || 0) * ratio) + 'px';
+          img.style.top = ((fCfg.y || 0) * ratio) + 'px';
         };
         if (img.complete) img.onload();
       } else {
@@ -2508,12 +2507,11 @@ function crtRenderCard(item, area, lado, callback) {
           if (fCfg2.naturalWidth && fCfg2.naturalWidth !== cfgI.naturalWidth) zoom = zoom * (fCfg2.naturalWidth / cfgI.naturalWidth);
           var savedFrameW = fCfg2.frameW || frameWpx;
           var savedFrameH = fCfg2.frameH || frameHpx;
-          var ratioW = frameWpx / savedFrameW;
-          var ratioH = frameHpx / savedFrameH;
-          cfgI.style.width = (cfgI.naturalWidth * zoom * ratioW) + 'px';
-          cfgI.style.height = (cfgI.naturalHeight * zoom * ratioH) + 'px';
-          cfgI.style.left = ((fCfg2.x || 0) * ratioW) + 'px';
-          cfgI.style.top = ((fCfg2.y || 0) * ratioH) + 'px';
+          var ratio = frameWpx / savedFrameW; // escala uniforme p/ não distorcer
+          cfgI.style.width = (cfgI.naturalWidth * zoom * ratio) + 'px';
+          cfgI.style.height = (cfgI.naturalHeight * zoom * ratio) + 'px';
+          cfgI.style.left = ((fCfg2.x || 0) * ratio) + 'px';
+          cfgI.style.top = ((fCfg2.y || 0) * ratio) + 'px';
         } catch(e){}
       }
       capturar();
@@ -2593,10 +2591,12 @@ function myCardInit() {
             img.onload = function() { myCardAplicarFoto(); };
             if (img.complete) myCardAplicarFoto();
           } else {
+            img.style.objectFit = 'cover';
             img.style.width = '100%'; img.style.height = '100%';
             img.style.left = '0px'; img.style.top = '0px';
           }
         } catch(e) {
+          img.style.objectFit = 'cover';
           img.style.width = '100%'; img.style.height = '100%';
         }
       }
@@ -2632,15 +2632,17 @@ function dashCardAplicarFoto() {
   if (!img || !frame || !img.src || img.style.display === 'none') return;
   var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
   if (!frameW || !frameH) return;
-  if (dashCardFotoCfg) {
+  if (dashCardFotoCfg && img.naturalWidth) {
     var zoom = dashCardFotoCfg.zoom || 1;
-    var ratioW = frameW / (dashCardFotoCfg.frameW || frameW);
-    var ratioH = frameH / (dashCardFotoCfg.frameH || frameH);
-    img.style.width  = (img.naturalWidth  * zoom * ratioW) + 'px';
-    img.style.height = (img.naturalHeight * zoom * ratioH) + 'px';
-    img.style.left = ((dashCardFotoCfg.x || 0) * ratioW) + 'px';
-    img.style.top  = ((dashCardFotoCfg.y || 0) * ratioH) + 'px';
+    var ratio = frameW / (dashCardFotoCfg.frameW || frameW); // escala uniforme p/ não distorcer
+    img.style.objectFit = '';
+    img.style.width  = (img.naturalWidth  * zoom * ratio) + 'px';
+    img.style.height = (img.naturalHeight * zoom * ratio) + 'px';
+    img.style.left = ((dashCardFotoCfg.x || 0) * ratio) + 'px';
+    img.style.top  = ((dashCardFotoCfg.y || 0) * ratio) + 'px';
   } else {
+    // Sem ajuste salvo: cobre o quadro preservando a proporção (sem esticar)
+    img.style.objectFit = 'cover';
     img.style.width = '100%'; img.style.height = '100%'; img.style.left = '0'; img.style.top = '0';
   }
 }
@@ -2744,18 +2746,17 @@ function myCardAtualizarTextos() {
 function myCardAplicarFoto() {
   var img = document.getElementById('myPhotoImg');
   var frame = document.getElementById('myPhotoFrame');
-  if (!img || !frame) return;
+  if (!img || !frame || !img.naturalWidth) return;
   var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+  if (!frameW || !frameH) return;
   var zoom = myCardPhotoCfg.zoom || 1;
-  var savedFrameW = myCardPhotoCfg.frameW || frameW;
-  var savedFrameH = myCardPhotoCfg.frameH || frameH;
-  var ratioW = frameW / savedFrameW;
-  var ratioH = frameH / savedFrameH;
-  var imgW = img.naturalWidth * zoom * ratioW;
-  var imgH = img.naturalHeight * zoom * ratioH;
+  // Escala uniforme (mesma p/ largura e altura) preserva a proporção da foto
+  var ratio = frameW / (myCardPhotoCfg.frameW || frameW);
+  var imgW = img.naturalWidth * zoom * ratio;
+  var imgH = img.naturalHeight * zoom * ratio;
   img.style.width = imgW + 'px'; img.style.height = imgH + 'px';
-  img.style.left = ((myCardPhotoCfg.x || 0) * ratioW) + 'px';
-  img.style.top = ((myCardPhotoCfg.y || 0) * ratioH) + 'px';
+  img.style.left = ((myCardPhotoCfg.x || 0) * ratio) + 'px';
+  img.style.top = ((myCardPhotoCfg.y || 0) * ratio) + 'px';
 }
 
 function myCardOnFoto(input) {

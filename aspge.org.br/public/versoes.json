@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T11:55:50.532Z",
+  "geradoEm": "2026-09-24T12:19:04.489Z",
   "versoes": [
+    {
+      "versao": "v2.7.5",
+      "data": "24 de set de 2026",
+      "hash": "4d861f9",
+      "titulo": "fix: gestao de convenios - admin ve todos (inclui ocultos), contador do dashboard usa convenios visiveis",
+      "tipo": "fixed",
+      "itens": [
+        "fix: gestao de convenios - admin ve todos (inclui ocultos), contador do dashboard usa convenios visiveis"
+      ]
+    },
     {
       "versao": "v2.7.4",
       "data": "24 de set de 2026",
