@@ -124,9 +124,11 @@ section[id]{scroll-margin-top:84px}
   .hero h1{font-size:32px}
   .hero p{font-size:16px}
   .section-title{font-size:24px}
-  .header-inner{flex-direction:column;gap:16px}
-  .nav-links{flex-direction:column;width:100%}
-  .nav-link{text-align:center}
+  .header{position:static}
+  .header-inner{flex-direction:row;flex-wrap:wrap;gap:10px;padding:12px 16px}
+  .nav-links{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;width:100%;gap:6px;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-link{text-align:center;white-space:nowrap;padding:8px 14px;font-size:13px;flex-shrink:0}
   .hero{padding:64px 24px}
   .hero-cta{flex-direction:column;align-items:stretch}
   .hero-cta .hero-btn{text-align:center}
@@ -449,6 +451,15 @@ carregarEnquetes();
 carregarConvenios();
 </script>
 
+<!-- MODAL INSTALAR PWA -->
+<div id="pwaModal" class="pwa-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="pwaModalTitle">
+  <div class="pwa-modal-box">
+    <h3 id="pwaModalTitle">📲 Instalar Aplicativo</h3>
+    <p id="pwaModalText"></p>
+    <button class="hero-btn" style="padding:10px 26px;font-size:14px;color:#fff;background:#0075bf" onclick="document.getElementById('pwaModal').style.display='none'">Entendi</button>
+  </div>
+</div>
+
 <script>
 // ===== BOTÃO INSTALAR / ACESSAR PWA =====
 var pwaDeferredPrompt = null;
@@ -513,15 +524,6 @@ window.addEventListener('appinstalled', function () {
 // Fechar modal ao clicar no fundo
 document.getElementById('pwaModal').addEventListener('click', function (e) { if (e.target === this) this.style.display = 'none'; });
 </script>
-
-<!-- MODAL INSTALAR PWA -->
-<div id="pwaModal" class="pwa-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="pwaModalTitle">
-  <div class="pwa-modal-box">
-    <h3 id="pwaModalTitle">📲 Instalar Aplicativo</h3>
-    <p id="pwaModalText"></p>
-    <button class="hero-btn" style="padding:10px 26px;font-size:14px;color:#fff;background:#0075bf" onclick="document.getElementById('pwaModal').style.display='none'">Entendi</button>
-  </div>
-</div>
 
 <script>
 if ('serviceWorker' in navigator) {
