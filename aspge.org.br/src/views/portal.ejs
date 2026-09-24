@@ -693,9 +693,9 @@ tbody tr:hover{background:#f9fafb}
                 <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
                   <div id="crtPreview" style="position:relative;width:85mm;height:54mm;overflow:hidden;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);background:#f5f5f5;flex-shrink:0">
                     <img id="crtBg" src="" style="width:100%;height:100%;display:block" draggable="false">
-                    <div id="crtPhotoFrame" style="position:absolute;overflow:hidden;background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">
+                    <div id="crtPhotoFrame" style="position:absolute;overflow:hidden;background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;cursor:move" onmousedown="crtStartDrag(event)" ontouchstart="crtStartDrag(event)" title="Arraste para posicionar a foto">
                       <span id="crtPhotoPlaceholder" style="font-size:24px;opacity:0.5">📷</span>
-                      <img id="crtPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none">
+                      <img id="crtPhotoImg" draggable="false" style="width:100%;height:100%;object-fit:cover;display:none;pointer-events:none;user-select:none">
                     </div>
                     <span class="crt-overlay" id="crtLblNome">ASSOCIADO:</span>
                     <span class="crt-overlay" id="crtNome">NOME DO ASSOCIADO</span>
@@ -729,6 +729,28 @@ tbody tr:hover{background:#f9fafb}
                       <div class="crt-ctrl"><label>Larg.</label><input type="range" min="3" max="80" step="0.1" id="crtFrameW" value="29.4" oninput="crtSyncFrameFromRange('crtFrameW','crtFrameWVal','width')"><input type="number" class="crt-val" id="crtFrameWVal" value="29.4" min="3" max="80" step="0.1" oninput="crtSyncFrameFromNum('crtFrameWVal','crtFrameW','width')"></div>
                       <div class="crt-ctrl"><label>Alt.</label><input type="range" min="3" max="80" step="0.1" id="crtFrameH" value="24.1" oninput="crtSyncFrameFromRange('crtFrameH','crtFrameHVal','height')"><input type="number" class="crt-val" id="crtFrameHVal" value="24.1" min="3" max="80" step="0.1" oninput="crtSyncFrameFromNum('crtFrameHVal','crtFrameH','height')"></div>
                     </div>
+                  </div>
+                  <!-- Ajuste da Foto do Associado -->
+                  <div id="crtFotoControls" style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px;display:none">
+                    <h4 style="margin:0 0 6px;font-size:12px;color:#0075bf;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #0075bf;padding-bottom:4px">Foto do Associado <span id="crtFotoAssocNome" style="color:#0075bf;text-transform:none;font-weight:600"></span></h4>
+                    <p style="font-size:11px;color:#666;margin:0 0 8px">Arraste a foto no cartão ou use os controles abaixo.</p>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                      <button onclick="crtMoverFoto(0,-2)" style="width:36px;height:32px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer">&#9650;</button>
+                      <div style="display:flex;gap:4px;align-items:center">
+                        <button onclick="crtMoverFoto(-2,0)" style="width:36px;height:32px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer">&#9664;</button>
+                        <div style="width:36px;text-align:center;font-size:10px;color:#999">foto</div>
+                        <button onclick="crtMoverFoto(2,0)" style="width:36px;height:32px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer">&#9654;</button>
+                      </div>
+                      <button onclick="crtMoverFoto(0,2)" style="width:36px;height:32px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer">&#9660;</button>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+                      <button onclick="crtAjustarZoom(-0.01)" style="width:36px;height:32px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer">&#8722;</button>
+                      <input type="range" id="crtZoomSlider" min="0.1" max="3" step="0.01" value="1" oninput="crtSetZoom(this.value)" style="flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#dee2e6;outline:none">
+                      <button onclick="crtAjustarZoom(0.01)" style="width:36px;height:32px;border:1px solid #dee2e6;border-radius:6px;background:#fff;cursor:pointer">+</button>
+                      <span id="crtZoomLabel" style="font-size:12px;color:#666;min-width:40px;text-align:center">100%</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="crtSalvarFotoAssociado()" id="crtBtnSalvarFoto" style="width:100%;padding:8px;margin-top:10px">💾 Salvar foto deste associado</button>
+                    <div id="crtMsgFoto" style="font-size:12px;min-height:18px;margin-top:4px"></div>
                   </div>
                   <!-- Campos de Texto -->
                   <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:14px">
@@ -1992,6 +2014,9 @@ var crtKeyMapInv = {}; for(var k in crtKeyMap) crtKeyMapInv[crtKeyMap[k]] = k;
 var crtListaAssoc = [];
 var crtTemplateFrenteUrl = null;
 var crtTemplateVersoUrl = null;
+var crtPhotoCfg = null;        // fotoConfig do associado em preview (coords do frame atual)
+var crtPreviewAssocId = null;  // id do associado em preview (p/ salvar fotoConfig)
+var crtDragging = false, crtDragStart = null, crtImgStart = null;
 
 function crtSyncFromRange(rangeId, numId) {
   document.getElementById(numId).value = parseFloat(document.getElementById(rangeId).value).toFixed(1);
@@ -2058,6 +2083,24 @@ function crtAplicarFrame() {
   f.style.top = crtFrameConfig.top + '%';
   f.style.width = crtFrameConfig.width + '%';
   f.style.height = crtFrameConfig.height + '%';
+  crtRebaseFoto(); // mantém a foto proporcional ao novo tamanho do frame
+}
+// Rebase da foto p/ o tamanho atual do frame (chamado ao redimensionar o enquadramento)
+function crtRebaseFoto() {
+  var img = document.getElementById('crtPhotoImg');
+  var frame = document.getElementById('crtPhotoFrame');
+  if (!crtPhotoCfg || !img || !frame || !img.naturalWidth || img.style.display === 'none') return;
+  var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+  if (!frameW || !frameH) return;
+  var r = frameW / (crtPhotoCfg.frameW || frameW);
+  if (Math.abs(r - 1) < 0.001) return;
+  crtPhotoCfg.zoom *= r;
+  crtPhotoCfg.x = (crtPhotoCfg.x || 0) * r;
+  crtPhotoCfg.y = (crtPhotoCfg.y || 0) * r;
+  crtPhotoCfg.frameW = frameW;
+  crtPhotoCfg.frameH = frameH;
+  crtAplicarFoto();
+  crtSyncZoomUI();
 }
 function crtSincronizarFrameUI() {
   document.getElementById('crtFrameLeft').value = crtFrameConfig.left;
@@ -2199,6 +2242,8 @@ async function crtCarregarPreview() {
     document.getElementById('crtValidade').textContent = crtFormatarData(val);
     document.getElementById('crtPhotoImg').style.display = 'none';
     document.getElementById('crtPhotoPlaceholder').style.display = '';
+    crtPreviewAssocId = null; crtPhotoCfg = null;
+    document.getElementById('crtFotoControls').style.display = 'none';
     return;
   }
   msgEl.innerHTML = '<span style="color:#2563eb">Carregando preview...</span>';
@@ -2219,39 +2264,121 @@ async function crtCarregarPreview() {
     var val2 = new Date(hoje2); val2.setFullYear(val2.getFullYear() + 4);
     document.getElementById('crtValidade').textContent = crtFormatarData(val2);
     var fotoSrc = r.fotoBase64 || d.fotoCarteirinhaUrl || d.fotoUrl;
+    crtPreviewAssocId = d.id;
     if (fotoSrc) {
       var img = document.getElementById('crtPhotoImg');
       img.src = fotoSrc;
       img.style.display = 'block';
       document.getElementById('crtPhotoPlaceholder').style.display = 'none';
-      var fCfg = null;
-      try { if (d.fotoConfig) fCfg = JSON.parse(d.fotoConfig); } catch(e){}
-      if (fCfg && fCfg.zoom) {
-        img.style.objectFit = '';
-        img.style.position = 'absolute';
-        img.onload = function() {
-          var frame = document.getElementById('crtPhotoFrame');
-          var frameWpx = frame.offsetWidth, frameHpx = frame.offsetHeight;
-          var savedFrameW = fCfg.frameW || frameWpx;
-          var savedFrameH = fCfg.frameH || frameHpx;
-          var ratio = frameWpx / savedFrameW; // escala uniforme p/ não distorcer
-          var imgW = img.naturalWidth * fCfg.zoom * ratio;
-          var imgH = img.naturalHeight * fCfg.zoom * ratio;
-          img.style.width = imgW + 'px'; img.style.height = imgH + 'px';
-          img.style.left = ((fCfg.x || 0) * ratio) + 'px';
-          img.style.top = ((fCfg.y || 0) * ratio) + 'px';
-        };
-        if (img.complete) img.onload();
-      } else {
-        img.style.objectFit = 'cover'; img.style.position = '';
-        img.style.width = '100%'; img.style.height = '100%';
-        img.style.left = ''; img.style.top = '';
-      }
+      crtPhotoCfg = null;
+      try { if (d.fotoConfig) crtPhotoCfg = JSON.parse(d.fotoConfig); } catch(e){}
+      document.getElementById('crtFotoControls').style.display = 'block';
+      document.getElementById('crtFotoAssocNome').textContent = '— ' + (d.nomeCompleto || '');
+      document.getElementById('crtMsgFoto').innerHTML = '';
+      img.onload = function() { crtInitFotoCfg(); crtAplicarFoto(); };
+      if (img.complete) { crtInitFotoCfg(); crtAplicarFoto(); }
     } else {
+      crtPhotoCfg = null;
       document.getElementById('crtPhotoImg').style.display = 'none';
       document.getElementById('crtPhotoPlaceholder').style.display = '';
+      document.getElementById('crtFotoControls').style.display = 'none';
     }
   } catch(e) { msgEl.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
+}
+
+// ===== AJUSTE DA FOTO DO ASSOCIADO (EMISSÃO) =====
+// Converte o fotoConfig salvo p/ as coords do frame de preview atual (ou cria cover-fit padrão)
+function crtInitFotoCfg() {
+  var img = document.getElementById('crtPhotoImg');
+  var frame = document.getElementById('crtPhotoFrame');
+  if (!img || !frame || !img.naturalWidth) return;
+  var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+  if (!frameW || !frameH) return;
+  if (crtPhotoCfg && crtPhotoCfg.zoom) {
+    var r = frameW / (crtPhotoCfg.frameW || frameW);
+    crtPhotoCfg.zoom = (crtPhotoCfg.zoom || 1) * r;
+    crtPhotoCfg.x = (crtPhotoCfg.x || 0) * r;
+    crtPhotoCfg.y = (crtPhotoCfg.y || 0) * r;
+  } else {
+    var s = Math.max(frameW / img.naturalWidth, frameH / img.naturalHeight); // cover
+    crtPhotoCfg = { zoom: s, x: (frameW - img.naturalWidth * s) / 2, y: (frameH - img.naturalHeight * s) / 2 };
+  }
+  crtPhotoCfg.frameW = frameW;
+  crtPhotoCfg.frameH = frameH;
+  crtPhotoCfg.naturalWidth = img.naturalWidth;
+  crtSyncZoomUI();
+}
+function crtSyncZoomUI() {
+  var sl = document.getElementById('crtZoomSlider');
+  if (sl && crtPhotoCfg) { sl.value = crtPhotoCfg.zoom; document.getElementById('crtZoomLabel').textContent = Math.round(crtPhotoCfg.zoom * 100) + '%'; }
+}
+function crtAplicarFoto() {
+  var img = document.getElementById('crtPhotoImg');
+  if (!img || !crtPhotoCfg || !img.naturalWidth) return;
+  img.style.objectFit = '';
+  img.style.position = 'absolute';
+  img.style.width = (img.naturalWidth * crtPhotoCfg.zoom) + 'px';
+  img.style.height = (img.naturalHeight * crtPhotoCfg.zoom) + 'px';
+  img.style.left = (crtPhotoCfg.x || 0) + 'px';
+  img.style.top = (crtPhotoCfg.y || 0) + 'px';
+}
+function crtSetZoom(val) {
+  var z = parseFloat(val); if (isNaN(z) || !crtPhotoCfg) return;
+  crtPhotoCfg.zoom = Math.max(0.1, Math.min(3, z));
+  crtSyncZoomUI();
+  crtAplicarFoto();
+}
+function crtAjustarZoom(d) { crtSetZoom((crtPhotoCfg ? crtPhotoCfg.zoom : 1) + d); }
+function crtMoverFoto(dx, dy) {
+  if (!crtPhotoCfg) return;
+  crtPhotoCfg.x = (crtPhotoCfg.x || 0) + dx;
+  crtPhotoCfg.y = (crtPhotoCfg.y || 0) + dy;
+  crtAplicarFoto();
+}
+function crtStartDrag(e) {
+  var img = document.getElementById('crtPhotoImg');
+  if (!img || img.style.display === 'none' || !crtPhotoCfg) return;
+  e.preventDefault();
+  crtDragging = true;
+  var pt = e.touches ? e.touches[0] : e;
+  crtDragStart = { x: pt.clientX, y: pt.clientY };
+  crtImgStart = { x: crtPhotoCfg.x || 0, y: crtPhotoCfg.y || 0 };
+  function move(ev) {
+    if (!crtDragging) return;
+    var p = ev.touches ? ev.touches[0] : ev;
+    crtPhotoCfg.x = crtImgStart.x + (p.clientX - crtDragStart.x);
+    crtPhotoCfg.y = crtImgStart.y + (p.clientY - crtDragStart.y);
+    crtAplicarFoto();
+  }
+  function up() {
+    crtDragging = false;
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', up);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', up);
+  }
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up);
+  document.addEventListener('touchmove', move);
+  document.addEventListener('touchend', up);
+}
+async function crtSalvarFotoAssociado() {
+  var msg = document.getElementById('crtMsgFoto');
+  if (!crtPreviewAssocId || !crtPhotoCfg) { msg.innerHTML = '<span style="color:#dc2626">Selecione um associado com foto.</span>'; return; }
+  var btn = document.getElementById('crtBtnSalvarFoto'); btn.disabled = true;
+  msg.innerHTML = '<span style="color:#2563eb">Salvando...</span>';
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/associados/' + crtPreviewAssocId, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fotoConfig: JSON.stringify(crtPhotoCfg) })
+    });
+    var r = await resp.json();
+    btn.disabled = false;
+    if (r.sucesso) msg.innerHTML = '<span style="color:#16a34a">Foto do associado salva!</span>';
+    else msg.innerHTML = '<span style="color:#dc2626">' + (r.erro || 'Erro ao salvar') + '</span>';
+  } catch(e) { btn.disabled = false; msg.innerHTML = '<span style="color:#dc2626">Erro: ' + e.message + '</span>'; }
 }
 
 async function crtCarregarLista() {
