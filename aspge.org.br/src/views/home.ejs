@@ -28,6 +28,8 @@ html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8f
 .hero p{font-size:20px;opacity:.9;max-width:600px;margin-bottom:32px}
 .hero-btn{display:inline-block;padding:16px 32px;background:#fff;color:#dc2626;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;transition:.2s}
 .hero-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.hero-btn-install{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.85);margin-left:12px;cursor:pointer;font-family:inherit}
+.hero-btn-install:hover{background:rgba(255,255,255,.15)}
 
 /* SECTIONS */
 .section{padding:64px 24px}
@@ -73,6 +75,7 @@ html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8f
   .header-inner{flex-direction:column;gap:16px}
   .nav-links{flex-direction:column;width:100%}
   .nav-link{text-align:center}
+  .hero-btn-install{margin-left:0;margin-top:12px}
 }
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
@@ -109,6 +112,7 @@ html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8f
     <h1 id="hero-title">ASPGE-PA</h1>
     <p id="hero-subtitle">Associação dos Procuradores do Estado do Pará</p>
     <a href="/login" class="hero-btn">Acessar Portal</a>
+    <button id="btnInstalar" class="hero-btn hero-btn-install" style="display:none" onclick="instalarOuAcessar()">📲 Instalar Aplicativo</button>
   </div>
 </section>
 
@@ -324,6 +328,63 @@ carregarConfig();
 carregarDiretoria();
 carregarNoticias();
 carregarEnquetes();
+</script>
+
+<script>
+// ===== BOTÃO INSTALAR / ACESSAR PWA =====
+var pwaDeferredPrompt = null;
+var btnInstalar = document.getElementById('btnInstalar');
+var pwaStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+function setBtnInstalar(modo) {
+  if (modo === 'oculto') { btnInstalar.style.display = 'none'; return; }
+  btnInstalar.style.display = 'inline-block';
+  btnInstalar.dataset.modo = modo;
+  btnInstalar.textContent = modo === 'acessar' ? '📱 Acessar Aplicativo' : '📲 Instalar Aplicativo';
+}
+
+async function pwaJaInstalado() {
+  if (pwaStandalone) return true;
+  if ('getInstalledRelatedApps' in navigator) {
+    try { var apps = await navigator.getInstalledRelatedApps(); return !!(apps && apps.length); }
+    catch (e) { return false; }
+  }
+  return false;
+}
+
+function instalarOuAcessar() {
+  if (btnInstalar.dataset.modo === 'acessar') { window.location.href = '/carteirinha'; return; }
+  if (pwaDeferredPrompt) {
+    pwaDeferredPrompt.prompt();
+    pwaDeferredPrompt.userChoice.then(function (choice) {
+      if (choice.outcome === 'accepted') setBtnInstalar('acessar');
+      pwaDeferredPrompt = null;
+    });
+  } else if (isIOS) {
+    alert('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar (quadrado com seta)\n2. Toque em "Adicionar à Tela de Início"\n3. Toque em "Adicionar"');
+  } else {
+    alert('Para instalar, abra o menu do navegador e toque em "Instalar app" ou "Adicionar à tela inicial".');
+  }
+}
+
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  pwaDeferredPrompt = e;
+  if (btnInstalar.dataset.modo !== 'acessar') setBtnInstalar('instalar');
+});
+
+window.addEventListener('appinstalled', function () {
+  pwaDeferredPrompt = null;
+  setBtnInstalar('acessar');
+});
+
+// Estado inicial do botão
+(async function () {
+  if (await pwaJaInstalado()) { setBtnInstalar('acessar'); return; }
+  if (isIOS) { setBtnInstalar('instalar'); } // iOS: instalação manual via Safari
+  // Android/desktop: aguarda beforeinstallprompt; se não disparar, o botão fica oculto
+})();
 </script>
 
 <script>
