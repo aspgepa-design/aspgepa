@@ -12,7 +12,7 @@
 <meta property="og:locale" content="pt_BR">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6}
@@ -33,14 +33,15 @@ section[id]{scroll-margin-top:84px}
 .nav-link-secondary{color:#4b5563}.nav-link-secondary:hover{background:#f3f4f6}
 
 /* HERO BANNER */
-.hero{position:relative;background:linear-gradient(135deg,#dc2626 0%,#16a34a 50%,#0075bf 100%);color:#fff;padding:80px 24px;overflow:hidden}
+.hero{position:relative;background:linear-gradient(120deg,#0b2545 0%,#123f6d 55%,#0075bf 100%);color:#fff;padding:96px 24px;overflow:hidden}
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:6px;background:linear-gradient(90deg,#dc2626,#f59e0b)}
 .hero-bg{position:absolute;top:0;right:0;bottom:0;left:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>') center/cover;opacity:.3}
 .hero-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1}
 .hero h1{font-size:48px;font-weight:900;margin-bottom:16px;line-height:1.1}
 .hero p{font-size:20px;opacity:.9;max-width:600px;margin-bottom:32px}
 .hero-btn{display:inline-block;padding:16px 32px;background:#fff;color:#dc2626;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;transition:.2s}
 .hero-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.hero-btn-install{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.85);margin-left:12px;cursor:pointer;font-family:inherit}
+.hero-btn-install{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.85);cursor:pointer;font-family:inherit}
 .hero-btn-install:hover{background:rgba(255,255,255,.15)}
 
 /* SECTIONS */
@@ -79,6 +80,45 @@ section[id]{scroll-margin-top:84px}
 .footer a:hover{color:#fff}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;text-align:center;font-size:13px;opacity:.7}
 
+/* SKELETONS */
+.skeleton{position:relative;overflow:hidden;background:#e5e7eb;border-radius:8px}
+.skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:sk 1.4s infinite}
+@keyframes sk{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.skel-card{height:130px;border-radius:16px}
+.skel-line{display:block;height:14px;margin:6px 0}
+.section-sub{text-align:center;color:#6b7280;margin:-30px 0 40px;font-size:16px}
+
+/* HERO CTA */
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.85)}
+.hero-btn-outline:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+
+/* DIRETORIA */
+.dir-card{text-align:center}
+.dir-foto{width:88px;height:88px;border-radius:50%;object-fit:cover;margin:0 auto 14px;border:3px solid #fee2e2;display:block}
+.dir-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#0075bf);color:#fff;font-weight:800;font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.dir-cargo{color:#dc2626;font-weight:600}
+
+/* CONVÊNIOS */
+.conv-card{text-decoration:none;color:inherit;display:block;transition:.2s}
+.conv-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:#0075bf}
+.conv-cat{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#0075bf;background:#eff6ff;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+.conv-link{display:inline-block;margin-top:14px;color:#0075bf;font-weight:600;font-size:13px}
+
+/* NOTÍCIAS */
+.news-link-card{text-decoration:none;color:inherit;display:block;transition:.2s}
+.news-link-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:#0075bf}
+.news-link{display:inline-block;margin-top:12px;color:#0075bf;font-weight:600;font-size:13px}
+
+/* CTA BAND */
+.cta-band{background:linear-gradient(120deg,#dc2626,#b91c1c);color:#fff;padding:64px 24px}
+
+/* PWA MODAL */
+.pwa-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px}
+.pwa-modal-box{background:#fff;border-radius:16px;padding:30px;max-width:420px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pwa-modal-box h3{color:#dc2626;margin-bottom:12px;font-size:20px}
+.pwa-modal-box p{color:#4b5563;font-size:15px;margin-bottom:22px;white-space:pre-line;line-height:1.6}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .hero h1{font-size:32px}
@@ -87,7 +127,9 @@ section[id]{scroll-margin-top:84px}
   .header-inner{flex-direction:column;gap:16px}
   .nav-links{flex-direction:column;width:100%}
   .nav-link{text-align:center}
-  .hero-btn-install{margin-left:0;margin-top:12px}
+  .hero{padding:64px 24px}
+  .hero-cta{flex-direction:column;align-items:stretch}
+  .hero-cta .hero-btn{text-align:center}
 }
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
@@ -105,11 +147,12 @@ section[id]{scroll-margin-top:84px}
 <header class="header">
   <div class="header-inner">
     <a href="/" class="logo">
-      <img src="/public/logo.png" alt="ASPGE-PA Logo" class="logo-img">
+      <img src="/public/logo.png" alt="ASPGE-PA Logo" class="logo-img" width="48" height="48" decoding="async" fetchpriority="high">
       <div class="logo-text">ASPGE-PA</div>
     </a>
     <nav class="nav-links" aria-label="Navegação principal">
       <a href="#sobre" class="nav-link nav-link-secondary">Sobre</a>
+      <a href="#convenios" id="nav-convenios" class="nav-link nav-link-secondary" style="display:none">Convênios</a>
       <a href="#noticias" id="nav-noticias" class="nav-link nav-link-secondary" style="display:none">Notícias</a>
       <a href="#enquetes" id="nav-enquetes" class="nav-link nav-link-secondary" style="display:none">Enquetes</a>
       <a href="/login" class="nav-link nav-link-primary">Acesso Associados</a>
@@ -123,8 +166,11 @@ section[id]{scroll-margin-top:84px}
   <div class="hero-inner">
     <h1 id="hero-title">ASPGE-PA</h1>
     <p id="hero-subtitle">Associação dos Procuradores do Estado do Pará</p>
-    <a href="/login" class="hero-btn">Acessar Portal</a>
-    <button id="btnInstalar" class="hero-btn hero-btn-install" style="display:none" onclick="instalarOuAcessar()">📲 Instalar Aplicativo</button>
+    <div class="hero-cta">
+      <a href="/login" class="hero-btn">Acessar Portal</a>
+      <a href="/inscricao" class="hero-btn hero-btn-outline">Associe-se</a>
+      <button id="btnInstalar" class="hero-btn hero-btn-install" style="display:none" onclick="instalarOuAcessar()">📲 Instalar Aplicativo</button>
+    </div>
   </div>
 </section>
 
@@ -135,15 +181,15 @@ section[id]{scroll-margin-top:84px}
     <div class="grid">
       <div class="card info-card">
         <h3>Missão</h3>
-        <p id="missao-text">Carregando...</p>
+        <p id="missao-text"><span class="skeleton skel-line"></span><span class="skeleton skel-line" style="width:80%"></span></p>
       </div>
       <div class="card info-card">
         <h3>Visão</h3>
-        <p id="visao-text">Carregando...</p>
+        <p id="visao-text"><span class="skeleton skel-line"></span><span class="skeleton skel-line" style="width:80%"></span></p>
       </div>
       <div class="card info-card">
         <h3>Valores</h3>
-        <p id="valores-text">Carregando...</p>
+        <p id="valores-text"><span class="skeleton skel-line"></span><span class="skeleton skel-line" style="width:80%"></span></p>
       </div>
     </div>
   </div>
@@ -158,8 +204,17 @@ section[id]{scroll-margin-top:84px}
       <p id="gestao-periodo" style="font-size:14px;color:#6b7280"></p>
     </div>
     <div class="grid" id="diretoria-grid">
-      <p>Carregando diretoria...</p>
+      <div class="skeleton skel-card"></div><div class="skeleton skel-card"></div><div class="skeleton skel-card"></div>
     </div>
+  </div>
+</section>
+
+<!-- CONVÊNIOS -->
+<section class="section" id="convenios" style="display:none;background:#fff">
+  <div class="section-inner">
+    <h2 class="section-title">Convênios e Parcerias</h2>
+    <p class="section-sub">Descontos e benefícios exclusivos para associados.</p>
+    <div class="grid" id="convenios-grid"></div>
   </div>
 </section>
 
@@ -168,8 +223,9 @@ section[id]{scroll-margin-top:84px}
   <div class="section-inner">
     <h2 class="section-title">Notícias</h2>
     <div class="grid" id="noticias-grid">
-      <p>Carregando notícias...</p>
+      <div class="skeleton skel-card"></div><div class="skeleton skel-card"></div><div class="skeleton skel-card"></div>
     </div>
+    <div style="text-align:center;margin-top:28px"><a href="/noticias" class="nav-link nav-link-primary" style="display:inline-block">Ver todas as notícias</a></div>
   </div>
 </section>
 
@@ -178,8 +234,17 @@ section[id]{scroll-margin-top:84px}
   <div class="section-inner">
     <h2 class="section-title">Enquetes</h2>
     <div class="grid" id="enquetes-grid">
-      <p>Carregando enquetes...</p>
+      <div class="skeleton skel-card"></div><div class="skeleton skel-card"></div>
     </div>
+  </div>
+</section>
+
+<!-- CTA ASSOCIE-SE -->
+<section class="cta-band">
+  <div class="section-inner" style="text-align:center">
+    <h2 style="font-size:30px;font-weight:900;margin-bottom:12px">Faça parte da ASPGE-PA</h2>
+    <p style="font-size:17px;opacity:.92;max-width:560px;margin:0 auto 28px">Junte-se aos procuradores do Estado do Pará e tenha acesso a benefícios, carteirinha digital e representação.</p>
+    <a href="/inscricao" class="hero-btn">Preencher Ficha de Inscrição</a>
   </div>
 </section>
 
@@ -188,19 +253,29 @@ section[id]{scroll-margin-top:84px}
   <div class="footer-inner">
     <div class="footer-grid">
       <div>
+        <h4>ASPGE-PA</h4>
+        <p style="opacity:.8;font-size:14px;line-height:1.7">Associação dos Procuradores do Estado do Pará.<br>Representação, benefícios e carteirinha digital.</p>
+      </div>
+      <div>
         <h4>Links Rápidos</h4>
         <div id="links-rapidos">
           <a href="/login">Portal do Associado</a>
           <a href="/inscricao">Ficha de Inscrição</a>
+          <a href="/noticias">Notícias</a>
+          <a href="/versoes">Versões do Sistema</a>
         </div>
       </div>
       <div>
         <h4>Contato</h4>
-        <p style="opacity:.8;font-size:14px">Belém, Pará</p>
+        <p style="opacity:.8;font-size:14px;line-height:1.7">Belém, Pará — Brasil<br><a href="mailto:contato@aspgepa.org.br" style="display:inline;padding:0">contato@aspgepa.org.br</a></p>
       </div>
       <div>
-        <h4>ASPGE-PA</h4>
-        <p style="opacity:.8;font-size:14px">Associação dos Procuradores do Estado do Pará</p>
+        <h4>Redes Sociais</h4>
+        <div id="redes-sociais">
+          <a href="#" target="_blank" rel="noopener">Instagram</a>
+          <a href="#" target="_blank" rel="noopener">Facebook</a>
+          <a href="#" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
       </div>
     </div>
     <div class="footer-bottom">
@@ -274,7 +349,11 @@ async function carregarDiretoria() {
       if (gestaoAtiva.membros && gestaoAtiva.membros.length > 0) {
         const grid = document.getElementById('diretoria-grid');
         grid.innerHTML = gestaoAtiva.membros.map(function(membro){
-          return '<div class="card"><h3>' + esc(membro.nome) + '</h3><p style="color:#dc2626;font-weight:600">' + esc(membro.cargo) + '</p></div>';
+          var ini = (membro.nome||'?').trim().split(/\s+/).map(function(p){return p[0];}).slice(0,2).join('').toUpperCase();
+          var foto = membro.fotoUrl
+            ? '<img src="' + esc(membro.fotoUrl) + '" alt="' + esc(membro.nome) + '" class="dir-foto" loading="lazy" onerror="this.style.display=\'none\'">'
+            : '<div class="dir-avatar">' + esc(ini) + '</div>';
+          return '<div class="card dir-card">' + foto + '<h3>' + esc(membro.nome) + '</h3><p class="dir-cargo">' + esc(membro.cargo) + '</p></div>';
         }).join('');
       } else {
         document.getElementById('diretoria-grid').innerHTML = '<p>Nenhum membro cadastrado na diretoria.</p>';
@@ -301,9 +380,9 @@ async function carregarNoticias() {
         if (!noticia.descricao && conteudo.length > 150) desc += '...';
         var d = noticia.dataPublicacao ? new Date(noticia.dataPublicacao) : null;
         var dataTxt = (d && !isNaN(d)) ? d.toLocaleDateString('pt-BR') : '';
-        return '<div class="card news-card"><h3>' + esc(noticia.titulo) + '</h3>' +
+        return '<a href="/noticias/' + noticia.id + '" class="card news-card news-link-card"><h3>' + esc(noticia.titulo) + '</h3>' +
                (dataTxt ? '<span class="news-date">' + dataTxt + '</span>' : '') +
-               '<p class="news-desc">' + esc(desc) + '</p></div>';
+               '<p class="news-desc">' + esc(desc) + '</p><span class="news-link">Ler mais →</span></a>';
       }).join('');
     } else {
       document.getElementById('noticias-grid').innerHTML = '<p>Nenhuma notícia publicada.</p>';
@@ -342,12 +421,32 @@ async function carregarEnquetes() {
   }
 }
 
+async function carregarConvenios() {
+  try {
+    const response = await fetch('/api/convenios/publicos');
+    const data = await response.json();
+    const lista = data.dados || (Array.isArray(data) ? data : []);
+    if (lista.length > 0) {
+      document.getElementById('convenios').style.display = 'block';
+      document.getElementById('nav-convenios').style.display = '';
+      document.getElementById('convenios-grid').innerHTML = lista.map(function(c){
+        var inner = '<span class="conv-cat">' + esc(c.categoria || 'Convênio') + '</span><h3>' + esc(c.nome) + '</h3>' +
+                    (c.descricao ? '<p>' + esc(c.descricao) + '</p>' : '');
+        return c.link
+          ? '<a class="card conv-card" href="' + esc(c.link) + '" target="_blank" rel="noopener">' + inner + '<span class="conv-link">Acessar →</span></a>'
+          : '<div class="card conv-card">' + inner + '</div>';
+      }).join('');
+    }
+  } catch (e) { console.error('Erro ao carregar convênios:', e); }
+}
+
 // Carregar dados ao iniciar
 document.getElementById('footer-ano').textContent = new Date().getFullYear();
 carregarConfig();
 carregarDiretoria();
 carregarNoticias();
 carregarEnquetes();
+carregarConvenios();
 </script>
 
 <script>
@@ -382,10 +481,15 @@ function instalarOuAcessar() {
       pwaDeferredPrompt = null;
     });
   } else if (isIOS) {
-    alert('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar (quadrado com seta)\n2. Toque em "Adicionar à Tela de Início"\n3. Toque em "Adicionar"');
+    abrirPwaModal('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar (quadrado com seta)\n2. Toque em "Adicionar à Tela de Início"\n3. Toque em "Adicionar"');
   } else {
-    alert('Para instalar, abra o menu do navegador e toque em "Instalar app" ou "Adicionar à tela inicial".');
+    abrirPwaModal('Para instalar, abra o menu do navegador e toque em "Instalar app" ou "Adicionar à tela inicial".');
   }
+}
+
+function abrirPwaModal(texto) {
+  document.getElementById('pwaModalText').textContent = texto;
+  document.getElementById('pwaModal').style.display = 'flex';
 }
 
 window.addEventListener('beforeinstallprompt', function (e) {
@@ -405,7 +509,19 @@ window.addEventListener('appinstalled', function () {
   if (isIOS) { setBtnInstalar('instalar'); } // iOS: instalação manual via Safari
   // Android/desktop: aguarda beforeinstallprompt; se não disparar, o botão fica oculto
 })();
+
+// Fechar modal ao clicar no fundo
+document.getElementById('pwaModal').addEventListener('click', function (e) { if (e.target === this) this.style.display = 'none'; });
 </script>
+
+<!-- MODAL INSTALAR PWA -->
+<div id="pwaModal" class="pwa-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="pwaModalTitle">
+  <div class="pwa-modal-box">
+    <h3 id="pwaModalTitle">📲 Instalar Aplicativo</h3>
+    <p id="pwaModalText"></p>
+    <button class="hero-btn" style="padding:10px 26px;font-size:14px;color:#fff;background:#0075bf" onclick="document.getElementById('pwaModal').style.display='none'">Entendi</button>
+  </div>
+</div>
 
 <script>
 if ('serviceWorker' in navigator) {

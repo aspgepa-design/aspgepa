@@ -191,8 +191,26 @@ async function alternarVisibilidade(req, res) {
   }
 }
 
+/**
+ * Listar convênios públicos (somente visíveis, campos seguros) — para a home
+ */
+async function listarPublicos(req, res) {
+  try {
+    const convenios = await prisma.convenio.findMany({
+      where: { visivel: true },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true, descricao: true, categoria: true, link: true }
+    });
+    res.json({ sucesso: true, dados: convenios });
+  } catch (error) {
+    logger.error('Erro ao listar convênios públicos:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
 module.exports = {
   listar,
+  listarPublicos,
   criar,
   atualizar,
   excluir,

@@ -4,7 +4,10 @@ const router = express.Router();
 const convenioController = require('../controllers/convenioController');
 const { authMiddleware, authorize } = require('../middleware/auth');
 
-// Todas as rotas são protegidas
+// Rota pública (home): somente convênios visíveis, campos seguros
+router.get('/publicos', convenioController.listarPublicos);
+
+// Todas as demais rotas são protegidas
 router.use(authMiddleware);
 
 // Listar (todos autenticados)

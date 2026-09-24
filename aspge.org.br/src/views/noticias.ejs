@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= title %></title>
+<meta name="description" content="Notícias da ASPGE-PA — Associação dos Procuradores do Estado do Pará.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/public/icons/icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6}
+.header{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-img{width:44px;height:44px;object-fit:contain}
+.logo-text{font-weight:900;color:#dc2626;font-size:20px;letter-spacing:-.5px}
+.nav-link{padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;background:#0075bf;color:#fff}
+.nav-link:hover{background:#005a91}
+.wrap{max-width:1100px;margin:0 auto;padding:48px 24px}
+.page-title{font-size:34px;font-weight:900;color:#dc2626;margin-bottom:8px}
+.page-sub{color:#6b7280;margin-bottom:36px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+.card{background:#fff;border-radius:16px;padding:28px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.card h3{font-size:19px;font-weight:700;color:#dc2626;margin-bottom:8px}
+.news-date{font-size:12px;color:#9ca3af;margin-bottom:12px;display:block}
+.news-desc{color:#6b7280;font-size:14px;line-height:1.6;flex:1}
+.news-link{display:inline-block;margin-top:16px;color:#0075bf;font-weight:600;font-size:14px;text-decoration:none}
+.news-link:hover{text-decoration:underline}
+/* Detalhe */
+.detail{background:#fff;border-radius:16px;padding:40px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.detail h1{font-size:32px;font-weight:900;color:#dc2626;line-height:1.2;margin-bottom:12px}
+.detail .news-date{margin-bottom:24px}
+.detail .conteudo{font-size:17px;color:#374151;line-height:1.8;white-space:pre-wrap}
+.back{display:inline-block;margin-bottom:24px;color:#0075bf;font-weight:600;text-decoration:none}
+.back:hover{text-decoration:underline}
+.empty{text-align:center;color:#9ca3af;padding:48px 0}
+.footer{background:#1e3a5f;color:#fff;padding:32px 24px;text-align:center;font-size:13px;opacity:.9;margin-top:48px}
+@media(max-width:640px){.page-title{font-size:26px}.detail{padding:24px}.detail h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo"><img src="/public/logo.png" alt="ASPGE-PA" class="logo-img" width="44" height="44"><div class="logo-text">ASPGE-PA</div></a>
+    <a href="/portal" class="nav-link">Acesso Associados</a>
+  </div>
+</header>
+
+<main class="wrap" id="conteudo">
+  <p class="empty">Carregando...</p>
+</main>
+
+<footer class="footer">© <span id="ano"></span> ASPGE-PA — Associação dos Procuradores do Estado do Pará</footer>
+
+<script>
+var _m = window.location.pathname.match(/^\/noticias\/(\d+)/);
+var NOTICIA_ID = _m ? _m[1] : null;
+document.getElementById('ano').textContent = new Date().getFullYear();
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function fmtData(d){ var dt=d?new Date(d):null; return (dt&&!isNaN(dt))?dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):''; }
+
+async function init(){
+  var el=document.getElementById('conteudo');
+  try{
+    if(NOTICIA_ID){
+      var r=await fetch('/api/noticias/'+encodeURIComponent(NOTICIA_ID)); var j=await r.json();
+      var n=j.dados||j;
+      if(!j.sucesso&&!n.titulo){ el.innerHTML='<p class="empty">Notícia não encontrada.</p>'; return; }
+      document.title=(n.titulo||'Notícia')+' - ASPGE-PA';
+      el.innerHTML='<a href="/noticias" class="back">← Todas as notícias</a>'+
+        '<article class="detail"><h1>'+esc(n.titulo)+'</h1>'+
+        (fmtData(n.dataPublicacao)?'<span class="news-date">'+fmtData(n.dataPublicacao)+'</span>':'')+
+        '<div class="conteudo">'+esc(n.conteudo||n.descricao||'')+'</div></article>';
+    } else {
+      var r2=await fetch('/api/noticias'); var j2=await r2.json();
+      var lista=j2.dados||[];
+      var h='<h1 class="page-title">Notícias</h1><p class="page-sub">Acompanhe as novidades da ASPGE-PA.</p>';
+      if(!lista.length){ el.innerHTML=h+'<p class="empty">Nenhuma notícia publicada.</p>'; return; }
+      h+='<div class="grid">'+lista.map(function(n){
+        var conteudo=String(n.conteudo||''); var desc=n.descricao||conteudo.substring(0,160);
+        if(!n.descricao&&conteudo.length>160)desc+='...';
+        return '<div class="card"><h3>'+esc(n.titulo)+'</h3>'+
+          (fmtData(n.dataPublicacao)?'<span class="news-date">'+fmtData(n.dataPublicacao)+'</span>':'')+
+          '<p class="news-desc">'+esc(desc)+'</p>'+
+          '<a href="/noticias/'+n.id+'" class="news-link">Ler mais →</a></div>';
+      }).join('')+'</div>';
+      el.innerHTML=h;
+    }
+  }catch(e){ el.innerHTML='<p class="empty">Erro ao carregar. Tente recarregar a página.</p>'; }
+}
+init();
+</script>
+</body>
+</html>

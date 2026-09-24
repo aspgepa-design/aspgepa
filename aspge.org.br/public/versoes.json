@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T14:02:50.745Z",
+  "geradoEm": "2026-09-24T16:05:09.013Z",
   "versoes": [
+    {
+      "versao": "v2.10.1",
+      "data": "24 de set de 2026",
+      "hash": "ed10132",
+      "titulo": "fix(home): corrige 'undefined'/Invalid Date/'Carregando' travado, XSS via innerHTML, links mortos do menu, ano dinamico, SEO/a11y",
+      "tipo": "fixed",
+      "itens": [
+        "fix(home): corrige 'undefined'/Invalid Date/'Carregando' travado, XSS via innerHTML, links mortos do menu, ano dinamico, SEO/a11y"
+      ]
+    },
     {
       "versao": "v2.10.0",
       "data": "24 de set de 2026",

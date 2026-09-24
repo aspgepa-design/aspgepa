@@ -22,6 +22,17 @@ const gestaoController = {
         where: { ativa: true },
         include: { membros: true }
       });
+      // Anexar foto do associado (join por CPF) para exibir na home
+      if (gestao && gestao.membros && gestao.membros.length) {
+        const cpfs = gestao.membros.map(m => m.cpf).filter(Boolean);
+        const associados = await prisma.associado.findMany({
+          where: { cpf: { in: cpfs } },
+          select: { cpf: true, fotoUrl: true }
+        });
+        const fotoPorCpf = {};
+        associados.forEach(a => { fotoPorCpf[a.cpf] = a.fotoUrl; });
+        gestao.membros.forEach(m => { m.fotoUrl = fotoPorCpf[m.cpf] || null; });
+      }
       res.json({ sucesso: true, dados: gestao });
     } catch (error) {
       logger.error('Erro ao obter gestão ativa:', error);
