@@ -102,44 +102,9 @@ function gerarToken(associado) {
   );
 }
 
-/**
- * Middleware para log de ações
- */
-const logMiddleware = (acao) => {
-  return async (req, res, next) => {
-    // Guardar resposta original
-    const originalJson = res.json;
-    
-    res.json = function(data) {
-      // Registrar log após resposta
-      if (req.user) {
-        prisma.log.create({
-          data: {
-            acao: acao,
-            detalhes: JSON.stringify({
-              body: req.body,
-              params: req.params,
-              query: req.query,
-              resultado: data
-            }),
-            associadoId: req.user.id,
-            ip: req.ip,
-            userAgent: req.headers['user-agent']
-          }
-        }).catch(err => logger.error('Erro ao registrar log:', err));
-      }
-      
-      return originalJson.call(this, data);
-    };
-    
-    next();
-  };
-};
-
 module.exports = {
   authMiddleware,
   authorize,
   gerarToken,
-  obterRole,
-  logMiddleware
+  obterRole
 };

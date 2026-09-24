@@ -6,8 +6,8 @@ Write-Host "[check] Verificando segredos e arquivos proibidos no stage..."
 
 $staged = git diff --cached --name-only
 
-# Bloqueia .env e dumps com dados pessoais
-$forbidden = $staged | Where-Object { $_ -match '(^|/)\.env$|\.dump$|\.sql$' }
+# Bloqueia .env e dumps com dados pessoais (migration.sql do Prisma é permitido)
+$forbidden = $staged | Where-Object { $_ -match '(^|/)\.env$|\.dump$|\.sql$' -and $_ -notmatch 'prisma/migrations/.*\.sql$' }
 if ($forbidden) {
   Write-Host "[ERRO] Arquivo proibido no commit (.env/dump):"
   $forbidden | ForEach-Object { Write-Host "   $_" }

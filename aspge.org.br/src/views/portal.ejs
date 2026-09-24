@@ -1321,10 +1321,10 @@ async function carregarLogs() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
-    if (data.sucesso && data.dados && data.dados.length > 0) {
+    if (data.logs && data.logs.length > 0) {
       var html = '<table><thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Detalhes</th></tr></thead><tbody>';
-      data.dados.forEach(function(l) {
-        html += '<tr><td style="color:#6b7280">' + new Date(l.createdAt).toLocaleString('pt-BR') + '</td><td style="font-weight:600">' + (l.usuario || '-') + '</td><td>' + l.acao + '</td><td style="color:#6b7280;font-style:italic">' + (l.detalhes || '') + '</td></tr>';
+      data.logs.forEach(function(l) {
+        html += '<tr><td style="color:#6b7280">' + (l.dataHora || '-') + '</td><td style="font-weight:600">' + (l.nome || l.cpf || '-') + '</td><td>' + l.acao + '</td><td style="color:#6b7280;font-style:italic">' + (l.detalhes || '') + '</td></tr>';
       });
       html += '</tbody></table>';
       document.getElementById('logsTabela').innerHTML = html;

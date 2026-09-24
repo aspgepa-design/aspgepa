@@ -126,55 +126,43 @@
     <div class="header">
       <h1>ASPGE-PA — Histórico de Versões</h1>
       <p>Associação dos Servidores da Procuradoria Geral do Estado do Pará</p>
+      <% if (versoes.length) { %>
+        <p style="margin-top:8px;font-weight:600;color:#667eea">Versão atual: <%= versoes[0].versao %></p>
+      <% } %>
     </div>
 
-    <div class="version">
-      <div class="version-number">v2.0.0</div>
-      <div class="version-date">Maio de 2026</div>
-      <h3>Novidades</h3>
-      <ul>
-        <li class="added">Nova arquitetura Node.js/Express + PostgreSQL</li>
-        <li class="added">Sistema de autenticação com CPF e senha (JWT)</li>
-        <li class="added">API REST completa para integração</li>
-        <li class="added">Armazenamento local de fotos e documentos</li>
-        <li class="added">Sistema de carteirinhas digitais com frente e verso</li>
-        <li class="added">Configuração de layout de carteirinhas com posicionamento de campos</li>
-        <li class="added">Labels configuráveis (texto, posição, tamanho, cor)</li>
-        <li class="added">Exportação de PDF com 8 carteirinhas por folha (frente e verso alternados)</li>
-        <li class="added">Controle de enquadramento de foto com ajuste fino</li>
-        <li class="added">Templates separados para frente e verso da carteirinha</li>
-      </ul>
-      <h3>Correções</h3>
-      <ul>
-        <li class="fixed">Correção do filtro de cargo "Com cargo definido" e "Sem cargo definido"</li>
-        <li class="fixed">Ajuste na sincronização do enquadramento da foto</li>
-        <li class="fixed">Migração de Google Apps Script para VPS dedicado</li>
-      </ul>
-    </div>
+    <% versoes.forEach(function(v) { %>
+      <div class="version">
+        <div class="version-number"><%= v.versao %></div>
+        <div class="version-date">
+          <%= v.data %><% if (v.hash) { %> · commit <code><%= v.hash %></code><% } %>
+        </div>
+        <h3><%= v.titulo %></h3>
+        <ul>
+          <% v.itens.forEach(function(item) { %>
+            <li class="<%= v.tipo %>"><%= item %></li>
+          <% }); %>
+        </ul>
+      </div>
+    <% }); %>
 
-    <div class="version">
-      <div class="version-number">v1.5.0</div>
-      <div class="version-date">Abril de 2026</div>
-      <h3>Novidades</h3>
-      <ul>
-        <li class="added">Módulo de gerenciamento de eventos</li>
-        <li class="added">Sistema de votações online</li>
-        <li class="added">Convênios e parcerias</li>
-      </ul>
-    </div>
-
-    <div class="version">
-      <div class="version-number">v1.0.0</div>
-      <div class="version-date">Janeiro de 2026</div>
-      <h3>Lançamento Inicial</h3>
-      <ul>
-        <li class="added">Portal do associado com autenticação por CPF</li>
-        <li class="added">Cadastro e atualização de dados pessoais</li>
-        <li class="added">Painel administrativo para gestão de associados</li>
-        <li class="added">Controle de perfis e permissões</li>
-        <li class="added">Sistema de logs de auditoria</li>
-      </ul>
-    </div>
+    <% if (marcos && marcos.length) { %>
+      <div class="header" style="margin-top:10px">
+        <h1 style="font-size:18px">Marcos históricos (piloto GAS)</h1>
+      </div>
+      <% marcos.forEach(function(v) { %>
+        <div class="version" style="border-left-color:#9ca3af">
+          <div class="version-number" style="color:#6b7280"><%= v.versao %></div>
+          <div class="version-date"><%= v.data %></div>
+          <h3><%= v.titulo %></h3>
+          <ul>
+            <% v.itens.forEach(function(item) { %>
+              <li class="added"><%= item %></li>
+            <% }); %>
+          </ul>
+        </div>
+      <% }); %>
+    <% } %>
 
     <div class="footer">
       <p><strong>ASPGE-PA</strong> — Associação dos Servidores da Procuradoria Geral do Estado do Pará</p>

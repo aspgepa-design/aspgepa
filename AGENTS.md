@@ -27,6 +27,7 @@ Sistema de gestão da ASPGE-PA: portal do associado, carteirinha digital, transp
 | `qa-reviewer` | Sintaxe, convenções, validação de entrada, padrão MVC | **Não** |
 | `security-reviewer` | JWT, RBAC, injeção, dados pessoais, segredos | **Não** |
 | `docs-curator` | Docs alinhadas ao código (`AGENTS.md`, `README*`, `dev/`, `docs/`, `reports/`) | Sim |
+| `version-curator` | Página `/versoes` derivada dos commits (`versoesService.js`, `versoes.ejs`, `gerar-versoes.js`, `versoes.json`, hooks post-commit) | Sim |
 | `gas-legacy-analyst` | Regras de negócio do piloto `GAS/` | **Não** |
 
 ## Skills (`.agents/skills/<nome>/SKILL.md`)
@@ -42,10 +43,11 @@ Sistema de gestão da ASPGE-PA: portal do associado, carteirinha digital, transp
 
 ## Automação
 
-- **Hooks:** `.devin/hooks.v1.json` — `hook-guard` (comandos destrutivos), `hook-guard-gas` (bloqueia escrita em `GAS/`), `hook-guard-secrets`, `hook-validate`, `hook-activity-log`
+- **Hooks:** `.devin/hooks.v1.json` — `hook-guard` (comandos destrutivos), `hook-guard-gas` (bloqueia escrita em `GAS/`), `hook-guard-secrets`, `hook-validate`, `hook-activity-log`, `hook-versoes` (regenera `versoes.json` pós-commit)
 - **MCP:** `.devin/mcp_config.json` — filesystem + PostgreSQL (`${DATABASE_URL}`)
 - **Schedules:** `.agents/schedules/cron.yaml` — relatório semanal de paridade (`weekly-parity-report`)
 - **Cron runner:** `scripts/run-cron.sh` / `run-cron.ps1`
+- **Versionamento:** cada commit gera uma versão `vx.y.z` (base `v2.0.0`; `feat`→minor, `fix`/demais→patch, `BREAKING`→major). Página pública `/versoes`; regenere com `npm run versoes` em `aspge.org.br/`.
 
 ## Regras de execução
 

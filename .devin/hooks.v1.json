@@ -58,6 +58,15 @@
       "event": "after_commit",
       "action": "remind",
       "message": "Commit concluido: registrar atividade na API do portfolio conforme ATIVIDADES.md (curl.exe + JSON UTF-8 + X-Admin-Key)."
+    },
+    {
+      "id": "hook-versoes",
+      "description": "Regenera public/versoes.json a partir do git log apos cada commit (pagina /versoes)",
+      "event": "after_commit",
+      "action": "run",
+      "command": "./.agents/hooks/post-commit.sh",
+      "command_windows": ".\\.agents\\hooks\\post-commit.ps1",
+      "message": "versoes.json atualizado e adicionado ao stage para o proximo commit."
     }
   ]
 }

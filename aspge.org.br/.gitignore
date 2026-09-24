@@ -23,8 +23,7 @@ pids/
 public/uploads/*
 !public/uploads/.gitkeep
 
-# Prisma
-prisma/migrations/
+# Prisma (migrations DEVEM ser commitadas para o migrate deploy no VPS)
 
 # Coverage
 coverage/

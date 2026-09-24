@@ -22,6 +22,8 @@ const gestaoRoutes = require('./src/routes/gestoes');
 const siteConfigRoutes = require('./src/routes/siteConfig');
 const noticiasRoutes = require('./src/routes/noticias');
 
+const { obterVersoes } = require('./src/services/versoesService');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -108,9 +110,10 @@ app.get('/atualizacao', (req, res) => {
   res.render('atualizacao', { title: 'Atualização Cadastral - ASPGE-PA' });
 });
 
-// Versões
+// Versões (gerada a partir do git log — ver src/services/versoesService.js)
 app.get('/versoes', (req, res) => {
-  res.render('versoes', { title: 'Histórico de Versões - ASPGE-PA' });
+  const { versoes, marcos } = obterVersoes();
+  res.render('versoes', { title: 'Histórico de Versões - ASPGE-PA', versoes, marcos });
 });
 
 // Carteirinha digital

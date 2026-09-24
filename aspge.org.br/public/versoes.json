@@ -1,0 +1,579 @@
+{
+  "geradoEm": "2026-09-23T12:45:00.267Z",
+  "versoes": [
+    {
+      "versao": "v2.1.2",
+      "data": "21 de set de 2026",
+      "hash": "48f0e62",
+      "titulo": "Reestrutura agentica (.devin/agents, skills, hooks) + correcoes de seguranca e bugs da revisao geral",
+      "tipo": "changed",
+      "itens": [
+        "Nova estrutura: 9 perfis em .devin/agents, skills renomeadas (SKILL.md), hooks.v1.json, mcp_config.json, AGENTS.md reescrito",
+        "Seguranca: RBAC em noticias/siteConfig/associados/carteirinhas, rate limiting (login e rotas publicas), JWT_SECRET fail-fast em producao, login anti-enumeracao, select minimo LGPD em buscarPorCpf",
+        "Funcional: endpoint publico POST /api/associados/inscricao, portal.ejs PUT /api/associados/:id, calcularCompletude com Date, filename de foto por id, senha hasheada no criar, PrismaClient compartilhado, validationResult em votacao/gestao, paths de template corrigidos",
+        "DevOps: deploy.sh abre UFW na porta SSH 22022, APP_DIR alinhado ao nginx",
+        "Relatorio: reports/review-geral-2026-09-21.md"
+      ]
+    },
+    {
+      "versao": "v2.1.1",
+      "data": "21 de set de 2026",
+      "hash": "e9b53ba",
+      "titulo": "Sincroniza aspge.org.br com producao (VPS): atualizacao cadastral publica, campos de endereco, senhaAlterada, CRUD convenios no portal",
+      "tipo": "changed",
+      "itens": [
+        "Sincroniza aspge.org.br com producao (VPS): atualizacao cadastral publica, campos de endereco, senhaAlterada, CRUD convenios no portal"
+      ]
+    },
+    {
+      "versao": "v2.1.0",
+      "data": "15 de set de 2026",
+      "hash": "39eff7b",
+      "titulo": "Adiciona ATIVIDADES.md - instrucoes de registro de atividades no portfolio",
+      "tipo": "added",
+      "itens": [
+        "Adiciona ATIVIDADES.md - instrucoes de registro de atividades no portfolio"
+      ]
+    },
+    {
+      "versao": "v2.0.0",
+      "data": "15 de set de 2026",
+      "hash": "f525c2c",
+      "titulo": "Estrutura agentica (.agents) + sistema ASPGE-PA API v2.0 (aspge.org.br) + piloto GAS como referencia",
+      "tipo": "changed",
+      "itens": [
+        "Nova arquitetura Node.js/Express + PostgreSQL (Prisma)",
+        "Autenticação JWT com CPF e senha (perfis: presidente, diretor, tesoureiro, associado)",
+        "API REST completa para integração",
+        "Carteirinha digital com templates frente/verso e exportação em PDF",
+        "Upload de fotos e documentos em storage local",
+        "Migração do piloto Google Apps Script para VPS dedicado"
+      ]
+    },
+    {
+      "versao": "v1.13.29",
+      "data": "17 de abr de 2026",
+      "hash": "9a968a6",
+      "titulo": "v74 - Zoom carteirinha step 0.1 com input direto",
+      "tipo": "changed",
+      "itens": [
+        "v74 - Zoom carteirinha step 0.1 com input direto"
+      ]
+    },
+    {
+      "versao": "v1.13.28",
+      "data": "17 de abr de 2026",
+      "hash": "3b154a6",
+      "titulo": "v73 - Filtro sem cargo na exportacao",
+      "tipo": "changed",
+      "itens": [
+        "v73 - Filtro sem cargo na exportacao"
+      ]
+    },
+    {
+      "versao": "v1.13.27",
+      "data": "17 de abr de 2026",
+      "hash": "5d6cf7c",
+      "titulo": "v72 - Filtros foto e cargo na exportacao PDF",
+      "tipo": "changed",
+      "itens": [
+        "v72 - Filtros foto e cargo na exportacao PDF"
+      ]
+    },
+    {
+      "versao": "v1.13.26",
+      "data": "17 de abr de 2026",
+      "hash": "8502376",
+      "titulo": "v71 - Fix foto resolucao preview Portal usa thumbnail como Carteirinha",
+      "tipo": "fixed",
+      "itens": [
+        "v71 - Fix foto resolucao preview Portal usa thumbnail como Carteirinha"
+      ]
+    },
+    {
+      "versao": "v1.13.25",
+      "data": "17 de abr de 2026",
+      "hash": "550ab30",
+      "titulo": "v70 - Debug logs foto config carteirinha vs portal",
+      "tipo": "changed",
+      "itens": [
+        "v70 - Debug logs foto config carteirinha vs portal"
+      ]
+    },
+    {
+      "versao": "v1.13.24",
+      "data": "17 de abr de 2026",
+      "hash": "e0db477",
+      "titulo": "v69 - Preview Portal respeita fotoConfig posicao zoom",
+      "tipo": "changed",
+      "itens": [
+        "v69 - Preview Portal respeita fotoConfig posicao zoom"
+      ]
+    },
+    {
+      "versao": "v1.13.23",
+      "data": "17 de abr de 2026",
+      "hash": "9f61cde",
+      "titulo": "v68 - Remove snapshot carteirinha ao salvar",
+      "tipo": "changed",
+      "itens": [
+        "v68 - Remove snapshot carteirinha ao salvar"
+      ]
+    },
+    {
+      "versao": "v1.13.22",
+      "data": "16 de abr de 2026",
+      "hash": "5e47d3f",
+      "titulo": "v67 - PDF respeita fotoConfig posicao zoom do editor",
+      "tipo": "changed",
+      "itens": [
+        "v67 - PDF respeita fotoConfig posicao zoom do editor"
+      ]
+    },
+    {
+      "versao": "v1.13.21",
+      "data": "16 de abr de 2026",
+      "hash": "471d107",
+      "titulo": "v66 - Fix controles step 0.1 e input manual",
+      "tipo": "fixed",
+      "itens": [
+        "v66 - Fix controles step 0.1 e input manual"
+      ]
+    },
+    {
+      "versao": "v1.13.20",
+      "data": "16 de abr de 2026",
+      "hash": "c6bae6a",
+      "titulo": "v65 - PDF sempre renderiza ao vivo com template atual",
+      "tipo": "changed",
+      "itens": [
+        "v65 - PDF sempre renderiza ao vivo com template atual"
+      ]
+    },
+    {
+      "versao": "v1.13.19",
+      "data": "16 de abr de 2026",
+      "hash": "52d0878",
+      "titulo": "v64 - Fix preview background sumindo ao selecionar associado",
+      "tipo": "fixed",
+      "itens": [
+        "v64 - Fix preview background sumindo ao selecionar associado"
+      ]
+    },
+    {
+      "versao": "v1.13.18",
+      "data": "16 de abr de 2026",
+      "hash": "994b955",
+      "titulo": "v63 - Template carteirinha configuravel",
+      "tipo": "changed",
+      "itens": [
+        "v63 - Template carteirinha configuravel"
+      ]
+    },
+    {
+      "versao": "v1.13.17",
+      "data": "16 de abr de 2026",
+      "hash": "ba78c1e",
+      "titulo": "v62 - Editar Carteirinha button + Cargo multi-line",
+      "tipo": "changed",
+      "itens": [
+        "v62 - Editar Carteirinha button + Cargo multi-line"
+      ]
+    },
+    {
+      "versao": "v1.13.16",
+      "data": "16 de abr de 2026",
+      "hash": "69c06fc",
+      "titulo": "v61 - fix coluna T: validarFotoConfig_ ignora dados antigos de cargo na coluna",
+      "tipo": "fixed",
+      "itens": [
+        "v61 - fix coluna T: validarFotoConfig_ ignora dados antigos de cargo na coluna"
+      ]
+    },
+    {
+      "versao": "v1.13.15",
+      "data": "16 de abr de 2026",
+      "hash": "2bbb06e",
+      "titulo": "v60 - fix PDF sem foto: templateBase64 no fallback e allowTaint true",
+      "tipo": "fixed",
+      "itens": [
+        "v60 - fix PDF sem foto: templateBase64 no fallback e allowTaint true"
+      ]
+    },
+    {
+      "versao": "v1.13.14",
+      "data": "16 de abr de 2026",
+      "hash": "f405c17",
+      "titulo": "v59 - log fonte foto carteirinha: registra se usou perfil (R) ou especifica (S)",
+      "tipo": "changed",
+      "itens": [
+        "v59 - log fonte foto carteirinha: registra se usou perfil (R) ou especifica (S)"
+      ]
+    },
+    {
+      "versao": "v1.13.13",
+      "data": "16 de abr de 2026",
+      "hash": "bffdce1",
+      "titulo": "v58 - snapshot carteirinha: gera imagem no editor, usa no preview e PDF export",
+      "tipo": "changed",
+      "itens": [
+        "v58 - snapshot carteirinha: gera imagem no editor, usa no preview e PDF export"
+      ]
+    },
+    {
+      "versao": "v1.13.12",
+      "data": "15 de abr de 2026",
+      "hash": "7172c6a",
+      "titulo": "v57 - fix preview carteirinha: usar fotoConfig salva no preview e PDF",
+      "tipo": "fixed",
+      "itens": [
+        "v57 - fix preview carteirinha: usar fotoConfig salva no preview e PDF"
+      ]
+    },
+    {
+      "versao": "v1.13.11",
+      "data": "15 de abr de 2026",
+      "hash": "d526896",
+      "titulo": "v56 - fix escala proporcional foto no PDF export carteirinha",
+      "tipo": "fixed",
+      "itens": [
+        "v56 - fix escala proporcional foto no PDF export carteirinha"
+      ]
+    },
+    {
+      "versao": "v1.13.10",
+      "data": "15 de abr de 2026",
+      "hash": "69b1916",
+      "titulo": "v55 - foto carteirinha: salvar posicao/zoom por associado e usar no export PDF",
+      "tipo": "changed",
+      "itens": [
+        "v55 - foto carteirinha: salvar posicao/zoom por associado e usar no export PDF"
+      ]
+    },
+    {
+      "versao": "v1.13.9",
+      "data": "15 de abr de 2026",
+      "hash": "d501956",
+      "titulo": "v54 - fix upload foto carteirinha: helper obterPastaFotos_ com fallback Drive global",
+      "tipo": "fixed",
+      "itens": [
+        "v54 - fix upload foto carteirinha: helper obterPastaFotos_ com fallback Drive global"
+      ]
+    },
+    {
+      "versao": "v1.13.8",
+      "data": "15 de abr de 2026",
+      "hash": "fe5a0eb",
+      "titulo": "v53 - Carteirinha mobile responsivo: fix sobreposicao card sobre controles",
+      "tipo": "fixed",
+      "itens": [
+        "v53 - Carteirinha mobile responsivo: fix sobreposicao card sobre controles"
+      ]
+    },
+    {
+      "versao": "v1.13.7",
+      "data": "15 de abr de 2026",
+      "hash": "2f1273d",
+      "titulo": "v52 - Fix upload foto carteirinha com fallback",
+      "tipo": "fixed",
+      "itens": [
+        "v52 - Fix upload foto carteirinha com fallback"
+      ]
+    },
+    {
+      "versao": "v1.13.6",
+      "data": "15 de abr de 2026",
+      "hash": "969afaf",
+      "titulo": "v51 - Login persistente com localStorage",
+      "tipo": "changed",
+      "itens": [
+        "v51 - Login persistente com localStorage"
+      ]
+    },
+    {
+      "versao": "v1.13.5",
+      "data": "15 de abr de 2026",
+      "hash": "ec25316",
+      "titulo": "v50 - Logs em Carteirinha, Atualizacao e Inscricao",
+      "tipo": "changed",
+      "itens": [
+        "v50 - Logs em Carteirinha, Atualizacao e Inscricao"
+      ]
+    },
+    {
+      "versao": "v1.13.4",
+      "data": "15 de abr de 2026",
+      "hash": "4c2a434",
+      "titulo": "v49 - Sistema de logs: registro de acessos e acoes",
+      "tipo": "changed",
+      "itens": [
+        "v49 - Sistema de logs: registro de acessos e acoes"
+      ]
+    },
+    {
+      "versao": "v1.13.3",
+      "data": "15 de abr de 2026",
+      "hash": "2653396",
+      "titulo": "v48 - Ocultar botao WhatsApp sem numero valido",
+      "tipo": "changed",
+      "itens": [
+        "v48 - Ocultar botao WhatsApp sem numero valido"
+      ]
+    },
+    {
+      "versao": "v1.13.2",
+      "data": "15 de abr de 2026",
+      "hash": "302e2ed",
+      "titulo": "v47 - Gestão associados: ocultar inativos + checkbox Mostrar Inativos",
+      "tipo": "changed",
+      "itens": [
+        "v47 - Gestão associados: ocultar inativos + checkbox Mostrar Inativos"
+      ]
+    },
+    {
+      "versao": "v1.13.1",
+      "data": "15 de abr de 2026",
+      "hash": "35af9a0",
+      "titulo": "v46 - Formulário inscrição: campos matrícula, sexo e foto",
+      "tipo": "changed",
+      "itens": [
+        "v46 - Formulário inscrição: campos matrícula, sexo e foto"
+      ]
+    },
+    {
+      "versao": "v1.13.0",
+      "data": "15 de abr de 2026",
+      "hash": "fc390c4",
+      "titulo": "feat: nome quebra linha quando ultrapassa margem da carteirinha (v45)",
+      "tipo": "added",
+      "itens": [
+        "feat: nome quebra linha quando ultrapassa margem da carteirinha (v45)"
+      ]
+    },
+    {
+      "versao": "v1.12.1",
+      "data": "15 de abr de 2026",
+      "hash": "5697362",
+      "titulo": "fix: foto carteirinha carrega apos frame config aplicado (v44)",
+      "tipo": "fixed",
+      "itens": [
+        "fix: foto carteirinha carrega apos frame config aplicado (v44)"
+      ]
+    },
+    {
+      "versao": "v1.12.0",
+      "data": "15 de abr de 2026",
+      "hash": "be64916",
+      "titulo": "feat: botao WhatsApp na lista de associados (v43)",
+      "tipo": "added",
+      "itens": [
+        "feat: botao WhatsApp na lista de associados (v43)"
+      ]
+    },
+    {
+      "versao": "v1.11.2",
+      "data": "15 de abr de 2026",
+      "hash": "c05021a",
+      "titulo": "fix: seletor de preview acima do grid para nao sobrepor controles (v42)",
+      "tipo": "fixed",
+      "itens": [
+        "fix: seletor de preview acima do grid para nao sobrepor controles (v42)"
+      ]
+    },
+    {
+      "versao": "v1.11.1",
+      "data": "15 de abr de 2026",
+      "hash": "239a2ca",
+      "titulo": "fix: preview carteirinha com funcao leve sem perm. check + error handling (v41)",
+      "tipo": "fixed",
+      "itens": [
+        "fix: preview carteirinha com funcao leve sem perm. check + error handling (v41)"
+      ]
+    },
+    {
+      "versao": "v1.11.0",
+      "data": "15 de abr de 2026",
+      "hash": "83c2d3f",
+      "titulo": "feat: preview de qualquer associado + inputs numericos precisos nos controles de layout (v40)",
+      "tipo": "added",
+      "itens": [
+        "feat: preview de qualquer associado + inputs numericos precisos nos controles de layout (v40)"
+      ]
+    },
+    {
+      "versao": "v1.10.3",
+      "data": "15 de abr de 2026",
+      "hash": "1dd32c3",
+      "titulo": "fix: atualiza imagem template carteirinha (v39)",
+      "tipo": "fixed",
+      "itens": [
+        "fix: atualiza imagem template carteirinha (v39)"
+      ]
+    },
+    {
+      "versao": "v1.10.2",
+      "data": "15 de abr de 2026",
+      "hash": "08099a8",
+      "titulo": "refactor: config+export carteirinhas movido para Portal, Carteirinha somente self-service (v38)",
+      "tipo": "changed",
+      "itens": [
+        "refactor: config+export carteirinhas movido para Portal, Carteirinha somente self-service (v38)"
+      ]
+    },
+    {
+      "versao": "v1.10.1",
+      "data": "15 de abr de 2026",
+      "hash": "e5c292f",
+      "titulo": "fix: resolve CORS na geracao de PDF - template e fotos em base64",
+      "tipo": "fixed",
+      "itens": [
+        "fix: resolve CORS na geracao de PDF - template e fotos em base64"
+      ]
+    },
+    {
+      "versao": "v1.10.0",
+      "data": "15 de abr de 2026",
+      "hash": "5553bd2",
+      "titulo": "feat: emissao de carteirinhas na area do Diretor Sociocultural",
+      "tipo": "added",
+      "itens": [
+        "feat: emissao de carteirinhas na area do Diretor Sociocultural"
+      ]
+    },
+    {
+      "versao": "v1.9.0",
+      "data": "15 de abr de 2026",
+      "hash": "2486b64",
+      "titulo": "feat: adiciona campos CPF e RG na carteirinha",
+      "tipo": "added",
+      "itens": [
+        "feat: adiciona campos CPF e RG na carteirinha"
+      ]
+    },
+    {
+      "versao": "v1.8.0",
+      "data": "15 de abr de 2026",
+      "hash": "07d78fa",
+      "titulo": "feat: impressao multiplas carteirinhas por folha A4 (2x2 grid)",
+      "tipo": "added",
+      "itens": [
+        "feat: impressao multiplas carteirinhas por folha A4 (2x2 grid)"
+      ]
+    },
+    {
+      "versao": "v1.7.0",
+      "data": "15 de abr de 2026",
+      "hash": "8a9dc7e",
+      "titulo": "feat: CRUD eventos e convenios com permissoes por perfil",
+      "tipo": "added",
+      "itens": [
+        "feat: CRUD eventos e convenios com permissoes por perfil"
+      ]
+    },
+    {
+      "versao": "v1.6.0",
+      "data": "15 de abr de 2026",
+      "hash": "f80c1d9",
+      "titulo": "feat: sistema de gestoes com vigencia e diretoria por periodo",
+      "tipo": "added",
+      "itens": [
+        "feat: sistema de gestoes com vigencia e diretoria por periodo"
+      ]
+    },
+    {
+      "versao": "v1.5.1",
+      "data": "15 de abr de 2026",
+      "hash": "b9d7df4",
+      "titulo": "fix: remover dados mock - exibir apenas dados reais (financeiro zerado, convenios/votacoes/eventos vazios)",
+      "tipo": "fixed",
+      "itens": [
+        "fix: remover dados mock - exibir apenas dados reais (financeiro zerado, convenios/votacoes/eventos vazios)"
+      ]
+    },
+    {
+      "versao": "v1.5.0",
+      "data": "15 de abr de 2026",
+      "hash": "4a02001",
+      "titulo": "feat: exportar carteirinhas selecionadas para PDF com qualidade gráfica",
+      "tipo": "added",
+      "itens": [
+        "feat: exportar carteirinhas selecionadas para PDF com qualidade gráfica"
+      ]
+    },
+    {
+      "versao": "v1.4.1",
+      "data": "15 de abr de 2026",
+      "hash": "269cc3c",
+      "titulo": "fix: carteirinha preview sticky para ficar visivel durante ajustes - Preview fica fixo no topo ao rolar os controles (sticky) - Container com scroll interno - Mobile: preview menor (60mm) e sticky com fundo branco - Deploy v29",
+      "tipo": "fixed",
+      "itens": [
+        "fix: carteirinha preview sticky para ficar visivel durante ajustes - Preview fica fixo no topo ao rolar os controles (sticky) - Container com scroll interno - Mobile: preview menor (60mm) e sticky com fundo branco - Deploy v29"
+      ]
+    },
+    {
+      "versao": "v1.4.0",
+      "data": "15 de abr de 2026",
+      "hash": "3be11f5",
+      "titulo": "feat: foto da carteirinha separada da foto de perfil - Upload na carteirinha salva em pasta e coluna separadas (Fotos Carteirinha / col S) - Foto do perfil (col R) nao e alterada ao enviar foto pela carteirinha - Carteirinha prioriza foto especifica, fallback para foto de perfil - Deploy v27",
+      "tipo": "added",
+      "itens": [
+        "feat: foto da carteirinha separada da foto de perfil - Upload na carteirinha salva em pasta e coluna separadas (Fotos Carteirinha / col S) - Foto do perfil (col R) nao e alterada ao enviar foto pela carteirinha - Carteirinha prioriza foto especifica, fallback para foto de perfil - Deploy v27"
+      ]
+    },
+    {
+      "versao": "v1.3.0",
+      "data": "15 de abr de 2026",
+      "hash": "92b5901",
+      "titulo": "feat: controle de acesso do layout da carteirinha por perfil",
+      "tipo": "added",
+      "itens": [
+        "Somente Diretor Sociocultural pode editar enquadramento da foto e campos",
+        "Config do layout salva na aba ConfigCarteirinha (compartilhada para todos)",
+        "Associados comuns veem layout definido pelo diretor",
+        "Todos podem editar posicao da foto dentro do enquadramento e seus dados",
+        "Deploy v25"
+      ]
+    },
+    {
+      "versao": "v1.2.0",
+      "data": "14 de abr de 2026",
+      "hash": "c61d218",
+      "titulo": "feat: controles de ajuste do enquadramento e campos da carteirinha - Enquadramento da foto: posição X/Y e largura/altura ajustáveis via sliders - Campos de texto: posição, tamanho de fonte, peso e cor ajustáveis - Seletor de campo com destaque visual no cartão - Deploy v23",
+      "tipo": "added",
+      "itens": [
+        "feat: controles de ajuste do enquadramento e campos da carteirinha - Enquadramento da foto: posição X/Y e largura/altura ajustáveis via sliders - Campos de texto: posição, tamanho de fonte, peso e cor ajustáveis - Seletor de campo com destaque visual no cartão - Deploy v23"
+      ]
+    },
+    {
+      "versao": "v1.1.1",
+      "data": "14 de abr de 2026",
+      "hash": "0e33d66",
+      "titulo": "fix: substitui base64 por URL do Drive na carteirinha (250KB -> 28KB)",
+      "tipo": "fixed",
+      "itens": [
+        "fix: substitui base64 por URL do Drive na carteirinha (250KB -> 28KB)"
+      ]
+    },
+    {
+      "versao": "v1.1.0",
+      "data": "14 de abr de 2026",
+      "hash": "99f61bc",
+      "titulo": "feat: cria página de carteirinha com preview, upload e ajuste de posição da foto",
+      "tipo": "added",
+      "itens": [
+        "feat: cria página de carteirinha com preview, upload e ajuste de posição da foto"
+      ]
+    },
+    {
+      "versao": "v1.0.0",
+      "data": "09 de abr de 2026",
+      "hash": "adbfd3a",
+      "titulo": "feat: adiciona prévia da carteirinha de associado no formulário de atualização cadastral",
+      "tipo": "added",
+      "itens": [
+        "feat: adiciona prévia da carteirinha de associado no formulário de atualização cadastral"
+      ]
+    }
+  ],
+  "marcos": []
+}

@@ -10,6 +10,8 @@
     "db:generate": "npx prisma generate",
     "db:studio": "npx prisma studio",
     "db:seed": "node prisma/seed.js",
+    "db:deploy": "npx prisma migrate deploy",
+    "versoes": "node scripts/gerar-versoes.js",
     "test:local": "npm run db:migrate && npm run dev"
   },
   "keywords": ["aspge", "associados", "pge-pa"],

@@ -4,8 +4,8 @@ set -e
 
 echo "🔒 Verificando segredos e arquivos proibidos no stage..."
 
-# Bloqueia .env e dumps com dados pessoais
-if git diff --cached --name-only | grep -E '(^|/)\.env$|\.dump$|\.sql$' ; then
+# Bloqueia .env e dumps com dados pessoais (migration.sql do Prisma é permitido)
+if git diff --cached --name-only | grep -E '(^|/)\.env$|\.dump$|\.sql$' | grep -vE '(^|/)prisma/migrations/.*\.sql$' ; then
   echo "❌ Arquivo proibido no commit (.env/dump). Remova do stage."
   exit 1
 fi
