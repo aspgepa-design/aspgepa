@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T11:23:36.332Z",
+  "geradoEm": "2026-09-24T11:38:15.305Z",
   "versoes": [
+    {
+      "versao": "v2.7.2",
+      "data": "24 de set de 2026",
+      "hash": "eb9f8e3",
+      "titulo": "fix: chama dashCardInit() no portal - carteirinha do Inicio nao populava",
+      "tipo": "fixed",
+      "itens": [
+        "fix: chama dashCardInit() no portal - carteirinha do Inicio nao populava"
+      ]
+    },
     {
       "versao": "v2.7.1",
       "data": "24 de set de 2026",

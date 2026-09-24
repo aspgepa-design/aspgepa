@@ -138,6 +138,11 @@ tbody tr:hover{background:#f9fafb}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ===== RESPONSIVE ===== */
+/* Telas médias/tablets: carteirinha empilhada acima dos widgets e centralizada */
+@media(max-width:992px){
+  .dashboard-grid{grid-template-columns:1fr !important}
+  .dc-flip-scene{max-width:440px;margin:0 auto}
+}
 @media(max-width:768px){
   .sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:50;transition:left .3s ease;box-shadow:4px 0 24px rgba(0,0,0,.1)}
   .sidebar.open{left:0}
@@ -146,7 +151,14 @@ tbody tr:hover{background:#f9fafb}
   .widgets-grid{grid-template-columns:1fr}
   .header{padding:12px 16px}
   .header h1{font-size:16px}
-  .dashboard-grid{grid-template-columns:1fr !important}
+  .card-body{padding:16px}
+  .widget-stat .value{font-size:26px}
+}
+@media(max-width:480px){
+  .content{padding:12px}
+  .card-body{padding:14px}
+  .widget-stat .value{font-size:22px}
+  .widget-stat .label{font-size:10px}
 }
 
 /* ===== LOADING ===== */
