@@ -126,7 +126,10 @@ async function alterarSenha(req, res) {
       return res.status(404).json({ erro: 'Associado não encontrado' });
     }
 
-    // Verificar senha atual
+    // Verificar senha atual (senha pode ser null se ainda não definida)
+    if (!associado.senha) {
+      return res.status(400).json({ erro: 'Senha não configurada. Use a recuperação de senha ou contate a diretoria.' });
+    }
     const senhaValida = await bcrypt.compare(senhaAtual, associado.senha);
     if (!senhaValida) {
       return res.status(401).json({ erro: 'Senha atual incorreta' });
@@ -300,6 +303,69 @@ async function logout(req, res) {
   }
 }
 
+/**
+ * Recuperação de senha self-service (sem e-mail).
+ * Verifica identidade por CPF + data de nascimento + email cadastrado.
+ * Fortemente rate-limited na rota para evitar enumeração/força bruta.
+ */
+async function recuperarSenha(req, res) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
+    }
+
+    const { cpf, dataNascimento, email, novaSenha } = req.body;
+    const cpfLimpo = String(cpf || '').replace(/\D/g, '');
+
+    const associado = await prisma.associado.findFirst({
+      where: { OR: [{ cpf: cpfLimpo }, { cpf }] }
+    });
+
+    // Mensagem genérica — não revelar qual campo falhou (anti-enumeração)
+    const falha = () => res.status(401).json({ erro: 'Dados não conferem. Verifique CPF, data de nascimento e e-mail.' });
+
+    if (!associado) return falha();
+
+    // Conferir data de nascimento (compara só a parte da data)
+    const nascInformado = String(dataNascimento || '').substring(0, 10);
+    const nascCadastro = associado.dataNascimento
+      ? new Date(associado.dataNascimento).toISOString().substring(0, 10)
+      : null;
+    if (!nascCadastro || nascInformado !== nascCadastro) return falha();
+
+    // Conferir e-mail (case-insensitive)
+    const emailInformado = String(email || '').trim().toLowerCase();
+    const emailCadastro = String(associado.email || '').trim().toLowerCase();
+    if (!emailCadastro || emailInformado !== emailCadastro) return falha();
+
+    const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+    await prisma.associado.update({
+      where: { id: associado.id },
+      data: { senha: novaSenhaHash, senhaAlterada: true }
+    });
+
+    try {
+      await prisma.log.create({
+        data: {
+          acao: 'Recuperou senha',
+          detalhes: `CPF: ${cpfLimpo}`,
+          associadoId: associado.id,
+          ip: req.ip,
+          userAgent: req.headers['user-agent']
+        }
+      });
+    } catch (logError) {
+      logger.error('Erro ao criar log:', logError);
+    }
+
+    res.json({ sucesso: true, mensagem: 'Senha redefinida com sucesso. Faça login com a nova senha.' });
+  } catch (error) {
+    logger.error('Erro na recuperação de senha:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
 // Helper para obter iniciais do nome
 function obterIniciais(nome) {
   if (!nome) return '??';
@@ -312,6 +378,7 @@ module.exports = {
   login,
   alterarSenha,
   definirSenha,
+  recuperarSenha,
   obterPerfil,
   logout
 };

@@ -102,9 +102,37 @@ function gerarToken(associado) {
   );
 }
 
+/**
+ * Autenticação opcional: popula req.user se houver token válido,
+ * mas não bloqueia a requisição se ausente/inválido.
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const associado = await prisma.associado.findUnique({ where: { id: decoded.id } });
+      if (associado) {
+        req.user = {
+          id: associado.id,
+          cpf: associado.cpf,
+          nome: associado.nomeCompleto,
+          perfil: associado.perfil,
+          role: obterRole(associado.perfil)
+        };
+      }
+    }
+  } catch (_) {
+    // token ausente/inválido → segue como anônimo
+  }
+  next();
+};
+
 module.exports = {
   authMiddleware,
   authorize,
   gerarToken,
-  obterRole
+  obterRole,
+  optionalAuth
 };

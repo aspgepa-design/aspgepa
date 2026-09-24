@@ -38,8 +38,22 @@ html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,san
     <button class="login-btn" id="loginBtn" onclick="fazerLogin()">Entrar no Portal</button>
     <div class="login-error" id="loginErro"></div>
     <div class="login-links">
-      <a href="/inscricao">Ainda não é associado? Inscreva-se</a>
+      <a href="javascript:void(0)" onclick="toggleRecuperar()">Esqueci minha senha</a><br>
+      <a href="/inscricao" style="display:inline-block;margin-top:10px">Ainda não é associado? Inscreva-se</a>
     </div>
+  </div>
+
+  <!-- Card de recuperação de senha -->
+  <div class="login-card" id="cardRecuperar" style="display:none;margin-top:16px">
+    <h1 style="font-size:18px">Recuperar Senha</h1>
+    <p class="subtitle" style="margin-bottom:20px">Confirme seus dados para redefinir a senha</p>
+    <input type="text" id="recCpf" class="login-input" placeholder="CPF" maxlength="14" oninput="mascaraCPF(this)">
+    <input type="date" id="recNascimento" class="login-input" placeholder="Data de nascimento">
+    <input type="email" id="recEmail" class="login-input" placeholder="E-mail cadastrado">
+    <input type="password" id="recNovaSenha" class="login-input" placeholder="Nova senha (mín. 6)">
+    <button class="login-btn" id="recBtn" onclick="recuperarSenha()">Redefinir Senha</button>
+    <div class="login-error" id="recErro"></div>
+    <div class="login-links"><a href="javascript:void(0)" onclick="toggleRecuperar()">← Voltar ao login</a></div>
   </div>
 </div>
 
@@ -102,6 +116,51 @@ async function fazerLogin() {
   } catch (error) {
     btn.disabled = false;
     btn.textContent = 'Entrar no Portal';
+    erro.textContent = 'Erro de conexão. Tente novamente.';
+  }
+}
+
+function toggleRecuperar() {
+  var card = document.getElementById('cardRecuperar');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+}
+
+async function recuperarSenha() {
+  var cpf = document.getElementById('recCpf').value;
+  var nascimento = document.getElementById('recNascimento').value;
+  var email = document.getElementById('recEmail').value;
+  var novaSenha = document.getElementById('recNovaSenha').value;
+  var btn = document.getElementById('recBtn');
+  var erro = document.getElementById('recErro');
+
+  if (cpf.replace(/\D/g, '').length < 11) { erro.textContent = 'Digite um CPF válido.'; return; }
+  if (!nascimento) { erro.textContent = 'Informe a data de nascimento.'; return; }
+  if (!email) { erro.textContent = 'Informe o e-mail cadastrado.'; return; }
+  if (novaSenha.length < 6) { erro.textContent = 'A nova senha deve ter ao menos 6 caracteres.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+  erro.textContent = '';
+
+  try {
+    const response = await fetch('/api/auth/recuperar-senha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cpf: cpf, dataNascimento: nascimento, email: email, novaSenha: novaSenha })
+    });
+    const data = await response.json();
+    btn.disabled = false;
+    btn.textContent = 'Redefinir Senha';
+    if (data.sucesso) {
+      erro.style.color = '#16a34a';
+      erro.textContent = data.mensagem;
+      setTimeout(function(){ toggleRecuperar(); erro.style.color = '#dc2626'; }, 2000);
+    } else {
+      erro.textContent = data.erro || 'Não foi possível redefinir.';
+    }
+  } catch (error) {
+    btn.disabled = false;
+    btn.textContent = 'Redefinir Senha';
     erro.textContent = 'Erro de conexão. Tente novamente.';
   }
 }

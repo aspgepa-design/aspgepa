@@ -36,6 +36,11 @@ router.get('/', authorize('presidente', 'diretor', 'tesoureiro'), associadoContr
 // Listar resumido (diretoria - para seleção de carteirinhas)
 router.get('/resumido', authorize('presidente', 'diretor'), associadoController.listarResumido);
 
+// Aprovação de inscrições públicas (diretoria)
+router.get('/pendentes', authorize('presidente', 'diretor'), associadoController.listarPendentes);
+router.post('/:id/aprovar', authorize('presidente', 'diretor'), associadoController.aprovar);
+router.post('/:id/rejeitar', authorize('presidente', 'diretor'), associadoController.rejeitar);
+
 // Buscar por ID (próprio cadastro ou diretoria)
 router.get('/:id', proprioOuDiretoria, associadoController.buscarPorId);
 

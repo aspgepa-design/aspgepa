@@ -21,6 +21,8 @@ const votacaoRoutes = require('./src/routes/votacoes');
 const gestaoRoutes = require('./src/routes/gestoes');
 const siteConfigRoutes = require('./src/routes/siteConfig');
 const noticiasRoutes = require('./src/routes/noticias');
+const documentoRoutes = require('./src/routes/documentos');
+const dependenteRoutes = require('./src/routes/dependentes');
 
 const { obterVersoes } = require('./src/services/versoesService');
 
@@ -76,6 +78,8 @@ app.use('/api/financeiro', financeiroRoutes);
 app.use('/api/carteirinhas', carteirinhaRoutes);
 app.use('/api/votacoes', votacaoRoutes);
 app.use('/api/gestoes', gestaoRoutes);
+app.use('/api/documentos', documentoRoutes);
+app.use('/api/dependentes', dependenteRoutes);
 app.use('/api/site-config', siteConfigRoutes);
 app.use('/api/noticias', noticiasRoutes);
 
@@ -91,13 +95,9 @@ app.get('/login', (req, res) => {
   res.render('login', { title: 'Login - ASPGE-PA' });
 });
 
-// Portal (protegido)
+// Portal (protegido — dados do usuário carregados via JS/API)
 app.get('/portal', (req, res) => {
-  res.render('portal', { 
-    title: 'Portal do Associado - ASPGE-PA',
-    user: { nome: 'Usuário', iniciais: 'US', perfil: 'Associado', role: 'associado' },
-    showSidebar: true
-  });
+  res.render('portal', { title: 'Portal do Associado - ASPGE-PA' });
 });
 
 // Inscrição (público)

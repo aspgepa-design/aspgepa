@@ -32,8 +32,19 @@ const definirSenhaValidation = [
     .isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
 ];
 
+// Recuperação de senha — rate limit agressivo (verificação de identidade)
+const recuperarLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: 'Muitas tentativas. Tente novamente em alguns minutos.' });
+
+const recuperarSenhaValidation = [
+  body('cpf').notEmpty().withMessage('CPF é obrigatório'),
+  body('dataNascimento').notEmpty().withMessage('Data de nascimento é obrigatória'),
+  body('email').isEmail().withMessage('E-mail inválido'),
+  body('novaSenha').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
+];
+
 // Rotas públicas
 router.post('/login', loginLimiter, loginValidation, authController.login);
+router.post('/recuperar-senha', recuperarLimiter, recuperarSenhaValidation, authController.recuperarSenha);
 
 // Rotas protegidas
 router.get('/perfil', authMiddleware, authController.obterPerfil);

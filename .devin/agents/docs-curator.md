@@ -27,7 +27,7 @@ Curador da documentação do ASPGE-PA — o perfil mais barato e mais esquecido.
 - NÃO toca: código de aplicação (`aspge.org.br/src/`, `server.js`, `prisma/schema.prisma`), `GAS/`
 
 ## Convenções
-- Após mudança de endpoints → atualizar seção de API em `README-ASPGE.md`/`dev/ARQUITETURA.md`
+- Após mudança de endpoints → atualizar seção de API em `README.md`
 - Após mudança de schema → atualizar modelo de dados documentado
 - Após mudança de estrutura agêntica (perfis, skills, hooks) → atualizar `AGENTS.md`
 - Após deploy/rotina → verificar se relatório existe em `reports/`

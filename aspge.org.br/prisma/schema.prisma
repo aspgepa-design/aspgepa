@@ -20,7 +20,7 @@ model Associado {
   sexo               String?
   whatsapp           String?
   email              String?
-  senha              String       // hash bcrypt
+  senha              String?      // hash bcrypt (null até o associado definir)
   dataNascimento     DateTime?
   naturalidade       String?
   estadoCivil        String?
@@ -46,9 +46,12 @@ model Associado {
   updatedAt          DateTime     @updatedAt
 
   // Relações
-  documentos Documento[]
-  logs       Log[]
-  gestoes    Gestao[]
+  documentos       Documento[]
+  logs             Log[]
+  gestoes          Gestao[]
+  votos            Voto[]
+  inscricoesEvento InscricaoEvento[]
+  dependentes      Dependente[]
 
   @@map("associados")
 }
@@ -59,9 +62,11 @@ model Evento {
   titulo    String
   local     String?
   horario   String?
-  descricao String?
-  visivel   Boolean  @default(true)
-  createdAt DateTime @default(now())
+  descricao  String?
+  visivel    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  inscricoes InscricaoEvento[]
 
   @@map("eventos")
 }
@@ -95,10 +100,64 @@ model Votacao {
   titulo    String
   status    String   @default("Aberta") // Aberta, Encerrada
   dataFim   String?
-  votos     Int      @default(0)
+  votos     Int      @default(0) // desnormalizado: total de votos
   createdAt DateTime @default(now())
 
+  opcoes OpcaoVoto[]
+  votosRegistrados Voto[]
+
   @@map("votacoes")
+}
+
+model OpcaoVoto {
+  id        Int     @id @default(autoincrement())
+  votacaoId Int
+  votacao   Votacao @relation(fields: [votacaoId], references: [id], onDelete: Cascade)
+  texto     String
+  votos     Voto[]
+
+  @@map("opcoes_voto")
+}
+
+model Voto {
+  id          Int       @id @default(autoincrement())
+  votacaoId   Int
+  votacao     Votacao   @relation(fields: [votacaoId], references: [id], onDelete: Cascade)
+  opcaoId     Int
+  opcao       OpcaoVoto @relation(fields: [opcaoId], references: [id], onDelete: Cascade)
+  associadoId Int
+  associado   Associado @relation(fields: [associadoId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([votacaoId, associadoId])
+  @@index([opcaoId])
+  @@map("votos")
+}
+
+model InscricaoEvento {
+  id          Int       @id @default(autoincrement())
+  eventoId    Int
+  evento      Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  associadoId Int
+  associado   Associado @relation(fields: [associadoId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([eventoId, associadoId])
+  @@index([associadoId])
+  @@map("inscricoes_evento")
+}
+
+model Dependente {
+  id             Int       @id @default(autoincrement())
+  associadoId    Int
+  associado      Associado @relation(fields: [associadoId], references: [id], onDelete: Cascade)
+  nome           String
+  parentesco     String?
+  dataNascimento DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([associadoId])
+  @@map("dependentes")
 }
 
 model Gestao {

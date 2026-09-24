@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
 const path = require('path');
@@ -426,15 +427,155 @@ async function obterDadosExport(req, res) {
 }
 
 /**
- * Gerar PDF de carteirinhas (TODO: implementar com Puppeteer)
+ * Gerar PDF de carteirinhas (server-side com pdf-lib).
+ * Body: { cpfs: [...] } — renderiza frente (e verso se houver template) em grade A4.
  */
 async function gerarPdf(req, res) {
   try {
-    // TODO: Implementar geração de PDF server-side com Puppeteer
-    // Por enquanto retorna erro indicando que deve usar o método antigo (frontend)
-    res.status(501).json({ 
-      erro: 'Geração de PDF server-side em desenvolvimento. Use o método frontend por enquanto.'
-    });
+    const { cpfs } = req.body;
+    if (!Array.isArray(cpfs) || cpfs.length === 0) {
+      return res.status(400).json({ erro: 'Informe pelo menos um CPF' });
+    }
+
+    const uploadDir = process.env.UPLOAD_DIR || './public/uploads';
+    const config = await prisma.configCarteirinha.findFirst();
+    const cfg = config?.config ? JSON.parse(config.config) : CONFIG_PADRAO;
+
+    // Dimensões do cartão CR80 em pontos (1mm = 2.83465pt)
+    const CARD_W = 85.6 * 2.83465;
+    const CARD_H = 53.98 * 2.83465;
+    const PAGE_W = 595.28, PAGE_H = 841.89; // A4
+    const MARGIN = 28;
+    const COLS = 2, ROWS = 5;
+    const GAP_X = (PAGE_W - 2 * MARGIN - COLS * CARD_W) / (COLS - 1);
+    const GAP_Y = (PAGE_H - 2 * MARGIN - ROWS * CARD_H) / (ROWS - 1);
+
+    const doc = await PDFDocument.create();
+    const fonteNormal = await doc.embedFont(StandardFonts.Helvetica);
+    const fonteBold = await doc.embedFont(StandardFonts.HelveticaBold);
+
+    // Embute templates (se existirem)
+    const embutir = async (rel) => {
+      if (!rel) return null;
+      const p = path.join(uploadDir, 'templates', path.basename(rel));
+      if (!fs.existsSync(p)) return null;
+      const buf = fs.readFileSync(p);
+      const ext = path.extname(p).toLowerCase();
+      return ext === '.png' ? doc.embedPng(buf) : doc.embedJpg(buf);
+    };
+    const tplFrente = await embutir(config?.templateFrente);
+    const tplVerso = await embutir(config?.templateVerso);
+
+    // Carrega associados
+    const associados = [];
+    for (const cpf of cpfs.slice(0, 50)) {
+      const cpfLimpo = String(cpf).replace(/\D/g, '');
+      const a = await prisma.associado.findFirst({ where: { OR: [{ cpf: cpfLimpo }, { cpf }] } });
+      if (a) associados.push(a);
+    }
+    if (associados.length === 0) {
+      return res.status(404).json({ erro: 'Nenhum associado encontrado' });
+    }
+
+    const hexToRgb = (hex) => {
+      const m = String(hex || '#000000').replace('#', '');
+      const n = parseInt(m.length === 3 ? m.split('').map(c => c + c).join('') : m, 16);
+      return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+    };
+
+    const valorCampo = (key, a) => {
+      const hoje = new Date();
+      const emissao = `${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear()}`;
+      const validade = `${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear() + 2}`;
+      const mapa = {
+        cardNome: a.nomeCompleto,
+        cardMatricula: a.matricula,
+        cardCargo: a.cargo,
+        cardEmissao: emissao,
+        cardValidade: validade,
+        cardCpf: a.cpf,
+        cardRg: a.rg
+      };
+      return mapa[key];
+    };
+
+    const desenharFrente = async (page, a, ox, oy) => {
+      if (tplFrente) {
+        page.drawImage(tplFrente, { x: ox, y: oy, width: CARD_W, height: CARD_H });
+      } else {
+        page.drawRectangle({ x: ox, y: oy, width: CARD_W, height: CARD_H, borderColor: rgb(0.7, 0.7, 0.7), borderWidth: 0.5 });
+      }
+      // Foto no frame
+      const fotoUrl = a.fotoCarteirinhaUrl || a.fotoUrl;
+      if (fotoUrl) {
+        const m = fotoUrl.match(/fotos\/(\d+)\.(jpg|jpeg|png)$/i);
+        if (m) {
+          const fp = path.join(uploadDir, 'fotos', `${m[1]}.${m[2]}`);
+          if (fs.existsSync(fp)) {
+            try {
+              const img = m[2].toLowerCase() === 'png' ? await doc.embedPng(fs.readFileSync(fp)) : await doc.embedJpg(fs.readFileSync(fp));
+              const f = cfg.frame || CONFIG_PADRAO.frame;
+              page.drawImage(img, {
+                x: ox + (f.left / 100) * CARD_W,
+                y: oy + CARD_H - ((f.top + f.height) / 100) * CARD_H,
+                width: (f.width / 100) * CARD_W,
+                height: (f.height / 100) * CARD_H
+              });
+            } catch (e) { logger.warn('Foto não embutida:', e.message); }
+          }
+        }
+      }
+      // Campos de texto
+      for (const [key, c] of Object.entries(cfg.campos || {})) {
+        const texto = c.text !== undefined ? c.text : valorCampo(key, a);
+        if (!texto) continue;
+        const size = Math.max(4, (c.fontSize / 100) * CARD_H);
+        page.drawText(String(texto), {
+          x: ox + (c.left / 100) * CARD_W,
+          y: oy + CARD_H - (c.top / 100) * CARD_H - size,
+          size,
+          font: (c.fontWeight >= 600) ? fonteBold : fonteNormal,
+          color: hexToRgb(c.color)
+        });
+      }
+    };
+
+    // Paginação: frente (e verso espelhado p/ duplex) por página
+    for (let i = 0; i < associados.length; i += COLS * ROWS) {
+      const lote = associados.slice(i, i + COLS * ROWS);
+      const pagFrente = doc.addPage([PAGE_W, PAGE_H]);
+      for (let j = 0; j < lote.length; j++) {
+        const col = j % COLS, row = Math.floor(j / COLS);
+        const ox = MARGIN + col * (CARD_W + GAP_X);
+        const oy = PAGE_H - MARGIN - (row + 1) * CARD_H - row * GAP_Y;
+        await desenharFrente(pagFrente, lote[j], ox, oy);
+      }
+      if (tplVerso) {
+        const pagVerso = doc.addPage([PAGE_W, PAGE_H]);
+        for (let j = 0; j < lote.length; j++) {
+          const col = j % COLS, row = Math.floor(j / COLS);
+          // Espelha horizontalmente para impressão frente-e-verso
+          const ox = MARGIN + (COLS - 1 - col) * (CARD_W + GAP_X);
+          const oy = PAGE_H - MARGIN - (row + 1) * CARD_H - row * GAP_Y;
+          pagVerso.drawImage(tplVerso, { x: ox, y: oy, width: CARD_W, height: CARD_H });
+        }
+      }
+    }
+
+    await prisma.log.create({
+      data: {
+        acao: 'Gerou PDF de Carteirinhas',
+        detalhes: `${associados.length} carteirinha(s)`,
+        associadoId: req.user?.id,
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      }
+    }).catch(() => {});
+
+    const pdfBytes = await doc.save();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="carteirinhas.pdf"');
+    res.send(Buffer.from(pdfBytes));
   } catch (error) {
     logger.error('Erro ao gerar PDF:', error);
     res.status(500).json({ erro: 'Erro interno no servidor' });

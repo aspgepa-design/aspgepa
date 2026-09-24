@@ -29,4 +29,11 @@ router.delete('/:id', authorize('presidente', 'diretor'), eventoController.exclu
 // Alternar visibilidade (diretoria)
 router.patch('/:id/visibilidade', authorize('presidente', 'diretor'), eventoController.alternarVisibilidade);
 
+// Inscrição do associado logado no evento
+router.post('/:id/inscrever', eventoController.inscrever);
+router.delete('/:id/inscrever', eventoController.desinscrever);
+
+// Lista de inscritos (diretoria)
+router.get('/:id/inscritos', authorize('presidente', 'diretor'), eventoController.listarInscritos);
+
 module.exports = router;

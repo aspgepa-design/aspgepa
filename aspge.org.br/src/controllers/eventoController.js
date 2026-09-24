@@ -15,13 +15,26 @@ async function listar(req, res) {
 
     const eventos = await prisma.evento.findMany({
       where: mostrarTodos ? {} : { visivel: true },
-      orderBy: { data: 'desc' }
+      orderBy: { data: 'desc' },
+      include: { _count: { select: { inscricoes: true } } }
     });
+
+    // Marca em quais eventos o usuário logado está inscrito
+    let minhasInscricoes = [];
+    if (req.user?.id) {
+      minhasInscricoes = await prisma.inscricaoEvento.findMany({
+        where: { associadoId: req.user.id },
+        select: { eventoId: true }
+      });
+    }
+    const setInscrito = new Set(minhasInscricoes.map(i => i.eventoId));
 
     // Formatar datas para string dd/MM/yyyy
     const resultado = eventos.map(e => ({
       ...e,
-      data: formatarData(e.data)
+      data: formatarData(e.data),
+      totalInscritos: e._count.inscricoes,
+      inscrito: setInscrito.has(e.id)
     }));
 
     res.json(resultado);
@@ -218,6 +231,109 @@ async function alternarVisibilidade(req, res) {
   }
 }
 
+/**
+ * Inscrever o associado logado num evento
+ */
+async function inscrever(req, res) {
+  try {
+    const eventoId = parseInt(req.params.id);
+    const associadoId = req.user.id;
+
+    const evento = await prisma.evento.findUnique({ where: { id: eventoId } });
+    if (!evento) {
+      return res.status(404).json({ erro: 'Evento não encontrado' });
+    }
+    if (!evento.visivel) {
+      return res.status(400).json({ erro: 'Evento não está disponível para inscrição' });
+    }
+
+    const existente = await prisma.inscricaoEvento.findUnique({
+      where: { eventoId_associadoId: { eventoId, associadoId } }
+    });
+    if (existente) {
+      return res.status(409).json({ erro: 'Você já está inscrito neste evento' });
+    }
+
+    await prisma.inscricaoEvento.create({ data: { eventoId, associadoId } });
+
+    await prisma.log.create({
+      data: {
+        acao: 'Inscreveu-se em Evento',
+        detalhes: evento.titulo,
+        associadoId,
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      }
+    }).catch(() => {});
+
+    res.status(201).json({ sucesso: true, mensagem: 'Inscrição confirmada' });
+  } catch (error) {
+    logger.error('Erro ao inscrever em evento:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
+/**
+ * Cancelar inscrição do associado logado num evento
+ */
+async function desinscrever(req, res) {
+  try {
+    const eventoId = parseInt(req.params.id);
+    const associadoId = req.user.id;
+
+    const existente = await prisma.inscricaoEvento.findUnique({
+      where: { eventoId_associadoId: { eventoId, associadoId } }
+    });
+    if (!existente) {
+      return res.status(404).json({ erro: 'Inscrição não encontrada' });
+    }
+
+    await prisma.inscricaoEvento.delete({ where: { id: existente.id } });
+    res.json({ sucesso: true, mensagem: 'Inscrição cancelada' });
+  } catch (error) {
+    logger.error('Erro ao cancelar inscrição:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
+/**
+ * Listar inscritos de um evento (diretoria)
+ */
+async function listarInscritos(req, res) {
+  try {
+    const eventoId = parseInt(req.params.id);
+
+    const evento = await prisma.evento.findUnique({ where: { id: eventoId } });
+    if (!evento) {
+      return res.status(404).json({ erro: 'Evento não encontrado' });
+    }
+
+    const inscritos = await prisma.inscricaoEvento.findMany({
+      where: { eventoId },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        associado: { select: { id: true, nomeCompleto: true, cpf: true, whatsapp: true } }
+      }
+    });
+
+    res.json({
+      sucesso: true,
+      evento: evento.titulo,
+      total: inscritos.length,
+      dados: inscritos.map(i => ({
+        id: i.associado.id,
+        nome: i.associado.nomeCompleto,
+        cpf: i.associado.cpf,
+        whatsapp: i.associado.whatsapp,
+        inscritoEm: i.createdAt
+      }))
+    });
+  } catch (error) {
+    logger.error('Erro ao listar inscritos:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
 // Helpers
 function formatarData(data) {
   if (!data) return '';
@@ -252,5 +368,8 @@ module.exports = {
   criar,
   atualizar,
   excluir,
-  alternarVisibilidade
+  alternarVisibilidade,
+  inscrever,
+  desinscrever,
+  listarInscritos
 };

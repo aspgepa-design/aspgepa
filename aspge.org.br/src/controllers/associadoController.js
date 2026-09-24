@@ -692,6 +692,95 @@ async function inscricaoPublica(req, res) {
   }
 }
 
+/**
+ * Listar inscrições pendentes de aprovação (diretoria)
+ */
+async function listarPendentes(req, res) {
+  try {
+    const pendentes = await prisma.associado.findMany({
+      where: { situacao: 'Pendente' },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true, nomeCompleto: true, cpf: true, email: true, whatsapp: true,
+        cargo: true, matricula: true, lotacao: true, createdAt: true
+      }
+    });
+    res.json({ sucesso: true, total: pendentes.length, dados: pendentes });
+  } catch (error) {
+    logger.error('Erro ao listar pendentes:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
+/**
+ * Aprovar inscrição — ativa o associado (diretoria)
+ */
+async function aprovar(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const associado = await prisma.associado.findUnique({ where: { id } });
+    if (!associado) {
+      return res.status(404).json({ erro: 'Associado não encontrado' });
+    }
+    if (associado.situacao !== 'Pendente') {
+      return res.status(400).json({ erro: 'Cadastro não está pendente' });
+    }
+
+    await prisma.associado.update({
+      where: { id },
+      data: { situacao: 'Ativo' }
+    });
+
+    await prisma.log.create({
+      data: {
+        acao: 'Aprovou Inscrição',
+        detalhes: `Nome: ${associado.nomeCompleto}`,
+        associadoId: req.user?.id,
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      }
+    }).catch(() => {});
+
+    res.json({ sucesso: true, mensagem: `${associado.nomeCompleto} aprovado como associado` });
+  } catch (error) {
+    logger.error('Erro ao aprovar inscrição:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
+/**
+ * Rejeitar inscrição — remove o cadastro pendente (diretoria)
+ */
+async function rejeitar(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const associado = await prisma.associado.findUnique({ where: { id } });
+    if (!associado) {
+      return res.status(404).json({ erro: 'Associado não encontrado' });
+    }
+    if (associado.situacao !== 'Pendente') {
+      return res.status(400).json({ erro: 'Cadastro não está pendente' });
+    }
+
+    await prisma.associado.delete({ where: { id } });
+
+    await prisma.log.create({
+      data: {
+        acao: 'Rejeitou Inscrição',
+        detalhes: `Nome: ${associado.nomeCompleto}`,
+        associadoId: req.user?.id,
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      }
+    }).catch(() => {});
+
+    res.json({ sucesso: true, mensagem: 'Inscrição rejeitada e removida' });
+  } catch (error) {
+    logger.error('Erro ao rejeitar inscrição:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
 module.exports = {
   listarTodos,
   listarResumido,
@@ -701,6 +790,9 @@ module.exports = {
   atualizar,
   atualizarCadastro,
   inscricaoPublica,
+  listarPendentes,
+  aprovar,
+  rejeitar,
   excluir,
   uploadFoto
 };

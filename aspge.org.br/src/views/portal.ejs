@@ -339,6 +339,56 @@ tbody tr:hover{background:#f9fafb}
           </div>
         </div>
 
+        <!-- ===== VIEW: EVENTOS (membro) ===== -->
+        <div id="view-eventos" class="view">
+          <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:8px">Eventos</h2>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Confira os próximos eventos e confirme sua presença.</p>
+          <div id="eventosList">
+            <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: DEPENDENTES ===== -->
+        <div id="view-dependentes" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Dependentes</h2>
+              <p style="font-size:13px;color:#6b7280">Gerencie seus dependentes/agregados.</p>
+            </div>
+          </header>
+          <div class="card" style="margin-bottom:16px"><div class="card-body">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end">
+              <div><label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">Nome</label><input type="text" id="depNome" class="input" placeholder="Nome completo"></div>
+              <div><label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">Parentesco</label><input type="text" id="depParentesco" class="input" placeholder="Ex.: Filho(a)"></div>
+              <div><label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">Nascimento</label><input type="date" id="depNascimento" class="input"></div>
+              <button class="btn btn-primary btn-sm" onclick="adicionarDependente()">+ Adicionar</button>
+            </div>
+          </div></div>
+          <div class="card"><div class="card-body" style="padding:0">
+            <div class="table-wrap" id="dependentesTabela"><div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div></div>
+          </div></div>
+        </div>
+
+        <!-- ===== VIEW: MEUS DOCUMENTOS ===== -->
+        <div id="view-documentos" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Meus Documentos</h2>
+              <p style="font-size:13px;color:#6b7280">Envie e gerencie seus documentos (PDF, imagem ou Word, até 5MB).</p>
+            </div>
+          </header>
+          <div class="card" style="margin-bottom:16px"><div class="card-body">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <input type="text" id="docNome" class="input" placeholder="Nome do documento" style="flex:1;min-width:180px">
+              <input type="file" id="docArquivo" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="flex:1;min-width:180px">
+              <button class="btn btn-primary btn-sm" onclick="enviarDocumento()">Enviar</button>
+            </div>
+          </div></div>
+          <div class="card"><div class="card-body" style="padding:0">
+            <div class="table-wrap" id="documentosTabela"><div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div></div>
+          </div></div>
+        </div>
+
         <!-- ===== VIEW: ATUALIZAÇÃO CADASTRAL ===== -->
         <div id="view-atualizacao" class="view">
           <h2 style="font-size:22px;font-weight:900;color:#1f2937;margin-bottom:8px">Meu Cadastro</h2>
@@ -513,6 +563,24 @@ tbody tr:hover{background:#f9fafb}
           <!-- Lista -->
           <div id="assocLista">
             <div class="loading-overlay"><div class="spinner"></div> Carregando associados...</div>
+          </div>
+        </div>
+
+        <!-- ===== VIEW: INSCRIÇÕES (aprovação) ===== -->
+        <div id="view-inscricoes_adm" class="view">
+          <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#1f2937">Inscrições Pendentes</h2>
+              <p style="font-size:13px;color:#6b7280">Aprove ou rejeite as fichas de inscrição enviadas pela página pública.</p>
+            </div>
+            <button class="btn btn-sm" onclick="carregarInscricoes()">↻ Atualizar</button>
+          </header>
+          <div class="card">
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap" id="inscricoesTabela">
+                <div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -858,6 +926,10 @@ const ICONS = {
   transparencia: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
   convenios: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
   votacoes: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>',
+  eventos: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  documentos: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  dependentes: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  inscricoes_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>',
   financeiro: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
   atualizacao: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   associados_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
@@ -878,7 +950,10 @@ function getNav(role) {
   nav.push({ id: 'transparencia', label: 'Transparência' });
   nav.push({ id: 'convenios', label: 'Convênios' });
   nav.push({ id: 'votacoes', label: 'Votações' });
+  nav.push({ id: 'eventos', label: 'Eventos' });
   nav.push({ id: 'atualizacao', label: 'Meu Cadastro' });
+  nav.push({ id: 'dependentes', label: 'Dependentes' });
+  nav.push({ id: 'documentos', label: 'Meus Documentos' });
 
   // Tesoureiro: + Associados
   if (role === 'tesoureiro' || role === 'diretor' || role === 'presidente') {
@@ -887,6 +962,7 @@ function getNav(role) {
 
   // Diretor: + Gerir Eventos, Carteirinhas, Gerir Convênios, Gestões, Logs, Site Config, Notícias
   if (role === 'diretor' || role === 'presidente') {
+    nav.push({ id: 'inscricoes_adm', label: 'Inscrições' });
     nav.push({ id: 'eventos_adm', label: 'Gerir Eventos' });
     nav.push({ id: 'carteirinhas_adm', label: 'Carteirinhas' });
     nav.push({ id: 'convenios_adm', label: 'Gerir Convênios' });
@@ -951,8 +1027,8 @@ function navegarPara(tabId) {
   for (var j = 0; j < btns.length; j++) {
     btns[j].classList.toggle('active', btns[j].getAttribute('data-tab') === tabId);
   }
-  var labels = { inicio: 'Início', transparencia: 'Transparência', convenios: 'Convênios', votacoes: 'Votações',
-    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', associados_adm: 'Associados', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs', site_config_adm: 'Configurar Site', noticias_adm: 'Notícias' };
+  var labels = { inicio: 'Início', transparencia: 'Transparência', convenios: 'Convênios', votacoes: 'Votações', eventos: 'Eventos',
+    financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', dependentes: 'Dependentes', documentos: 'Meus Documentos', associados_adm: 'Associados', inscricoes_adm: 'Inscrições', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs', site_config_adm: 'Configurar Site', noticias_adm: 'Notícias' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
 }
 
@@ -1020,6 +1096,8 @@ async function carregarDadosAsync() {
   await carregarConvenios();
   await carregarFinanceiro();
   await carregarVotacoes();
+  await carregarDependentes();
+  await carregarDocumentos();
   
   if (usuarioAtual && (usuarioAtual.perfil === 'tesoureiro' || usuarioAtual.perfil === 'diretor' || usuarioAtual.perfil === 'presidente')) {
     await carregarAssociados();
@@ -1027,6 +1105,7 @@ async function carregarDadosAsync() {
   if (usuarioAtual && (usuarioAtual.perfil === 'diretor' || usuarioAtual.perfil === 'presidente')) {
     await carregarLogs();
     await carregarGestoes();
+    await carregarInscricoes();
     crtCarregarConfig();
     crtCarregarLista();
     await carregarSiteConfig();
@@ -1051,22 +1130,236 @@ async function carregarEventos() {
       });
       document.getElementById('dashEventos').innerHTML = html;
       // Tabela admin de eventos
-      var admHtml = '<table><thead><tr><th>Data</th><th>Título</th><th>Local</th><th>Visível</th></tr></thead><tbody>';
+      var admHtml = '<table><thead><tr><th>Data</th><th>Título</th><th>Local</th><th>Inscritos</th><th>Visível</th><th></th></tr></thead><tbody>';
       data.dados.forEach(function(e) {
-        admHtml += '<tr><td>' + new Date(e.data).toLocaleDateString('pt-BR') + '</td><td style="font-weight:600">' + e.titulo + '</td><td>' + (e.local || '-') + '</td><td>' + (e.visivel !== false ? '✓' : '✗') + '</td></tr>';
+        admHtml += '<tr><td>' + new Date(e.data).toLocaleDateString('pt-BR') + '</td><td style="font-weight:600">' + e.titulo + '</td><td>' + (e.local || '-') + '</td><td>' + (e.totalInscritos || 0) + '</td><td>' + (e.visivel !== false ? '✓' : '✗') + '</td><td><button class="btn btn-sm" onclick="verInscritos(' + e.id + ',\'' + String(e.titulo).replace(/'/g, "\\'") + '\')">Inscritos</button></td></tr>';
       });
       admHtml += '</tbody></table>';
       document.getElementById('eventosAdmTabela').innerHTML = admHtml;
+
+      // Lista de eventos do membro (com inscrição)
+      var memHtml = '';
+      data.dados.forEach(function(e) {
+        var dt = new Date(e.data);
+        var btn = e.inscrito
+          ? '<button class="btn btn-sm" style="background:#fee2e2;color:#b91c1c" onclick="desinscreverEvento(' + e.id + ')">Cancelar inscrição</button>'
+          : '<button class="btn btn-primary btn-sm" onclick="inscreverEvento(' + e.id + ')">Confirmar presença</button>';
+        memHtml += '<div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h3 style="font-size:15px;font-weight:700;color:#1f2937">' + e.titulo + '</h3><p style="font-size:12px;color:#6b7280">' + dt.toLocaleDateString('pt-BR') + (e.horario ? ' · ' + e.horario : '') + ' · ' + (e.local || 'Local a definir') + '</p>' + (e.descricao ? '<p style="font-size:13px;color:#4b5563;margin-top:4px">' + e.descricao + '</p>' : '') + '</div><div style="text-align:right"><p style="font-size:12px;color:#6b7280;margin-bottom:6px">' + (e.totalInscritos || 0) + ' inscrito(s)</p>' + btn + '</div></div></div>';
+      });
+      document.getElementById('eventosList').innerHTML = memHtml || '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
     } else {
       document.getElementById('dashConvenios').textContent = '0';
       document.getElementById('dashEventos').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
       document.getElementById('eventosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum evento cadastrado.</p>';
+      document.getElementById('eventosList').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
     }
   } catch (error) {
     console.error('Erro ao carregar eventos:', error);
     document.getElementById('dashEventos').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
     document.getElementById('eventosAdmTabela').innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum evento cadastrado.</p>';
+    document.getElementById('eventosList').innerHTML = '<p style="color:#9ca3af;font-size:13px">Nenhum evento agendado.</p>';
   }
+}
+
+async function inscreverEvento(id) {
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/eventos/' + id + '/inscrever', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.sucesso) { carregarEventos(); } else { alert(d.erro || 'Não foi possível se inscrever.'); }
+  } catch (e) { console.error(e); alert('Erro ao se inscrever.'); }
+}
+
+async function desinscreverEvento(id) {
+  try {
+    if (!confirm('Cancelar sua inscrição neste evento?')) return;
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/eventos/' + id + '/inscrever', { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.sucesso) { carregarEventos(); } else { alert(d.erro || 'Não foi possível cancelar.'); }
+  } catch (e) { console.error(e); alert('Erro ao cancelar inscrição.'); }
+}
+
+async function verInscritos(id, titulo) {
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/eventos/' + id + '/inscritos', { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (!d.sucesso) { alert(d.erro || 'Erro ao carregar inscritos.'); return; }
+    var linhas = d.dados.map(function(i, idx) {
+      return (idx + 1) + '. ' + i.nome + ' — ' + (i.cpf || '') + (i.whatsapp ? ' — ' + i.whatsapp : '');
+    }).join('\n');
+    alert('Inscritos em "' + titulo + '" (' + d.total + '):\n\n' + (linhas || 'Nenhum inscrito.'));
+  } catch (e) { console.error(e); alert('Erro ao carregar inscritos.'); }
+}
+
+// ===== DEPENDENTES =====
+async function carregarDependentes() {
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/dependentes', { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    var el = document.getElementById('dependentesTabela');
+    if (!el) return;
+    if (d.sucesso && d.dados && d.dados.length) {
+      var html = '<table><thead><tr><th>Nome</th><th>Parentesco</th><th>Nascimento</th><th></th></tr></thead><tbody>';
+      d.dados.forEach(function(dep) {
+        var nasc = dep.dataNascimento ? new Date(dep.dataNascimento).toLocaleDateString('pt-BR') : '-';
+        html += '<tr><td style="font-weight:600">' + dep.nome + '</td><td>' + (dep.parentesco || '-') + '</td><td>' + nasc + '</td><td><button class="btn btn-sm" style="background:#fee2e2;color:#b91c1c" onclick="excluirDependente(' + dep.id + ')">Remover</button></td></tr>';
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    } else {
+      el.innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum dependente cadastrado.</p>';
+    }
+  } catch (e) { console.error('Erro ao carregar dependentes:', e); }
+}
+
+async function adicionarDependente() {
+  var nome = document.getElementById('depNome').value.trim();
+  if (!nome) { alert('Informe o nome do dependente.'); return; }
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/dependentes', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: nome,
+        parentesco: document.getElementById('depParentesco').value.trim(),
+        dataNascimento: document.getElementById('depNascimento').value || null
+      })
+    });
+    const d = await r.json();
+    if (d.sucesso) {
+      document.getElementById('depNome').value = '';
+      document.getElementById('depParentesco').value = '';
+      document.getElementById('depNascimento').value = '';
+      carregarDependentes();
+    } else { alert(d.erro || 'Erro ao adicionar.'); }
+  } catch (e) { console.error(e); alert('Erro ao adicionar dependente.'); }
+}
+
+async function excluirDependente(id) {
+  if (!confirm('Remover este dependente?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/dependentes/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.sucesso) { carregarDependentes(); } else { alert(d.erro || 'Erro ao remover.'); }
+  } catch (e) { console.error(e); alert('Erro ao remover dependente.'); }
+}
+
+// ===== DOCUMENTOS =====
+async function carregarDocumentos() {
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/documentos', { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    var el = document.getElementById('documentosTabela');
+    if (!el) return;
+    if (d.sucesso && d.dados && d.dados.length) {
+      var html = '<table><thead><tr><th>Nome</th><th>Tamanho</th><th>Enviado em</th><th></th></tr></thead><tbody>';
+      d.dados.forEach(function(doc) {
+        var tam = doc.tamanho ? (doc.tamanho / 1024).toFixed(0) + ' KB' : '-';
+        var dt = doc.createdAt ? new Date(doc.createdAt).toLocaleDateString('pt-BR') : '-';
+        html += '<tr><td style="font-weight:600">' + doc.nome + '</td><td>' + tam + '</td><td>' + dt + '</td><td style="white-space:nowrap"><a class="btn btn-sm" href="/api/documentos/' + doc.id + '/download?token=' + token + '" onclick="return baixarDocumento(event,' + doc.id + ')">Baixar</a> <button class="btn btn-sm" style="background:#fee2e2;color:#b91c1c" onclick="excluirDocumento(' + doc.id + ')">Excluir</button></td></tr>';
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    } else {
+      el.innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhum documento enviado.</p>';
+    }
+  } catch (e) { console.error('Erro ao carregar documentos:', e); }
+}
+
+async function enviarDocumento() {
+  var fileInput = document.getElementById('docArquivo');
+  if (!fileInput.files || !fileInput.files[0]) { alert('Selecione um arquivo.'); return; }
+  try {
+    const token = localStorage.getItem('token');
+    var fd = new FormData();
+    fd.append('arquivo', fileInput.files[0]);
+    fd.append('nome', document.getElementById('docNome').value.trim() || fileInput.files[0].name);
+    const r = await fetch('/api/documentos', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd });
+    const d = await r.json();
+    if (d.sucesso) {
+      document.getElementById('docNome').value = '';
+      fileInput.value = '';
+      carregarDocumentos();
+    } else { alert(d.erro || 'Erro ao enviar.'); }
+  } catch (e) { console.error(e); alert('Erro ao enviar documento.'); }
+}
+
+async function baixarDocumento(ev, id) {
+  ev.preventDefault();
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/documentos/' + id + '/download', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!r.ok) { alert('Erro ao baixar documento.'); return false; }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) { console.error(e); alert('Erro ao baixar documento.'); }
+  return false;
+}
+
+async function excluirDocumento(id) {
+  if (!confirm('Excluir este documento?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/documentos/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.sucesso) { carregarDocumentos(); } else { alert(d.erro || 'Erro ao excluir.'); }
+  } catch (e) { console.error(e); alert('Erro ao excluir documento.'); }
+}
+
+// ===== INSCRIÇÕES (aprovação - diretoria) =====
+async function carregarInscricoes() {
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/associados/pendentes', { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    var el = document.getElementById('inscricoesTabela');
+    if (!el) return;
+    if (d.sucesso && d.dados && d.dados.length) {
+      var html = '<table><thead><tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Contato</th><th>Enviada em</th><th></th></tr></thead><tbody>';
+      d.dados.forEach(function(a) {
+        var dt = a.createdAt ? new Date(a.createdAt).toLocaleDateString('pt-BR') : '-';
+        var contato = [a.email, a.whatsapp].filter(Boolean).join(' · ') || '-';
+        html += '<tr><td style="font-weight:600">' + a.nomeCompleto + '</td><td>' + a.cpf + '</td><td>' + (a.cargo || '-') + '</td><td style="font-size:12px">' + contato + '</td><td>' + dt + '</td><td style="white-space:nowrap"><button class="btn btn-primary btn-sm" onclick="aprovarInscricao(' + a.id + ')">Aprovar</button> <button class="btn btn-sm" style="background:#fee2e2;color:#b91c1c" onclick="rejeitarInscricao(' + a.id + ')">Rejeitar</button></td></tr>';
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    } else {
+      el.innerHTML = '<p style="color:#9ca3af;padding:16px;text-align:center">Nenhuma inscrição pendente.</p>';
+    }
+  } catch (e) { console.error('Erro ao carregar inscrições:', e); }
+}
+
+async function aprovarInscricao(id) {
+  if (!confirm('Aprovar esta inscrição e ativar o associado?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/associados/' + id + '/aprovar', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.sucesso) { carregarInscricoes(); carregarAssociados(); } else { alert(d.erro || 'Erro ao aprovar.'); }
+  } catch (e) { console.error(e); alert('Erro ao aprovar inscrição.'); }
+}
+
+async function rejeitarInscricao(id) {
+  if (!confirm('Rejeitar e remover esta inscrição?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/associados/' + id + '/rejeitar', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.sucesso) { carregarInscricoes(); } else { alert(d.erro || 'Erro ao rejeitar.'); }
+  } catch (e) { console.error(e); alert('Erro ao rejeitar inscrição.'); }
 }
 
 async function carregarConvenios() {
@@ -1351,13 +1644,56 @@ async function carregarVotacoes() {
       } else {
         data.dados.forEach(function(v) {
           var statusCls = v.status === 'Aberta' ? 'badge-green' : 'badge-gray';
-          html += '<div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center"><div><h3 style="font-size:15px;font-weight:700;color:#1f2937">' + v.titulo + '</h3><p style="font-size:12px;color:#6b7280">Encerra em: ' + (v.dataFim || 'Sem data') + '</p></div><div style="text-align:right"><span class="badge ' + statusCls + '">' + v.status + '</span><p style="font-size:12px;color:#6b7280;margin-top:4px">' + v.votos + ' votos</p></div></div></div>';
+          html += '<div class="card" style="margin-bottom:12px"><div class="card-body">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><h3 style="font-size:15px;font-weight:700;color:#1f2937">' + v.titulo + '</h3><p style="font-size:12px;color:#6b7280">Encerra em: ' + (v.dataFim || 'Sem data') + '</p></div><div style="text-align:right"><span class="badge ' + statusCls + '">' + v.status + '</span><p style="font-size:12px;color:#6b7280;margin-top:4px">' + (v.totalVotos || 0) + ' votos</p></div></div>';
+
+          // Opções de voto
+          if (v.opcoes && v.opcoes.length) {
+            html += '<div style="display:flex;flex-direction:column;gap:8px">';
+            v.opcoes.forEach(function(o) {
+              var total = v.totalVotos || 0;
+              var votosOp = o._count ? o._count.votos : 0;
+              var pct = total ? Math.round((votosOp / total) * 100) : 0;
+              var ehMinha = v.opcaoVotada === o.id;
+              if (v.status === 'Aberta' && !v.jaVotou) {
+                html += '<button class="btn btn-sm" style="text-align:left;border:1px solid #d1d5db;background:#fff" onclick="votar(' + v.id + ',' + o.id + ',this)">' + o.texto + '</button>';
+              } else {
+                html += '<div style="border:1px solid ' + (ehMinha ? '#2563eb' : '#e5e7eb') + ';border-radius:6px;padding:8px 10px;background:' + (ehMinha ? '#eff6ff' : '#f9fafb') + '"><div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:' + (ehMinha ? '700' : '500') + '">' + o.texto + (ehMinha ? ' ✓' : '') + '</span><span style="color:#6b7280">' + votosOp + ' (' + pct + '%)</span></div><div style="height:6px;background:#e5e7eb;border-radius:3px;margin-top:6px"><div style="height:100%;width:' + pct + '%;background:' + (ehMinha ? '#2563eb' : '#9ca3af') + ';border-radius:3px"></div></div></div>';
+              }
+            });
+            html += '</div>';
+          }
+          if (v.jaVotou) {
+            html += '<p style="font-size:12px;color:#059669;margin-top:8px">✓ Você já votou nesta votação.</p>';
+          }
+          html += '</div></div>';
         });
       }
       document.getElementById('votacoesList').innerHTML = html;
     }
   } catch (error) {
     console.error('Erro ao carregar votações:', error);
+  }
+}
+
+async function votar(votacaoId, opcaoId, btn) {
+  try {
+    if (!confirm('Confirmar seu voto? Esta ação não pode ser desfeita.')) return;
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/votacoes/' + votacaoId + '/votar', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ opcaoId: opcaoId })
+    });
+    const data = await response.json();
+    if (data.sucesso) {
+      carregarVotacoes();
+    } else {
+      alert(data.erro || 'Não foi possível registrar o voto.');
+    }
+  } catch (error) {
+    console.error('Erro ao votar:', error);
+    alert('Erro ao registrar voto.');
   }
 }
 
