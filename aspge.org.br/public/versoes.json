@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T12:19:04.489Z",
+  "geradoEm": "2026-09-24T12:30:24.541Z",
   "versoes": [
+    {
+      "versao": "v2.7.6",
+      "data": "24 de set de 2026",
+      "hash": "6ca8118",
+      "titulo": "fix: foto da carteirinha sem distorcao - escala uniforme preserva proporcao, object-fit cover no fallback",
+      "tipo": "fixed",
+      "itens": [
+        "fix: foto da carteirinha sem distorcao - escala uniforme preserva proporcao, object-fit cover no fallback"
+      ]
+    },
     {
       "versao": "v2.7.5",
       "data": "24 de set de 2026",
