@@ -1106,6 +1106,7 @@ async function carregarDadosUsuario() {
       navegarPara('inicio');
       carregarDadosAsync();
       myCardInit();
+      dashCardInit();
     } else {
       // Token inválido/expirado ou usuário inexistente — limpar e ir para o login
       localStorage.removeItem('token');
