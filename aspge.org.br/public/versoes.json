@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T12:30:24.541Z",
+  "geradoEm": "2026-09-24T12:35:32.991Z",
   "versoes": [
+    {
+      "versao": "v2.8.0",
+      "data": "24 de set de 2026",
+      "hash": "8f5c3cd",
+      "titulo": "feat: amplia zoom da foto da carteirinha - minimo 10% (era 50%), passo 5%, clamp 10-300%",
+      "tipo": "added",
+      "itens": [
+        "feat: amplia zoom da foto da carteirinha - minimo 10% (era 50%), passo 5%, clamp 10-300%"
+      ]
+    },
     {
       "versao": "v2.7.6",
       "data": "24 de set de 2026",
