@@ -9,239 +9,229 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #dc2626 0%, #16a34a 50%, #0075bf 100%);
       min-height: 100vh;
-      padding: 40px 20px;
+      padding: 24px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    .container {
-      max-width: 600px;
-      width: 100%;
-      text-align: center;
-    }
-    .header {
-      margin-bottom: 32px;
-      color: #fff;
-    }
-    .header h1 {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .header p {
-      opacity: 0.9;
-    }
-    .card-container {
-      background: #fff;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    .card {
-      width: 100%;
-      max-width: 400px;
-      aspect-ratio: 85/54;
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-      margin: 0 auto 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      background: #f5f5f5;
-    }
-    .card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .card-side-tabs {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 24px;
-    }
+    .container { max-width: 560px; width: 100%; text-align: center; }
+    .header { margin-bottom: 20px; color: #fff; }
+    .header h1 { font-size: 22px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.25); }
+    .header p { opacity: 0.9; font-size: 13px; }
+    .card-side-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
     .tab-btn {
-      padding: 12px 24px;
-      border: none;
-      background: #f3f4f6;
-      color: #6b7280;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 10px 28px; border: none; background: rgba(255,255,255,0.25); color: #fff;
+      border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s;
+      backdrop-filter: blur(4px);
     }
-    .tab-btn.active {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
+    .tab-btn.active { background: #fff; color: #111827; }
+    /* O cartão é renderizado em tamanho real (85.6×53.98mm) e escalado via transform p/ caber na tela */
+    .card-scaler { width: 100%; position: relative; }
+    .card {
+      width: 85.6mm; height: 53.98mm; position: relative; overflow: hidden;
+      border-radius: 4mm; background: #e5e7eb; transform-origin: top left;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
     }
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      text-align: left;
-      margin-bottom: 24px;
+    .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+    .photo-frame {
+      position: absolute; overflow: hidden; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.5);
     }
-    .info-item {
-      padding: 12px;
-      background: #f9fafb;
-      border-radius: 10px;
+    .photo-frame img { position: absolute; }
+    .ov { position: absolute; white-space: nowrap; line-height: 1; font-family: 'Inter', sans-serif; }
+    /* Nome e cargo podem quebrar linha (nomes longos) — igual ao export PDF */
+    #cardNome, #cardCargo { white-space: normal; max-width: 55%; line-height: 1.2; }
+    .no-template {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      color: #6b7280; font-size: 4mm; padding: 4mm; text-align: center;
     }
-    .info-label {
-      font-size: 12px;
-      color: #9ca3af;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .info-value {
-      font-size: 15px;
-      font-weight: 700;
-      color: #1f2937;
-    }
-    .btn-download {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(16,185,129,0.4);
-    }
+    .hint { color: rgba(255,255,255,0.85); font-size: 12px; margin-top: 14px; }
     .back-link {
-      display: inline-block;
-      margin-top: 24px;
-      color: #fff;
-      text-decoration: none;
-      font-weight: 600;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      display: inline-block; margin-top: 20px; color: #fff; text-decoration: none;
+      font-weight: 700; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.25);
     }
-    .loading {
-      padding: 40px;
-      color: #9ca3af;
-    }
-    @media (max-width: 480px) {
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+    .loading { padding: 60px 20px; color: rgba(255,255,255,0.9); font-size: 15px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>Carteirinha Digital</h1>
-      <p>ASPGE-PA - Associação dos Servidores da PGE-PA</p>
+      <p>ASPGE-PA · Associação dos Procuradores do Estado do Pará</p>
     </div>
-    
-    <div class="card-container">
-      <div class="card-side-tabs">
-        <button class="tab-btn active" id="tabFrente" onclick="showSide('frente')">Frente</button>
-        <button class="tab-btn" id="tabVerso" onclick="showSide('verso')">Verso</button>
-      </div>
-      
-      <div id="cardFrente" class="card-content">
-        <div class="card" id="cardFrenteImg">
-          <img src="/public/uploads/templates/template_frente.png" alt="Carteirinha Frente" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding:40px;text-align:center;color:#999\'>Template não configurado</div>'">
-        </div>
-      </div>
-      
-      <div id="cardVerso" class="card-content" style="display:none">
-        <div class="card" id="cardVersoImg">
-          <img src="/public/uploads/templates/template_verso.png" alt="Carteirinha Verso" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding:40px;text-align:center;color:#999\'>Template não configurado</div>'">
-        </div>
-      </div>
-      
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Nome</div>
-          <div class="info-value" id="infoNome">Carregando...</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Matrícula</div>
-          <div class="info-value" id="infoMatricula">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Cargo</div>
-          <div class="info-value" id="infoCargo">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Validade</div>
-          <div class="info-value" id="infoValidade">-</div>
-        </div>
-      </div>
-      
-      <button class="btn-download" onclick="downloadCard()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Baixar Carteirinha
-      </button>
+
+    <div class="card-side-tabs">
+      <button class="tab-btn active" id="tabFrente" onclick="showSide('frente')">Frente</button>
+      <button class="tab-btn" id="tabVerso" onclick="showSide('verso')">Verso</button>
     </div>
-    
+
+    <div class="card-scaler" id="scalerFrente">
+      <div class="card" id="cardFrente">
+        <img id="bgFrente" class="card-bg" alt="">
+        <div id="photoFrame" class="photo-frame"><img id="photoImg" alt=""></div>
+        <span class="ov" id="cardLblNome">ASSOCIADO:</span>
+        <span class="ov" id="cardNome"></span>
+        <span class="ov" id="cardLblMatricula">MATRÍCULA:</span>
+        <span class="ov" id="cardMatricula"></span>
+        <span class="ov" id="cardLblCargo">CARGO:</span>
+        <span class="ov" id="cardCargo"></span>
+        <span class="ov" id="cardLblEmissao">EMISSÃO:</span>
+        <span class="ov" id="cardEmissao"></span>
+        <span class="ov" id="cardLblValidade">VALIDADE:</span>
+        <span class="ov" id="cardValidade"></span>
+      </div>
+    </div>
+
+    <div class="card-scaler" id="scalerVerso" style="display:none">
+      <div class="card" id="cardVerso">
+        <img id="bgVerso" class="card-bg" alt="">
+        <span class="ov" id="cardLblDadosPessoais">DADOS PESSOAIS</span>
+        <span class="ov" id="cardLblCpf">CPF:</span>
+        <span class="ov" id="cardCpf"></span>
+        <span class="ov" id="cardLblRg">RG:</span>
+        <span class="ov" id="cardRg"></span>
+      </div>
+    </div>
+
+    <div class="loading" id="loadingMsg">Carregando sua carteirinha…</div>
+    <p class="hint">Apresente esta tela para identificação como associado.</p>
     <a href="/portal" class="back-link">← Voltar para o Portal</a>
   </div>
 
   <script>
-    let currentSide = 'frente';
-    
-    // Carregar dados do usuário
-    async function carregarDados() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        window.location.href = '/';
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/auth/perfil', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        const data = await response.json();
-        
-        if (data.sucesso) {
-          document.getElementById('infoNome').textContent = data.dados.nomeCompleto;
-          document.getElementById('infoMatricula').textContent = data.dados.matricula || 'N/A';
-          document.getElementById('infoCargo').textContent = data.dados.cargo || 'N/A';
-          
-          // Validade: 4 anos a partir de hoje
-          const hoje = new Date();
-          const validade = new Date(hoje.getFullYear() + 4, hoje.getMonth(), hoje.getDate());
-          document.getElementById('infoValidade').textContent = validade.toLocaleDateString('pt-BR');
-        }
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+    var fotoCfg = null;
+
+    function fmtData(d) {
+      return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+    }
+
+    // Escala o cartão (tamanho real em mm) para caber na largura da tela
+    function fitCards() {
+      ['scalerFrente','scalerVerso'].forEach(function(sid){
+        var scaler = document.getElementById(sid);
+        if (!scaler || scaler.clientWidth === 0) return;
+        var card = scaler.querySelector('.card');
+        var scale = scaler.clientWidth / card.offsetWidth;
+        card.style.transform = 'scale(' + scale + ')';
+        scaler.style.height = (card.offsetHeight * scale) + 'px';
+      });
+      aplicarFoto();
+    }
+
+    // Posiciona a foto dentro do frame conforme fotoConfig salvo (mesma lógica do portal)
+    function aplicarFoto() {
+      var img = document.getElementById('photoImg');
+      var frame = document.getElementById('photoFrame');
+      if (!img || !frame || !img.src || img.style.display === 'none') return;
+      var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
+      if (!frameW || !frameH) return;
+      if (fotoCfg) {
+        var zoom = fotoCfg.zoom || 1;
+        var ratioW = frameW / (fotoCfg.frameW || frameW);
+        var ratioH = frameH / (fotoCfg.frameH || frameH);
+        img.style.width  = (img.naturalWidth  * zoom * ratioW) + 'px';
+        img.style.height = (img.naturalHeight * zoom * ratioH) + 'px';
+        img.style.left = ((fotoCfg.x || 0) * ratioW) + 'px';
+        img.style.top  = ((fotoCfg.y || 0) * ratioH) + 'px';
+      } else {
+        img.style.width = '100%'; img.style.height = '100%'; img.style.left = '0'; img.style.top = '0';
       }
     }
-    
+
     function showSide(side) {
-      currentSide = side;
-      
-      document.getElementById('cardFrente').style.display = side === 'frente' ? 'block' : 'none';
-      document.getElementById('cardVerso').style.display = side === 'verso' ? 'block' : 'none';
-      
+      document.getElementById('scalerFrente').style.display = side === 'frente' ? 'block' : 'none';
+      document.getElementById('scalerVerso').style.display  = side === 'verso'  ? 'block' : 'none';
       document.getElementById('tabFrente').classList.toggle('active', side === 'frente');
       document.getElementById('tabVerso').classList.toggle('active', side === 'verso');
+      fitCards();
     }
-    
-    function downloadCard() {
-      // TODO: Implementar download usando html2canvas ou API
-      alert('Função de download em desenvolvimento. Use a função de exportação no portal.');
+
+    async function init() {
+      var token = localStorage.getItem('token');
+      if (!token) { window.location.href = '/login'; return; }
+      var headers = { 'Authorization': 'Bearer ' + token };
+      try {
+        var results = await Promise.all([
+          fetch('/api/auth/perfil', { headers: headers }).then(function(r){ return r.json(); }),
+          fetch('/api/carteirinhas/config', { headers: headers }).then(function(r){ return r.json(); })
+        ]);
+        var perfil = results[0], cfg = results[1];
+        if (!perfil.sucesso) { window.location.href = '/login'; return; }
+        var d = perfil.dados;
+
+        // Templates de fundo
+        if (cfg.templateFrente) {
+          document.getElementById('bgFrente').src = cfg.templateFrente + '?t=' + Date.now();
+        } else {
+          document.getElementById('bgFrente').outerHTML = '<div class="no-template">Template da frente não configurado</div>';
+        }
+        if (cfg.templateVerso) {
+          document.getElementById('bgVerso').src = cfg.templateVerso + '?t=' + Date.now();
+        } else {
+          document.getElementById('bgVerso').outerHTML = '<div class="no-template">Template do verso não configurado</div>';
+        }
+
+        // Posicionar frame da foto e campos conforme config salva
+        if (cfg.config) {
+          try {
+            var c = JSON.parse(cfg.config);
+            if (c.frame) {
+              var f = document.getElementById('photoFrame');
+              f.style.left = c.frame.left + '%'; f.style.top = c.frame.top + '%';
+              f.style.width = c.frame.width + '%'; f.style.height = c.frame.height + '%';
+            } else {
+              document.getElementById('photoFrame').style.display = 'none';
+            }
+            if (c.campos) {
+              for (var sid in c.campos) {
+                var el = document.getElementById(sid);
+                if (!el) continue;
+                var cc = c.campos[sid];
+                el.style.left = cc.left + '%'; el.style.top = cc.top + '%';
+                el.style.fontSize = cc.fontSize + 'mm';
+                el.style.color = cc.color; el.style.fontWeight = cc.fontWeight;
+                if (cc.text) el.textContent = cc.text;
+              }
+            }
+          } catch(e) {}
+        } else {
+          document.getElementById('photoFrame').style.display = 'none';
+        }
+
+        // Dados do associado
+        document.getElementById('cardNome').textContent = d.nomeCompleto || '';
+        document.getElementById('cardMatricula').textContent = d.matricula || '';
+        document.getElementById('cardCargo').textContent = d.cargoGestao || d.cargo || '';
+        document.getElementById('cardCpf').textContent = d.cpf || '';
+        document.getElementById('cardRg').textContent = d.rg || '';
+        var hoje = new Date();
+        document.getElementById('cardEmissao').textContent = fmtData(hoje);
+        var val = new Date(hoje); val.setFullYear(val.getFullYear() + 4);
+        document.getElementById('cardValidade').textContent = fmtData(val);
+
+        // Foto
+        var foto = d.fotoCarteirinhaUrl || d.fotoUrl;
+        if (foto) {
+          var img = document.getElementById('photoImg');
+          img.src = foto;
+          img.style.display = 'block';
+          try { if (d.fotoConfig) fotoCfg = JSON.parse(d.fotoConfig); } catch(e) {}
+          img.onload = aplicarFoto;
+          if (img.complete) aplicarFoto();
+        }
+
+        document.getElementById('loadingMsg').style.display = 'none';
+        fitCards();
+      } catch (e) {
+        console.error('Erro ao carregar carteirinha:', e);
+        document.getElementById('loadingMsg').textContent = 'Erro ao carregar. Tente novamente.';
+      }
     }
-    
-    // Inicializar
-    carregarDados();
+
+    window.addEventListener('resize', fitCards);
+    init();
   </script>
 </body>
 </html>

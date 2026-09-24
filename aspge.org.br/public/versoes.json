@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T01:08:44.265Z",
+  "geradoEm": "2026-09-24T01:35:09.809Z",
   "versoes": [
+    {
+      "versao": "v2.2.0",
+      "data": "23 de set de 2026",
+      "hash": "e048d27",
+      "titulo": "feat: votacao real, inscricao em eventos, aprovacao de inscricao, documentos, dependentes, recuperacao de senha e PDF de carteirinha",
+      "tipo": "added",
+      "itens": [
+        "feat: votacao real, inscricao em eventos, aprovacao de inscricao, documentos, dependentes, recuperacao de senha e PDF de carteirinha"
+      ]
+    },
     {
       "versao": "v2.1.3",
       "data": "23 de set de 2026",
