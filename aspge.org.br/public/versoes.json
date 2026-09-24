@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T09:53:01.187Z",
+  "geradoEm": "2026-09-24T10:22:25.609Z",
   "versoes": [
+    {
+      "versao": "v2.4.1",
+      "data": "24 de set de 2026",
+      "hash": "e996f3e",
+      "titulo": "fix: portal redireciona p/ login quando perfil falha (token invalido/usuario inexistente); bump SW cache v2",
+      "tipo": "fixed",
+      "itens": [
+        "fix: portal redireciona p/ login quando perfil falha (token invalido/usuario inexistente); bump SW cache v2"
+      ]
+    },
     {
       "versao": "v2.4.0",
       "data": "24 de set de 2026",

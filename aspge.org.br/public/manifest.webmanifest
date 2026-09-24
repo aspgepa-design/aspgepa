@@ -3,7 +3,7 @@
   "short_name": "ASPGE-PA",
   "description": "Portal do associado da ASPGE-PA: carteirinha digital, convênios, votações, eventos e transparência.",
   "id": "/",
-  "start_url": "/portal",
+  "start_url": "/carteirinha",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
