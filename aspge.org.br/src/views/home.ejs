@@ -257,9 +257,9 @@ section[id]{scroll-margin-top:84px}
       </div>
       <div>
         <h4>Contato</h4>
-        <p style="opacity:.8;font-size:14px;line-height:1.7">Belém, Pará — Brasil<br><a href="mailto:contato@aspgepa.org.br" style="display:inline;padding:0">contato@aspgepa.org.br</a></p>
+        <p id="footer-contato" style="opacity:.8;font-size:14px;line-height:1.7">Belém, Pará — Brasil<br><a href="mailto:contato@aspgepa.org.br" style="display:inline;padding:0">contato@aspgepa.org.br</a></p>
       </div>
-      <div>
+      <div id="footer-redes-wrap">
         <h4>Redes Sociais</h4>
         <div id="redes-sociais">
           <a href="#" target="_blank" rel="noopener">Instagram</a>
@@ -304,6 +304,25 @@ async function carregarConfig() {
           if (/^\s*javascript:/i.test(url)) url = '#'; // bloqueia javascript:
           return '<a href="' + esc(url) + '">' + esc(link.titulo) + '</a>';
         }).join('');
+      }
+
+      // Contato
+      var contatoHtml = '';
+      if (config.contatoEndereco) contatoHtml += esc(config.contatoEndereco) + '<br>';
+      if (config.contatoEmail) contatoHtml += '<a href="mailto:' + esc(config.contatoEmail) + '" style="display:inline;padding:0">' + esc(config.contatoEmail) + '</a><br>';
+      if (config.contatoTelefone) contatoHtml += esc(config.contatoTelefone);
+      if (contatoHtml) document.getElementById('footer-contato').innerHTML = contatoHtml;
+
+      // Redes sociais
+      if (config.redesSociais && config.redesSociais.length > 0) {
+        var redes = config.redesSociais.filter(function(r){ return r && r.url && !/^\s*javascript:/i.test(String(r.url)); });
+        if (redes.length) {
+          document.getElementById('redes-sociais').innerHTML = redes.map(function(r){
+            return '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.nome || 'Link') + '</a>';
+          }).join('');
+        } else {
+          document.getElementById('footer-redes-wrap').style.display = 'none';
+        }
       }
     }
   } catch (error) {

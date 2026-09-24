@@ -1,6 +1,26 @@
 {
-  "geradoEm": "2026-09-24T19:29:18.198Z",
+  "geradoEm": "2026-09-24T23:25:56.827Z",
   "versoes": [
+    {
+      "versao": "v2.15.0",
+      "data": "24 de set de 2026",
+      "hash": "5bbc2eb",
+      "titulo": "docs: adiciona CHECKLIST.md do projeto e instrui orchestrator a acompanhar pendencias",
+      "tipo": "added",
+      "itens": [
+        "docs: adiciona CHECKLIST.md do projeto e instrui orchestrator a acompanhar pendencias"
+      ]
+    },
+    {
+      "versao": "v2.14.0",
+      "data": "24 de set de 2026",
+      "hash": "5bb8cd7",
+      "titulo": "feat(portal): menu lateral reorganizado em categorias colapsaveis (Minha Conta, Portal, Administracao, Sistema)",
+      "tipo": "added",
+      "itens": [
+        "feat(portal): menu lateral reorganizado em categorias colapsaveis (Minha Conta, Portal, Administracao, Sistema)"
+      ]
+    },
     {
       "versao": "v2.13.0",
       "data": "24 de set de 2026",

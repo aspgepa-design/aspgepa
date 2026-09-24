@@ -6,8 +6,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
 
 const logger = require('./src/config/logger');
+const swaggerSpec = require('./src/config/swagger');
 
 // Importar rotas
 const authRoutes = require('./src/routes/auth');
@@ -47,6 +50,26 @@ app.use(compression());
 // Logs HTTP
 app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }));
 
+// Rate limiting
+// Geral: protege toda a API contra abuso
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { erro: 'Muitas requisições. Tente novamente mais tarde.' }
+});
+// Auth: mais restrito p/ mitigar força bruta no login
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { erro: 'Muitas tentativas de login. Tente novamente em alguns minutos.' }
+});
+app.use('/api/', apiLimiter);
+app.use('/api/auth/login', authLimiter);
+
 // Parse JSON e URL encoded
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -70,6 +93,10 @@ app.get('/manifest.webmanifest', (req, res) => {
   res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
   res.sendFile(path.join(__dirname, 'public', 'manifest.webmanifest'));
 });
+
+// Documentação interativa da API (Swagger UI)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customSiteTitle: 'ASPGE-PA API Docs' }));
+app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
 
 // Health check
 app.get('/health', (req, res) => {

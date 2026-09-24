@@ -948,6 +948,26 @@ tbody tr:hover{background:#f9fafb}
                     <input type="text" id="scBannerAlt" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
                   </div>
                 </div>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:4px 0">
+                <h3 style="font-size:15px;font-weight:700;color:#374151">Contato (rodapé)</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                  <div>
+                    <label style="display:block;font-weight:600;margin-bottom:8px">E-mail de contato</label>
+                    <input type="email" id="scContatoEmail" placeholder="contato@aspgepa.org.br" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                  </div>
+                  <div>
+                    <label style="display:block;font-weight:600;margin-bottom:8px">Telefone / WhatsApp</label>
+                    <input type="text" id="scContatoTelefone" placeholder="(91) 99999-9999" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-weight:600;margin-bottom:8px">Endereço</label>
+                  <input type="text" id="scContatoEndereco" placeholder="Belém, Pará — Brasil" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">
+                </div>
+                <h3 style="font-size:15px;font-weight:700;color:#374151">Redes Sociais (rodapé)</h3>
+                <div id="scRedesList" style="display:grid;gap:10px"></div>
+                <button type="button" class="btn" onclick="scAddRede()" style="justify-content:center;background:#f3f4f6">+ Adicionar rede social</button>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:4px 0">
                 <div style="display:flex;gap:24px">
                   <label style="display:flex;align-items:center;gap:8px">
                     <input type="checkbox" id="scMostrarEnquetes">
@@ -3127,10 +3147,44 @@ async function carregarSiteConfig() {
       document.getElementById('scMostrarEnquetes').checked = config.mostrarEnquetes;
       document.getElementById('scMostrarNoticias').checked = config.mostrarNoticias;
       document.getElementById('scMostrarEventos').checked = config.mostrarEventos;
+      document.getElementById('scContatoEmail').value = config.contatoEmail || '';
+      document.getElementById('scContatoTelefone').value = config.contatoTelefone || '';
+      document.getElementById('scContatoEndereco').value = config.contatoEndereco || '';
+      scRenderRedes(Array.isArray(config.redesSociais) ? config.redesSociais : []);
     }
   } catch (error) {
     console.error('Erro ao carregar configurações do site:', error);
   }
+}
+
+// Redes sociais: linhas dinâmicas nome+url
+function scRenderRedes(redes) {
+  var wrap = document.getElementById('scRedesList');
+  wrap.innerHTML = '';
+  if (!redes.length) redes = [{ nome: '', url: '' }];
+  redes.forEach(function(r){ scAddRede(r.nome, r.url); });
+}
+function scAddRede(nome, url) {
+  var wrap = document.getElementById('scRedesList');
+  var row = document.createElement('div');
+  row.className = 'sc-rede-row';
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:center';
+  row.innerHTML = '<input type="text" class="sc-rede-nome" placeholder="Nome (ex: Instagram)" style="padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">' +
+    '<input type="url" class="sc-rede-url" placeholder="https://..." style="padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px">' +
+    '<button type="button" class="btn" style="background:#fee2e2;color:#b91c1c;padding:10px 14px" onclick="this.parentNode.remove()">✕</button>';
+  row.querySelector('.sc-rede-nome').value = nome || '';
+  row.querySelector('.sc-rede-url').value = url || '';
+  wrap.appendChild(row);
+}
+function scGetRedes() {
+  var rows = document.querySelectorAll('#scRedesList .sc-rede-row');
+  var out = [];
+  rows.forEach(function(row){
+    var nome = row.querySelector('.sc-rede-nome').value.trim();
+    var url = row.querySelector('.sc-rede-url').value.trim();
+    if (nome && url) out.push({ nome: nome, url: url });
+  });
+  return out;
 }
 
 document.getElementById('siteConfigForm').addEventListener('submit', async function(e) {
@@ -3146,7 +3200,11 @@ document.getElementById('siteConfigForm').addEventListener('submit', async funct
     bannerAlt: document.getElementById('scBannerAlt').value,
     mostrarEnquetes: document.getElementById('scMostrarEnquetes').checked,
     mostrarNoticias: document.getElementById('scMostrarNoticias').checked,
-    mostrarEventos: document.getElementById('scMostrarEventos').checked
+    mostrarEventos: document.getElementById('scMostrarEventos').checked,
+    contatoEmail: document.getElementById('scContatoEmail').value,
+    contatoTelefone: document.getElementById('scContatoTelefone').value,
+    contatoEndereco: document.getElementById('scContatoEndereco').value,
+    redesSociais: scGetRedes()
   };
   try {
     const response = await fetch('/api/site-config', {

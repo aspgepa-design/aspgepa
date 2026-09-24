@@ -30,7 +30,8 @@ async function getConfig(req, res) {
     // Parse JSON fields
     const configParsed = {
       ...config,
-      linksRapidos: config.linksRapidos ? JSON.parse(config.linksRapidos) : []
+      linksRapidos: config.linksRapidos ? JSON.parse(config.linksRapidos) : [],
+      redesSociais: config.redesSociais ? JSON.parse(config.redesSociais) : []
     };
     
     res.json({ sucesso: true, dados: configParsed });
@@ -45,15 +46,19 @@ async function updateConfig(req, res) {
   try {
     const dados = req.body;
     
-    // Parse linksRapidos se for string
+    // Parse campos JSON se vierem como string
     if (dados.linksRapidos && typeof dados.linksRapidos === 'string') {
       dados.linksRapidos = JSON.parse(dados.linksRapidos);
     }
+    if (dados.redesSociais && typeof dados.redesSociais === 'string') {
+      dados.redesSociais = JSON.parse(dados.redesSociais);
+    }
     
-    // Stringify linksRapidos para salvar
+    // Stringify campos JSON para salvar
     const dadosAtualizacao = {
       ...dados,
-      linksRapidos: dados.linksRapidos ? JSON.stringify(dados.linksRapidos) : null
+      linksRapidos: dados.linksRapidos ? JSON.stringify(dados.linksRapidos) : null,
+      redesSociais: dados.redesSociais ? JSON.stringify(dados.redesSociais) : null
     };
     
     let config = await prisma.siteConfig.findFirst();
@@ -89,7 +94,8 @@ async function updateConfig(req, res) {
     
     const configParsed = {
       ...config,
-      linksRapidos: config.linksRapidos ? JSON.parse(config.linksRapidos) : []
+      linksRapidos: config.linksRapidos ? JSON.parse(config.linksRapidos) : [],
+      redesSociais: config.redesSociais ? JSON.parse(config.redesSociais) : []
     };
     
     res.json({ sucesso: true, dados: configParsed });

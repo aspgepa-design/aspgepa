@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: aspge-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://aspge:aspge@db:5432/aspge_db
+      JWT_SECRET: ${JWT_SECRET}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/public/uploads
+
+  db:
+    image: postgres:16-alpine
+    container_name: aspge-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aspge
+      POSTGRES_PASSWORD: aspge
+      POSTGRES_DB: aspge_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aspge -d aspge_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pg_data:
+  uploads_data:

@@ -699,6 +699,117 @@ Perfil: Presidente
 
 ---
 
+### Dependentes (`/api/dependentes`)
+
+Todas as rotas exigem autenticação. O associado gerencia os próprios dependentes; a diretoria pode gerenciar de qualquer associado.
+
+#### Listar Dependentes
+```http
+GET /api/dependentes
+Authorization: Bearer <token>
+```
+
+**Resposta:** `200 OK`
+```json
+[
+  {
+    "id": 1,
+    "associadoId": 1,
+    "nome": "Nome do Dependente",
+    "parentesco": "Filho(a)",
+    "dataNascimento": "2010-01-01"
+  }
+]
+```
+
+#### Adicionar Dependente
+```http
+POST /api/dependentes
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "nome": "Nome do Dependente",
+  "parentesco": "Filho(a)",
+  "dataNascimento": "2010-01-01"
+}
+```
+
+**Validação:** `nome` obrigatório.
+
+**Resposta:** `201 Created`
+
+#### Atualizar Dependente
+```http
+PUT /api/dependentes/:id
+Authorization: Bearer <token>
+```
+
+**Resposta:** `200 OK`
+
+#### Excluir Dependente
+```http
+DELETE /api/dependentes/:id
+Authorization: Bearer <token>
+```
+
+**Resposta:** `200 OK`
+
+---
+
+### Documentos (`/api/documentos`)
+
+Todas as rotas exigem autenticação. O associado gerencia os próprios documentos; a diretoria pode gerenciar de qualquer associado.
+
+#### Listar Documentos
+```http
+GET /api/documentos
+Authorization: Bearer <token>
+```
+
+**Resposta:** `200 OK`
+```json
+[
+  {
+    "id": 1,
+    "associadoId": 1,
+    "titulo": "Comprovante",
+    "arquivoUrl": "/uploads/documentos/arquivo.pdf",
+    "createdAt": "2024-01-01"
+  }
+]
+```
+
+#### Upload de Documento
+```http
+POST /api/documentos
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+arquivo: <arquivo>
+titulo: "Comprovante"
+```
+
+**Resposta:** `201 Created`
+
+#### Download de Documento
+```http
+GET /api/documentos/:id/download
+Authorization: Bearer <token>
+```
+
+**Resposta:** `200 OK` (arquivo)
+
+#### Excluir Documento
+```http
+DELETE /api/documentos/:id
+Authorization: Bearer <token>
+```
+
+**Resposta:** `200 OK`
+
+---
+
 ## Páginas Web
 
 ### Home Pública
@@ -804,9 +915,19 @@ GET /api
 }
 ```
 
-## Rate Limiting (Futuro)
+## Rate Limiting
 
-Limites de requisição por endpoint para prevenir abuso.
+Implementado via `express-rate-limit` (`server.js`):
+
+- **API geral** (`/api/*`): 300 requisições / 15 min por IP
+- **Login** (`/api/auth/login`): 20 tentativas / 15 min por IP (mitiga força bruta)
+
+Resposta ao exceder: `429` `{ "erro": "Muitas requisições..." }`. Headers `RateLimit-*` incluídos.
+
+## Documentação Interativa (Swagger)
+
+- **UI:** `GET /api-docs` (Swagger UI)
+- **Spec JSON:** `GET /api-docs.json` (OpenAPI 3.0)
 
 ## Webhooks (Futuro)
 

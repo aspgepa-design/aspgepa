@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "ASPGE-PA API",
+    "description": "Coleção da API ASPGE-PA. Defina {{baseUrl}} e faça login para obter {{token}} automaticamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["var r = pm.response.json();", "if (r.token) pm.collectionVariables.set('token', r.token);"] }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"cpf\": \"123.456.789-00\",\n  \"senha\": \"senha123\"\n}" }
+          }
+        },
+        { "name": "Perfil", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/auth/perfil", "host": ["{{baseUrl}}"], "path": ["api", "auth", "perfil"] } } },
+        {
+          "name": "Alterar Senha",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/alterar-senha", "host": ["{{baseUrl}}"], "path": ["api", "auth", "alterar-senha"] },
+            "body": { "mode": "raw", "raw": "{\n  \"senhaAtual\": \"antiga\",\n  \"novaSenha\": \"nova123\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Associados",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/associados", "host": ["{{baseUrl}}"], "path": ["api", "associados"] } } },
+        { "name": "Resumido", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/associados/resumido", "host": ["{{baseUrl}}"], "path": ["api", "associados", "resumido"] } } },
+        { "name": "Por ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/associados/1", "host": ["{{baseUrl}}"], "path": ["api", "associados", "1"] } } }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/eventos", "host": ["{{baseUrl}}"], "path": ["api", "eventos"] } } }
+      ]
+    },
+    {
+      "name": "Convênios",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/convenios", "host": ["{{baseUrl}}"], "path": ["api", "convenios"] } } },
+        { "name": "Públicos", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": { "raw": "{{baseUrl}}/api/convenios/publicos", "host": ["{{baseUrl}}"], "path": ["api", "convenios", "publicos"] } } }
+      ]
+    },
+    {
+      "name": "Financeiro",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/financeiro", "host": ["{{baseUrl}}"], "path": ["api", "financeiro"] } } }
+      ]
+    },
+    {
+      "name": "Votações",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/votacoes", "host": ["{{baseUrl}}"], "path": ["api", "votacoes"] } } }
+      ]
+    },
+    {
+      "name": "Gestões",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/gestoes", "host": ["{{baseUrl}}"], "path": ["api", "gestoes"] } } },
+        { "name": "Ativa", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": { "raw": "{{baseUrl}}/api/gestoes/ativa", "host": ["{{baseUrl}}"], "path": ["api", "gestoes", "ativa"] } } }
+      ]
+    },
+    {
+      "name": "Site Config",
+      "item": [
+        { "name": "Obter", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": { "raw": "{{baseUrl}}/api/site-config", "host": ["{{baseUrl}}"], "path": ["api", "site-config"] } } }
+      ]
+    },
+    {
+      "name": "Notícias",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": { "raw": "{{baseUrl}}/api/noticias", "host": ["{{baseUrl}}"], "path": ["api", "noticias"] } } }
+      ]
+    },
+    {
+      "name": "Dependentes",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/dependentes", "host": ["{{baseUrl}}"], "path": ["api", "dependentes"] } } }
+      ]
+    },
+    {
+      "name": "Documentos",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/documentos", "host": ["{{baseUrl}}"], "path": ["api", "documentos"] } } }
+      ]
+    },
+    {
+      "name": "Sistema",
+      "item": [
+        { "name": "Health", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] } } },
+        { "name": "API Info", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": { "raw": "{{baseUrl}}/api", "host": ["{{baseUrl}}"], "path": ["api"] } } }
+      ]
+    }
+  ]
+}

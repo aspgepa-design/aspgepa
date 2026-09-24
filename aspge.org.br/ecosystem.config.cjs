@@ -3,8 +3,8 @@ module.exports = {
     name: 'aspge-api',
     script: './server.js',
     cwd: '/var/www/aspge/app',
-    instances: 1,
-    exec_mode: 'fork',
+    instances: 'max',      // cluster mode: 1 processo por núcleo de CPU
+    exec_mode: 'cluster',
     env: {
       NODE_ENV: 'production',
       PORT: 3000

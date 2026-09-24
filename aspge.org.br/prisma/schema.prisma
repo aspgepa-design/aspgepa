@@ -235,6 +235,10 @@ model SiteConfig {
   mostrarNoticias Boolean  @default(true)
   mostrarEventos Boolean  @default(true)
   linksRapidos   String?  @db.Text // JSON array de {titulo, url}
+  contatoEndereco String? @db.Text
+  contatoEmail   String?
+  contatoTelefone String?
+  redesSociais   String?  @db.Text // JSON array de {nome, url}
   updatedAt      DateTime @updatedAt
 
   @@map("site_config")

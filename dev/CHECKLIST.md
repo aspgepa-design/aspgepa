@@ -14,16 +14,16 @@
 - [x] Health check `GET /health`
 - [x] Versionamento automático via git log (`versoesService.js` + página `/versoes`)
 - [x] Camada de serviços (`src/services/` — versoesService)
-- [ ] Rate limiting (`express-rate-limit`) — doc: "não implementado"
+- [x] Rate limiting (`express-rate-limit` — geral + login)
 - [ ] CSRF protection — doc: "não implementado"
 - [ ] Redis (cache/sessões)
 - [ ] CDN para estáticos
-- [ ] PM2 cluster mode / load balancing
-- [ ] Docker (containerização)
-- [ ] CI/CD (deploy automatizado)
+- [x] PM2 cluster mode / load balancing (`instances: 'max'`)
+- [x] Docker (containerização — Dockerfile + docker-compose)
+- [x] CI/CD (GitHub Actions `.github/workflows/deploy.yml`)
 - [ ] Monitoramento Prometheus + Grafana
 - [ ] WebSocket (notificações tempo real)
-- [ ] Swagger/OpenAPI (doc automática da API)
+- [x] Swagger/OpenAPI (`/api-docs` + `/api-docs.json`)
 - [ ] Webhooks
 
 ## 2. API — Endpoints
@@ -65,7 +65,7 @@
 
 ### Site Config (`/api/site-config`)
 - [x] `GET /` · `PUT /` (presidente)
-- [ ] Contato e redes sociais do footer editáveis via site-config (acordado, pendente)
+- [x] Contato e redes sociais do footer editáveis via site-config
 
 ### Notícias (`/api/noticias`)
 - [x] `GET /` · `POST /` · `PUT /:id` · `DELETE /:id`
@@ -75,7 +75,7 @@
 
 ### Dependentes & Documentos
 - [x] Rotas `/api/dependentes` e `/api/documentos` existem
-- [ ] Documentar esses endpoints em `dev/API.md`
+- [x] Documentar esses endpoints em `dev/API.md`
 
 ## 3. Páginas Web (Views)
 
@@ -97,7 +97,7 @@
 - [x] Seed (`npm run db:seed`)
 - [x] Índices (cpf unique, logs.associadoId, logs.createdAt)
 - [x] Backup via `pg_dump`
-- [ ] Backup automatizado (cron diário + retenção 7d/4sem/12m)
+- [x] Backup automatizado (`scripts/backup-db.sh` + cron, retenção configurável)
 - [ ] Criptografia de CPF em repouso (doc: "pode ser criptografado no futuro")
 
 ## 5. Segurança
@@ -111,7 +111,7 @@
 - [x] Upload: validação MIME + limite de tamanho
 - [x] Logs de auditoria no banco
 - [x] SSL/TLS + UFW + Fail2ban no VPS
-- [ ] Rate limiting
+- [x] Rate limiting
 - [ ] CSRF protection
 - [~] LGPD (parcial — falta consentimento explícito, exclusão sob demanda, notificação de incidentes)
 
@@ -121,7 +121,7 @@
 - [ ] Testes unitários (Jest)
 - [ ] Testes de integração (Supertest)
 - [ ] Testes E2E (Playwright/Cypress)
-- [ ] Collection Postman/Insomnia
+- [x] Collection Postman (`postman/ASPGE-PA.postman_collection.json`)
 
 ## 7. Integrações Externas
 
@@ -133,13 +133,13 @@
 
 ## 8. Próximas Melhorias (ARQUITETURA.md §"Próximas Melhorias")
 
-- [ ] Swagger/OpenAPI
+- [x] Swagger/OpenAPI
 - [ ] Testing Suite (Jest + Supertest)
 - [ ] Redis cache
-- [ ] Rate limiting
+- [x] Rate limiting
 - [ ] WebSocket
-- [ ] Docker
-- [ ] CI/CD
+- [x] Docker
+- [x] CI/CD
 - [ ] Prometheus + Grafana
 
 ---
