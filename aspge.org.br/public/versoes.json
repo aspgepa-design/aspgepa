@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T09:44:52.829Z",
+  "geradoEm": "2026-09-24T09:53:01.187Z",
   "versoes": [
+    {
+      "versao": "v2.4.0",
+      "data": "24 de set de 2026",
+      "hash": "63b19e9",
+      "titulo": "feat: PWA - manifest, service worker, icones e meta tags para Android/iOS",
+      "tipo": "added",
+      "itens": [
+        "feat: PWA - manifest, service worker, icones e meta tags para Android/iOS"
+      ]
+    },
     {
       "versao": "v2.3.0",
       "data": "24 de set de 2026",
