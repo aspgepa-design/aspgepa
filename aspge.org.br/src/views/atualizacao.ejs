@@ -216,6 +216,14 @@
       font-weight: 600;
     }
   </style>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#dc2626">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ASPGE-PA">
+  <link rel="apple-touch-icon" href="/public/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/public/icons/icon-192.png">
 </head>
 <body>
   <div class="container">
@@ -801,5 +809,12 @@
       btn.textContent = 'Salvar Alterações';
     });
   </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
 </body>
 </html>

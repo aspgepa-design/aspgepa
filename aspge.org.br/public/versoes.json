@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T01:35:09.809Z",
+  "geradoEm": "2026-09-24T09:44:52.829Z",
   "versoes": [
+    {
+      "versao": "v2.3.0",
+      "data": "24 de set de 2026",
+      "hash": "8bfd305",
+      "titulo": "feat: link da carteirinha digital no dashboard e pagina /carteirinha mobile com card real",
+      "tipo": "added",
+      "itens": [
+        "feat: link da carteirinha digital no dashboard e pagina /carteirinha mobile com card real"
+      ]
+    },
     {
       "versao": "v2.2.0",
       "data": "23 de set de 2026",

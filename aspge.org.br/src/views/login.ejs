@@ -24,6 +24,14 @@ html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,san
 .login-links a{color:#dc2626;font-size:13px;font-weight:700;text-decoration:none}
 .login-links a:hover{text-decoration:underline}
 </style>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#dc2626">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ASPGE-PA">
+<link rel="apple-touch-icon" href="/public/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/public/icons/icon-192.png">
 </head>
 <body>
 <div class="login-bg">
@@ -163,6 +171,13 @@ async function recuperarSenha() {
     btn.textContent = 'Redefinir Senha';
     erro.textContent = 'Erro de conexão. Tente novamente.';
   }
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
 }
 </script>
 </body>
