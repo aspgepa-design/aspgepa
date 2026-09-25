@@ -1,31 +1,35 @@
 const prisma = require('../config/database');
 const logger = require('../config/logger');
+const cache = require('../services/cacheService');
 
 // Buscar configurações do site
 async function getConfig(req, res) {
   try {
-    let config = await prisma.siteConfig.findFirst();
-    
-    // Se não existir, criar config padrão
-    if (!config) {
-      config = await prisma.siteConfig.create({
-        data: {
-          sobreTexto: 'Sobre a ASPGE-PA',
-          missao: 'Nossa missão',
-          visao: 'Nossa visão',
-          valores: 'Nossos valores',
-          estatutos: 'Estatutos da associação',
-          mostrarEnquetes: true,
-          mostrarNoticias: true,
-          mostrarEventos: true,
-          linksRapidos: JSON.stringify([
-            { titulo: 'Portal do Associado', url: '/login' },
-            { titulo: 'Ficha de Inscrição', url: '/inscricao' },
-            { titulo: 'Contato', url: '#contato' }
-          ])
-        }
-      });
-    }
+    let config = await cache.envolver('site-config', 300, async () => {
+      let cfg = await prisma.siteConfig.findFirst();
+
+      // Se não existir, criar config padrão
+      if (!cfg) {
+        cfg = await prisma.siteConfig.create({
+          data: {
+            sobreTexto: 'Sobre a ASPGE-PA',
+            missao: 'Nossa missão',
+            visao: 'Nossa visão',
+            valores: 'Nossos valores',
+            estatutos: 'Estatutos da associação',
+            mostrarEnquetes: true,
+            mostrarNoticias: true,
+            mostrarEventos: true,
+            linksRapidos: JSON.stringify([
+              { titulo: 'Portal do Associado', url: '/login' },
+              { titulo: 'Ficha de Inscrição', url: '/inscricao' },
+              { titulo: 'Contato', url: '#contato' }
+            ])
+          }
+        });
+      }
+      return cfg;
+    });
     
     // Parse JSON fields
     const configParsed = {
@@ -60,7 +64,9 @@ async function updateConfig(req, res) {
       linksRapidos: dados.linksRapidos ? JSON.stringify(dados.linksRapidos) : null,
       redesSociais: dados.redesSociais ? JSON.stringify(dados.redesSociais) : null
     };
-    
+
+    cache.invalidar('site-config').catch(() => {});
+
     let config = await prisma.siteConfig.findFirst();
     
     if (config) {

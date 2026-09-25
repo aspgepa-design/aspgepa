@@ -16,7 +16,7 @@
 - [x] Camada de serviços (`src/services/` — versoesService)
 - [x] Rate limiting (`express-rate-limit` — geral + login)
 - [x] CSRF protection (Origin/Referer check em mutações — `src/middleware/csrf.js`)
-- [ ] Redis (cache/sessões)
+- [x] Redis cache (`cacheService.js` — ioredis + fallback memória; `REDIS_URL` opcional)
 - [ ] CDN para estáticos
 - [x] PM2 cluster mode / load balancing (`instances: 'max'`)
 - [x] Docker (containerização — Dockerfile + docker-compose)
@@ -128,7 +128,7 @@
 
 - [x] Google Drive (download de fotos — script)
 - [x] Google Sheets (migração de dados — script)
-- [ ] Gateway de pagamento (mensalidades)
+- [x] Gateway de pagamento — N/A: mensalidades debitadas em folha de pagamento
 - [x] Email service (nodemailer — `emailService.js`; configurar SMTP no .env, fallback log)
 - [ ] SMS/WhatsApp (notificações)
 
@@ -136,7 +136,7 @@
 
 - [x] Swagger/OpenAPI
 - [x] Testing Suite (Jest + Supertest)
-- [ ] Redis cache
+- [x] Redis cache
 - [x] Rate limiting
 - [ ] WebSocket
 - [x] Docker

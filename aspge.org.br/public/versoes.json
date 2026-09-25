@@ -1,6 +1,26 @@
 {
-  "geradoEm": "2026-09-25T13:54:32.294Z",
+  "geradoEm": "2026-09-25T17:26:54.999Z",
   "versoes": [
+    {
+      "versao": "v2.24.0",
+      "data": "25 de set de 2026",
+      "hash": "e37fbf7",
+      "titulo": "feat: admin redefine senha de associado com opcao de exigir troca no proximo login",
+      "tipo": "added",
+      "itens": [
+        "feat: admin redefine senha de associado com opcao de exigir troca no proximo login"
+      ]
+    },
+    {
+      "versao": "v2.23.0",
+      "data": "25 de set de 2026",
+      "hash": "818ab64",
+      "titulo": "feat: CSRF via Origin/Referer, LGPD (consentimento + solicitacao de exclusao + /privacidade), email service nodemailer, E2E Puppeteer",
+      "tipo": "added",
+      "itens": [
+        "feat: CSRF via Origin/Referer, LGPD (consentimento + solicitacao de exclusao + /privacidade), email service nodemailer, E2E Puppeteer"
+      ]
+    },
     {
       "versao": "v2.22.0",
       "data": "25 de set de 2026",

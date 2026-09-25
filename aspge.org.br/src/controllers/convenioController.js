@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
+const cache = require('../services/cacheService');
 
 /**
  * Listar convênios
@@ -53,6 +54,8 @@ async function criar(req, res) {
         vigencia: vigencia || null
       }
     });
+
+    cache.invalidar('convenios').catch(() => {});
 
     await prisma.log.create({
       data: {
@@ -116,6 +119,8 @@ async function atualizar(req, res) {
       data: dadosAtualizacao
     });
 
+    cache.invalidar('convenios').catch(() => {});
+
     await prisma.log.create({
       data: {
         acao: 'Editou Convênio',
@@ -155,6 +160,8 @@ async function excluir(req, res) {
     await prisma.convenio.delete({
       where: { id: parseInt(id) }
     });
+
+    cache.invalidar('convenios').catch(() => {});
 
     await prisma.log.create({
       data: {
@@ -196,6 +203,8 @@ async function alternarVisibilidade(req, res) {
       data: { visivel: !convenio.visivel }
     });
 
+    cache.invalidar('convenios').catch(() => {});
+
     res.json({
       sucesso: true,
       visivel: convenioAtualizado.visivel,
@@ -212,11 +221,11 @@ async function alternarVisibilidade(req, res) {
  */
 async function listarPublicos(req, res) {
   try {
-    const convenios = await prisma.convenio.findMany({
+    const convenios = await cache.envolver('convenios:publicos', 300, () => prisma.convenio.findMany({
       where: { visivel: true },
       orderBy: { nome: 'asc' },
       select: { id: true, nome: true, descricao: true, categoria: true, link: true }
-    });
+    }));
     res.json({ sucesso: true, dados: convenios });
   } catch (error) {
     logger.error('Erro ao listar convênios públicos:', error);
@@ -230,14 +239,14 @@ async function listarPublicos(req, res) {
 async function obterPublico(req, res) {
   try {
     const { id } = req.params;
-    const convenio = await prisma.convenio.findFirst({
+    const convenio = await cache.envolver('convenios:publico:' + id, 300, () => prisma.convenio.findFirst({
       where: { id: parseInt(id), visivel: true },
       select: {
         id: true, nome: true, descricao: true, categoria: true, link: true,
         numeroConvenio: true, desconto: true, endereco: true, cnpj: true,
         telefone: true, condicoes: true, comoUsar: true, vigencia: true
       }
-    });
+    }));
     if (!convenio) {
       return res.status(404).json({ erro: 'ConvÃªnio nÃ£o encontrado' });
     }

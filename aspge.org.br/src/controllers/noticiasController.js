@@ -1,16 +1,17 @@
 const prisma = require('../config/database');
 const logger = require('../config/logger');
+const cache = require('../services/cacheService');
 
 // Listar notícias públicas
 async function listarNoticias(req, res) {
   try {
     const { limite = 10 } = req.query;
-    
-    const noticias = await prisma.noticia.findMany({
+
+    const noticias = await cache.envolver('noticias:publicas:' + limite, 120, () => prisma.noticia.findMany({
       where: { visivel: true },
       orderBy: { dataPublicacao: 'desc' },
       take: parseInt(limite)
-    });
+    }));
     
     res.json({ sucesso: true, dados: noticias });
   } catch (error) {
@@ -38,10 +39,10 @@ async function buscarNoticia(req, res) {
   try {
     const { id } = req.params;
     
-    const noticia = await prisma.noticia.findUnique({
+    const noticia = await cache.envolver('noticias:item:' + id, 120, () => prisma.noticia.findUnique({
       where: { id: parseInt(id) }
-    });
-    
+    }));
+
     if (!noticia) {
       return res.status(404).json({ erro: 'Notícia não encontrada' });
     }
@@ -71,7 +72,9 @@ async function criarNoticia(req, res) {
         visivel: visivel !== undefined ? visivel : true
       }
     });
-    
+
+    cache.invalidar('noticias').catch(() => {});
+
     // Log (apenas se usuário autenticado)
     if (req.user?.id) {
       try {
@@ -121,7 +124,9 @@ async function atualizarNoticia(req, res) {
       where: { id: parseInt(id) },
       data: dadosAtualizacao
     });
-    
+
+    cache.invalidar('noticias').catch(() => {});
+
     // Log (apenas se usuário autenticado)
     if (req.user?.id) {
       try {
@@ -162,7 +167,9 @@ async function excluirNoticia(req, res) {
     await prisma.noticia.delete({
       where: { id: parseInt(id) }
     });
-    
+
+    cache.invalidar('noticias').catch(() => {});
+
     // Log (apenas se usuário autenticado)
     if (req.user?.id) {
       try {

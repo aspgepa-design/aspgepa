@@ -29,6 +29,7 @@ const dependenteRoutes = require('./src/routes/dependentes');
 
 const { obterVersoes } = require('./src/services/versoesService');
 const { csrfProtection } = require('./src/middleware/csrf');
+const cache = require('./src/services/cacheService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -105,7 +106,7 @@ app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ 
+  res.json({ cache: cache.status(),
     status: 'OK', 
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '2.0.0'
