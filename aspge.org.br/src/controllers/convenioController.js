@@ -34,7 +34,7 @@ async function criar(req, res) {
       return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
     }
 
-    const { nome, descricao, categoria, link, visivel } = req.body;
+    const { nome, descricao, categoria, link, visivel, numeroConvenio, desconto, endereco, cnpj, telefone, condicoes, comoUsar, vigencia } = req.body;
 
     const convenio = await prisma.convenio.create({
       data: {
@@ -42,7 +42,15 @@ async function criar(req, res) {
         descricao: descricao || null,
         categoria: categoria || null,
         link: link || '#',
-        visivel: visivel !== undefined ? visivel : true
+        visivel: visivel !== undefined ? visivel : true,
+        numeroConvenio: numeroConvenio || null,
+        desconto: desconto || null,
+        endereco: endereco || null,
+        cnpj: cnpj || null,
+        telefone: telefone || null,
+        condicoes: condicoes || null,
+        comoUsar: comoUsar || null,
+        vigencia: vigencia || null
       }
     });
 
@@ -78,7 +86,7 @@ async function atualizar(req, res) {
     }
 
     const { id } = req.params;
-    const { nome, descricao, categoria, link, visivel } = req.body;
+    const { nome, descricao, categoria, link, visivel, numeroConvenio, desconto, endereco, cnpj, telefone, condicoes, comoUsar, vigencia } = req.body;
 
     const convenioExistente = await prisma.convenio.findUnique({
       where: { id: parseInt(id) }
@@ -94,6 +102,14 @@ async function atualizar(req, res) {
     if (categoria !== undefined) dadosAtualizacao.categoria = categoria;
     if (link !== undefined) dadosAtualizacao.link = link;
     if (visivel !== undefined) dadosAtualizacao.visivel = visivel;
+    if (numeroConvenio !== undefined) dadosAtualizacao.numeroConvenio = numeroConvenio;
+    if (desconto !== undefined) dadosAtualizacao.desconto = desconto;
+    if (endereco !== undefined) dadosAtualizacao.endereco = endereco;
+    if (cnpj !== undefined) dadosAtualizacao.cnpj = cnpj;
+    if (telefone !== undefined) dadosAtualizacao.telefone = telefone;
+    if (condicoes !== undefined) dadosAtualizacao.condicoes = condicoes;
+    if (comoUsar !== undefined) dadosAtualizacao.comoUsar = comoUsar;
+    if (vigencia !== undefined) dadosAtualizacao.vigencia = vigencia;
 
     const convenio = await prisma.convenio.update({
       where: { id: parseInt(id) },
@@ -208,9 +224,34 @@ async function listarPublicos(req, res) {
   }
 }
 
+/**
+ * Detalhe pÃºblico de um convÃªnio (somente se visÃ­vel) â€” para a pÃ¡gina /convenios/:id
+ */
+async function obterPublico(req, res) {
+  try {
+    const { id } = req.params;
+    const convenio = await prisma.convenio.findFirst({
+      where: { id: parseInt(id), visivel: true },
+      select: {
+        id: true, nome: true, descricao: true, categoria: true, link: true,
+        numeroConvenio: true, desconto: true, endereco: true, cnpj: true,
+        telefone: true, condicoes: true, comoUsar: true, vigencia: true
+      }
+    });
+    if (!convenio) {
+      return res.status(404).json({ erro: 'ConvÃªnio nÃ£o encontrado' });
+    }
+    res.json({ sucesso: true, dados: convenio });
+  } catch (error) {
+    logger.error('Erro ao obter convÃªnio pÃºblico:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
 module.exports = {
   listar,
   listarPublicos,
+  obterPublico,
   criar,
   atualizar,
   excluir,

@@ -162,6 +162,11 @@ app.get('/diretoria', (req, res) => {
   res.render('diretoria', { title: 'Diretoria - ASPGE-PA' });
 });
 
+// Convênio — página de detalhe (público)
+app.get('/convenios/:id', (req, res) => {
+  res.render('convenio', { title: 'Convênio - ASPGE-PA' });
+});
+
 // Notícias (público): lista e detalhe
 app.get('/noticias', (req, res) => {
   res.render('noticias', { title: 'Notícias - ASPGE-PA', noticiaId: null });

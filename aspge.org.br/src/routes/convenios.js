@@ -7,6 +7,9 @@ const { authMiddleware, authorize } = require('../middleware/auth');
 // Rota pública (home): somente convênios visíveis, campos seguros
 router.get('/publicos', convenioController.listarPublicos);
 
+// Rota pública: detalhe de um convênio visível (página /convenios/:id)
+router.get('/publicos/:id', convenioController.obterPublico);
+
 // Todas as demais rotas são protegidas
 router.use(authMiddleware);
 

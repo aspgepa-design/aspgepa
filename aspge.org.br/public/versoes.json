@@ -1,6 +1,36 @@
 {
-  "geradoEm": "2026-09-24T23:53:52.699Z",
+  "geradoEm": "2026-09-25T00:14:52.248Z",
   "versoes": [
+    {
+      "versao": "v2.16.3",
+      "data": "24 de set de 2026",
+      "hash": "60cc4f7",
+      "titulo": "fix: padroniza hifen em Procuradoria-Geral na pagina de versoes",
+      "tipo": "fixed",
+      "itens": [
+        "fix: padroniza hifen em Procuradoria-Geral na pagina de versoes"
+      ]
+    },
+    {
+      "versao": "v2.16.2",
+      "data": "24 de set de 2026",
+      "hash": "cdca48a",
+      "titulo": "chore: remove tarball do repo e ignora *.tar.gz",
+      "tipo": "changed",
+      "itens": [
+        "chore: remove tarball do repo e ignora *.tar.gz"
+      ]
+    },
+    {
+      "versao": "v2.16.1",
+      "data": "24 de set de 2026",
+      "hash": "9e83c4a",
+      "titulo": "fix: corrige nome da associacao para Associacao dos Servidores da Procuradoria-Geral do Estado do Para",
+      "tipo": "fixed",
+      "itens": [
+        "fix: corrige nome da associacao para Associacao dos Servidores da Procuradoria-Geral do Estado do Para"
+      ]
+    },
     {
       "versao": "v2.16.0",
       "data": "24 de set de 2026",

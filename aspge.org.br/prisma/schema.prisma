@@ -72,13 +72,21 @@ model Evento {
 }
 
 model Convenio {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  descricao   String?
-  categoria   String?
-  link        String?
-  visivel     Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id             Int      @id @default(autoincrement())
+  nome           String
+  descricao      String?
+  categoria      String?
+  link           String?
+  visivel        Boolean  @default(true)
+  numeroConvenio String?
+  desconto       String?
+  endereco       String?
+  cnpj           String?
+  telefone       String?
+  condicoes      String?  @db.Text
+  comoUsar       String?  @db.Text
+  vigencia       String?
+  createdAt      DateTime @default(now())
 
   @@map("convenios")
 }

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= title %></title>
+<meta name="description" content="Convênio ASPGE-PA — Associação dos Servidores da Procuradoria-Geral do Estado do Pará.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/public/icons/icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6}
+.header{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-img{width:44px;height:44px;object-fit:contain}
+.logo-text{font-weight:900;color:#dc2626;font-size:20px;letter-spacing:-.5px}
+.nav-link{padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;background:#0075bf;color:#fff}
+.nav-link:hover{background:#005a91}
+.wrap{max-width:860px;margin:0 auto;padding:40px 24px}
+.back{display:inline-block;margin-bottom:20px;color:#0075bf;text-decoration:none;font-weight:600;font-size:14px}
+.back:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,#dc2626,#0075bf);color:#fff;border-radius:20px;padding:40px 32px;margin-bottom:28px}
+.conv-cat{display:inline-block;background:rgba(255,255,255,.2);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.hero h1{font-size:32px;font-weight:900;line-height:1.2;margin-bottom:8px}
+.hero .num{font-size:14px;opacity:.85;font-weight:600}
+.desconto{display:inline-block;margin-top:16px;background:#fff;color:#dc2626;font-weight:900;font-size:20px;padding:10px 22px;border-radius:12px}
+.card{background:#fff;border-radius:16px;padding:28px;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:20px}
+.card h2{font-size:18px;font-weight:800;color:#dc2626;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card p{font-size:15px;color:#374151;white-space:pre-line}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.info-item{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px}
+.info-item .lbl{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.info-item .val{font-size:14px;font-weight:600;color:#1f2937;word-break:break-word}
+.cond-list{list-style:none;padding:0}
+.cond-list li{padding:10px 0 10px 28px;position:relative;font-size:15px;color:#374151;border-bottom:1px solid #f1f5f9}
+.cond-list li:last-child{border-bottom:none}
+.cond-list li::before{content:'✓';position:absolute;left:0;color:#16a34a;font-weight:800}
+.cta{display:inline-block;margin-top:8px;background:#0075bf;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px}
+.cta:hover{background:#005a91}
+.empty{text-align:center;color:#9ca3af;padding:48px 0}
+.skeleton{position:relative;overflow:hidden;background:#e5e7eb;border-radius:16px;height:180px;margin-bottom:20px}
+.skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:sk 1.4s infinite}
+@keyframes sk{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.footer{background:#1e3a5f;color:#fff;padding:32px 24px;text-align:center;font-size:13px;opacity:.9;margin-top:48px}
+@media(max-width:640px){.hero{padding:28px 20px}.hero h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo"><img src="/public/logo.png" alt="ASPGE-PA" class="logo-img" width="44" height="44"><div class="logo-text">ASPGE-PA</div></a>
+    <a href="/portal" class="nav-link">Acesso Associados</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <a href="/#convenios" class="back">← Voltar aos convênios</a>
+  <div id="conteudo">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</main>
+
+<footer class="footer">© <span id="ano"></span> ASPGE-PA — Associação dos Servidores da Procuradoria-Geral do Estado do Pará</footer>
+
+<script>
+document.getElementById('ano').textContent = new Date().getFullYear();
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+var _m = window.location.pathname.match(/^\/convenios\/(\d+)/);
+var CONVENIO_ID = _m ? _m[1] : null;
+
+function infoItem(lbl, val){
+  if(!val) return '';
+  return '<div class="info-item"><div class="lbl">'+esc(lbl)+'</div><div class="val">'+esc(val)+'</div></div>';
+}
+
+async function init(){
+  var box=document.getElementById('conteudo');
+  try{
+    var r=await fetch('/api/convenios/publicos/'+encodeURIComponent(CONVENIO_ID));
+    var j=await r.json();
+    var c=j.dados;
+    if(!j.sucesso||!c){ box.innerHTML='<p class="empty">Convênio não encontrado ou não está mais disponível.</p>'; return; }
+
+    var html='';
+    // Hero
+    html+='<div class="hero">';
+    if(c.categoria) html+='<span class="conv-cat">'+esc(c.categoria)+'</span>';
+    html+='<h1>'+esc(c.nome)+'</h1>';
+    if(c.numeroConvenio) html+='<div class="num">Convênio '+esc(c.numeroConvenio)+'</div>';
+    if(c.desconto) html+='<div class="desconto">'+esc(c.desconto)+'</div>';
+    html+='</div>';
+
+    // Descrição
+    if(c.descricao){
+      html+='<div class="card"><h2>Sobre</h2><p>'+esc(c.descricao)+'</p></div>';
+    }
+
+    // Informações
+    var info = infoItem('Endereço', c.endereco) + infoItem('CNPJ', c.cnpj) +
+               infoItem('Telefone', c.telefone) + infoItem('Vigência', c.vigencia);
+    if(info){
+      html+='<div class="card"><h2>Informações</h2><div class="info-grid">'+info+'</div></div>';
+    }
+
+    // Como usar
+    if(c.comoUsar){
+      html+='<div class="card"><h2>Como usar o benefício</h2><p>'+esc(c.comoUsar)+'</p></div>';
+    }
+
+    // Condições
+    if(c.condicoes){
+      var itens = c.condicoes.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+      html+='<div class="card"><h2>Condições</h2><ul class="cond-list">'+
+            itens.map(function(i){return '<li>'+esc(i)+'</li>';}).join('')+'</ul></div>';
+    }
+
+    // Link externo
+    if(c.link && c.link!=='#'){
+      var url=String(c.link);
+      if(!/^\s*javascript:/i.test(url)){
+        html+='<a class="cta" href="'+esc(url)+'" target="_blank" rel="noopener">Acessar site do convênio →</a>';
+      }
+    }
+
+    box.innerHTML=html;
+  }catch(e){
+    box.innerHTML='<p class="empty">Erro ao carregar o convênio. Tente recarregar a página.</p>';
+  }
+}
+init();
+</script>
+</body>
+</html>
