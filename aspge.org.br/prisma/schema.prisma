@@ -257,6 +257,26 @@ model SiteConfig {
   @@map("site_config")
 }
 
+model IncidenteLgpd {
+  id                    Int       @id @default(autoincrement())
+  titulo                String
+  descricao             String    @db.Text
+  dataOcorrencia        DateTime
+  dadosAfetados         String?   @db.Text // quais dados pessoais foram afetados
+  titularesAfetados     String?   @db.Text // escopo/grupo de titulares afetados
+  medidasTomadas        String?   @db.Text
+  // Trilha de comunicação (LGPD art. 48)
+  comunicadoAnpdEm      DateTime?
+  notificadoTitularesEm DateTime?
+  emailsEnviados        Int       @default(0)
+  emailsFalhados        Int       @default(0)
+  registradoPorId       Int?
+  registradoPor         String?
+  createdAt             DateTime  @default(now())
+
+  @@map("incidentes_lgpd")
+}
+
 model Noticia {
   id              Int      @id @default(autoincrement())
   titulo          String

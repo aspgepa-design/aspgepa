@@ -934,6 +934,53 @@ tbody tr:hover{background:#f9fafb}
           </div>
         </div>
 
+        <div id="view-incidentes_lgpd" class="view">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Registrar Incidente</h3></div>
+            <div class="card-body">
+              <p style="font-size:12px;color:#6b7280;margin-bottom:14px">LGPD art. 48 — comunique a ANPD e os titulares em prazo razoável. O sistema registra a trilha e auxilia na comunicação.</p>
+              <form id="incidenteForm" style="display:grid;gap:14px" onsubmit="criarIncidente(event)">
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+                  <div>
+                    <label class="form-label">Título <span class="req">*</span></label>
+                    <input type="text" id="incTitulo" required class="input" placeholder="Ex.: Vazamento de base de associados">
+                  </div>
+                  <div>
+                    <label class="form-label">Data da ocorrência <span class="req">*</span></label>
+                    <input type="date" id="incData" required class="input">
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label">Descrição <span class="req">*</span></label>
+                  <textarea id="incDescricao" required rows="3" class="input" placeholder="O que aconteceu, como foi detectado"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div>
+                    <label class="form-label">Dados afetados</label>
+                    <input type="text" id="incDados" class="input" placeholder="Ex.: nome, CPF, e-mail">
+                  </div>
+                  <div>
+                    <label class="form-label">Titulares afetados</label>
+                    <input type="text" id="incTitulares" class="input" placeholder="Ex.: todos os associados / 50 pessoas">
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label">Medidas tomadas</label>
+                  <textarea id="incMedidas" rows="2" class="input" placeholder="Ex.: reset de senhas, correção de falha, comunicação"></textarea>
+                </div>
+                <div id="incMsg" style="font-size:13px"></div>
+                <button type="submit" id="incBtnSalvar" class="btn btn-primary" style="justify-content:center">Registrar Incidente</button>
+              </form>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Incidentes Registrados</h3></div>
+            <div class="card-body" id="incidentesLista">
+              <div class="loading-overlay"><div class="spinner"></div> Carregando...</div>
+            </div>
+          </div>
+        </div>
+
         <div id="view-site_config_adm" class="view">
           <div class="card">
             <div class="card-body">
@@ -1083,7 +1130,8 @@ const ICONS = {
   logs_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
   site_config_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2h.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
   noticias_adm: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>',
-  seguranca: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+  seguranca: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  incidentes_lgpd: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
 };
 
 // ===== NAVEGAÇÃO POR PERFIL (agrupada e colapsável) =====
@@ -1115,6 +1163,7 @@ function getNavGroups(role) {
     admin.push({ id: 'convenios_adm', label: 'Gerir Convênios' });
     admin.push({ id: 'gestoes_adm', label: 'Gestões' });
     admin.push({ id: 'noticias_adm', label: 'Notícias' });
+    admin.push({ id: 'incidentes_lgpd', label: 'Incidentes LGPD' });
   }
   if (role === 'presidente' || role === 'tesoureiro') {
     admin.push({ id: 'financeiro', label: 'Financeiro' });
@@ -1225,7 +1274,7 @@ function navegarPara(tabId) {
   var activeBtn = document.querySelector('.nav-btn[data-tab="' + tabId + '"]');
   if (activeBtn) { var grp = activeBtn.closest('details'); if (grp) grp.open = true; }
   var labels = { inicio: 'Início', transparencia: 'Transparência Financeira', convenios: 'Parceiros e Convênios', votacoes: 'Decisões e Votações', eventos: 'Eventos',
-    financeiro: 'Gestão de Tesouraria', atualizacao: 'Meu Cadastro', dependentes: 'Dependentes', documentos: 'Meus Documentos', seguranca: 'Segurança', associados_adm: 'Gestão de Associados', inscricoes_adm: 'Inscrições Pendentes', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Emissão de Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs do Sistema', site_config_adm: 'Configurar Página Pública', noticias_adm: 'Gerenciar Notícias' };
+    financeiro: 'Gestão de Tesouraria', atualizacao: 'Meu Cadastro', dependentes: 'Dependentes', documentos: 'Meus Documentos', seguranca: 'Segurança', associados_adm: 'Gestão de Associados', inscricoes_adm: 'Inscrições Pendentes', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Emissão de Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs do Sistema', site_config_adm: 'Configurar Página Pública', noticias_adm: 'Gerenciar Notícias', incidentes_lgpd: 'Incidentes de Dados (LGPD)' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
   if (tabId === 'inicio') dashCardFit();
   if (tabId === 'atualizacao') myCardAplicarFoto();
@@ -1322,6 +1371,7 @@ async function carregarDadosAsync() {
     await carregarLogs();
     await carregarGestoes();
     await carregarInscricoes();
+    await carregarIncidentes();
     crtCarregarConfig();
     crtCarregarLista();
     await carregarSiteConfig();
@@ -3512,6 +3562,24 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="display:flex;gap:12px;justify-content:flex-end">
         <button onclick="fecharModalResetSenha()" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#374151">Cancelar</button>
         <button id="rsBtnSalvar" onclick="salvarResetSenha()" style="padding:10px 20px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Redefinir senha</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Comunicado ANPD -->
+<div id="modalAnpd" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #e5e7eb">
+      <h3 style="font-size:18px;font-weight:800;color:#1f2937">📋 Comunicado à ANPD</h3>
+      <button onclick="fecharModalAnpd()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;padding:4px 8px">&times;</button>
+    </div>
+    <div style="padding:24px">
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">Copie o texto abaixo e envie pelo formulário oficial da ANPD. A data do comunicado foi registrada automaticamente.</p>
+      <pre id="anpdTexto" style="white-space:pre-wrap;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px;font-size:12px;font-family:inherit;color:#1f2937;max-height:50vh;overflow-y:auto"></pre>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px">
+        <button onclick="fecharModalAnpd()" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#374151">Fechar</button>
+        <button onclick="copiarAnpd()" style="padding:10px 20px;border:none;border-radius:8px;background:#1e3a5f;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Copiar texto</button>
       </div>
     </div>
   </div>

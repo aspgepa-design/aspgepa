@@ -114,7 +114,7 @@
 - [x] SSL/TLS + UFW + Fail2ban no VPS
 - [x] Rate limiting
 - [x] CSRF protection (Origin/Referer — ver §1)
-- [~] LGPD (consentimento registrado na inscrição + `/privacidade` com solicitação de exclusão; falta notificação de incidentes/ANPD)
+- [x] LGPD (consentimento na inscrição + `/privacidade` c/ exclusão + `/api/incidentes` c/ comunicado ANPD e notificação a titulares)
 
 ## 6. Testes & Qualidade
 

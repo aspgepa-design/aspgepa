@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T17:26:54.999Z",
+  "geradoEm": "2026-09-25T17:34:26.074Z",
   "versoes": [
+    {
+      "versao": "v2.25.0",
+      "data": "25 de set de 2026",
+      "hash": "373982c",
+      "titulo": "feat: cache Redis (ioredis + fallback memoria) nos GETs publicos; gateway de pagamento N/A (mensalidades em folha)",
+      "tipo": "added",
+      "itens": [
+        "feat: cache Redis (ioredis + fallback memoria) nos GETs publicos; gateway de pagamento N/A (mensalidades em folha)"
+      ]
+    },
     {
       "versao": "v2.24.0",
       "data": "25 de set de 2026",

@@ -24,6 +24,7 @@ const votacaoRoutes = require('./src/routes/votacoes');
 const gestaoRoutes = require('./src/routes/gestoes');
 const siteConfigRoutes = require('./src/routes/siteConfig');
 const noticiasRoutes = require('./src/routes/noticias');
+const incidenteRoutes = require('./src/routes/incidentes');
 const documentoRoutes = require('./src/routes/documentos');
 const dependenteRoutes = require('./src/routes/dependentes');
 
@@ -127,6 +128,7 @@ app.use('/api/documentos', documentoRoutes);
 app.use('/api/dependentes', dependenteRoutes);
 app.use('/api/site-config', siteConfigRoutes);
 app.use('/api/noticias', noticiasRoutes);
+app.use('/api/incidentes', incidenteRoutes);
 
 // Rotas de Views (páginas HTML/EJS)
 
