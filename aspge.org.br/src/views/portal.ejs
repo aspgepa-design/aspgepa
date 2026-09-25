@@ -80,6 +80,33 @@ html,body{height:100%;width:100%;font-family:'Inter',system-ui,-apple-system,san
 .btn-outline{background:transparent;border:1px solid #0075bf;color:#0075bf}.btn-outline:hover{background:#eff6ff}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
+/* ===== COMPONENTS: FORMS ===== */
+.input{width:100%;padding:10px 14px;border:1.5px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;color:#1f2937;background:#fff;transition:border-color .15s,box-shadow .15s;outline:none}
+.input::placeholder{color:#9ca3af}
+.input:hover{border-color:#9ca3af}
+.input:focus{border-color:#0075bf;box-shadow:0 0 0 3px rgba(0,117,191,.15)}
+textarea.input{resize:vertical;min-height:80px;line-height:1.5}
+select.input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+.form-label{display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;letter-spacing:.2px}
+.form-label .req{color:#dc2626}
+.form-hint{font-size:11px;color:#9ca3af;margin-top:5px}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.form-grid{display:grid;gap:14px}
+.form-grid-2{grid-template-columns:1fr 1fr}
+.form-grid-3{grid-template-columns:1fr 1fr 1fr}
+.form-section-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800;color:#1f2937;margin-bottom:16px}
+.form-section-title .fi{width:34px;height:34px;border-radius:10px;background:#eff6ff;color:#0075bf;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.file-drop{position:relative;border:2px dashed #d1d5db;border-radius:12px;padding:22px;text-align:center;cursor:pointer;background:#f9fafb;transition:.2s}
+.file-drop:hover{border-color:#0075bf;background:#eff6ff}
+.file-drop.has-file{border-color:#16a34a;background:#f0fdf4;border-style:solid}
+.file-drop input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.file-drop .fd-icon{font-size:26px;margin-bottom:6px}
+.file-drop .fd-text{font-size:13px;font-weight:600;color:#374151}
+.file-drop .fd-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dep-grid{grid-template-columns:2fr 1fr 1fr auto;align-items:end}
+@media(max-width:640px){.form-grid-2,.form-grid-3,.dep-grid{grid-template-columns:1fr}}
+
 /* ===== COMPONENTS: TABLE ===== */
 .table-wrap{overflow-x:auto;width:100%}
 table{width:100%;text-align:left;font-size:13px;border-collapse:collapse}
@@ -413,11 +440,12 @@ tbody tr:hover{background:#f9fafb}
             </div>
           </header>
           <div class="card" style="margin-bottom:16px"><div class="card-body">
-            <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end">
-              <div><label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">Nome</label><input type="text" id="depNome" class="input" placeholder="Nome completo"></div>
-              <div><label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">Parentesco</label><input type="text" id="depParentesco" class="input" placeholder="Ex.: Filho(a)"></div>
-              <div><label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">Nascimento</label><input type="date" id="depNascimento" class="input"></div>
-              <button class="btn btn-primary btn-sm" onclick="adicionarDependente()">+ Adicionar</button>
+            <div class="form-section-title"><span class="fi">👤</span> Novo dependente</div>
+            <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end">
+              <div class="field"><label class="form-label" for="depNome">Nome <span class="req">*</span></label><input type="text" id="depNome" class="input" placeholder="Nome completo"></div>
+              <div class="field"><label class="form-label" for="depParentesco">Parentesco</label><input type="text" id="depParentesco" class="input" placeholder="Ex.: Filho(a)"></div>
+              <div class="field"><label class="form-label" for="depNascimento">Nascimento</label><input type="date" id="depNascimento" class="input"></div>
+              <button class="btn btn-primary" onclick="adicionarDependente()">+ Adicionar</button>
             </div>
           </div></div>
           <div class="card"><div class="card-body" style="padding:0">
@@ -434,11 +462,22 @@ tbody tr:hover{background:#f9fafb}
             </div>
           </header>
           <div class="card" style="margin-bottom:16px"><div class="card-body">
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <input type="text" id="docNome" class="input" placeholder="Nome do documento" style="flex:1;min-width:180px">
-              <input type="file" id="docArquivo" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="flex:1;min-width:180px">
-              <button class="btn btn-primary btn-sm" onclick="enviarDocumento()">Enviar</button>
+            <div class="form-section-title"><span class="fi">📎</span> Enviar documento</div>
+            <div class="field">
+              <label class="form-label" for="docNome">Nome do documento</label>
+              <input type="text" id="docNome" class="input" placeholder="Ex.: Comprovante de residência">
+              <p class="form-hint">Se vazio, será usado o nome do arquivo.</p>
             </div>
+            <div class="field">
+              <label class="form-label">Arquivo</label>
+              <div class="file-drop" id="docDrop">
+                <input type="file" id="docArquivo" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="docArquivoSelecionado(this)">
+                <div class="fd-icon">📤</div>
+                <div class="fd-text" id="docDropText">Clique ou arraste o arquivo aqui</div>
+                <div class="fd-sub">PDF, JPG, PNG, DOC ou DOCX — até 5MB</div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="enviarDocumento()">Enviar documento</button>
           </div></div>
           <div class="card"><div class="card-body" style="padding:0">
             <div class="table-wrap" id="documentosTabela"><div class="loading-overlay" style="padding:16px"><div class="spinner"></div> Carregando...</div></div>
@@ -452,22 +491,22 @@ tbody tr:hover{background:#f9fafb}
             <p style="font-size:13px;color:#6b7280">Altere sua senha de acesso ao portal.</p>
           </header>
           <div class="card" style="max-width:480px"><div class="card-body">
-            <div style="display:flex;flex-direction:column;gap:14px">
-              <div>
-                <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px">Senha atual</label>
-                <input type="password" id="segSenhaAtual" class="input" autocomplete="current-password" placeholder="Digite sua senha atual">
-              </div>
-              <div>
-                <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px">Nova senha</label>
-                <input type="password" id="segNovaSenha" class="input" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
-              </div>
-              <div>
-                <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px">Confirmar nova senha</label>
-                <input type="password" id="segConfirmaSenha" class="input" autocomplete="new-password" placeholder="Repita a nova senha">
-              </div>
-              <div id="segMsg" style="font-size:13px;min-height:18px"></div>
-              <button class="btn btn-primary" id="segBtnSalvar" onclick="alterarMinhaSenha()" style="align-self:flex-start">Alterar senha</button>
+            <div class="form-section-title"><span class="fi">🔒</span> Alterar senha</div>
+            <div class="field">
+              <label class="form-label" for="segSenhaAtual">Senha atual <span class="req">*</span></label>
+              <input type="password" id="segSenhaAtual" class="input" autocomplete="current-password" placeholder="Digite sua senha atual">
             </div>
+            <div class="field">
+              <label class="form-label" for="segNovaSenha">Nova senha <span class="req">*</span></label>
+              <input type="password" id="segNovaSenha" class="input" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+              <p class="form-hint">Use ao menos 6 caracteres. Combine letras e números para mais segurança.</p>
+            </div>
+            <div class="field">
+              <label class="form-label" for="segConfirmaSenha">Confirmar nova senha <span class="req">*</span></label>
+              <input type="password" id="segConfirmaSenha" class="input" autocomplete="new-password" placeholder="Repita a nova senha">
+            </div>
+            <div id="segMsg" style="font-size:13px;min-height:18px;margin-bottom:10px"></div>
+            <button class="btn btn-primary" id="segBtnSalvar" onclick="alterarMinhaSenha()">🔒 Alterar senha</button>
           </div></div>
         </div>
 
@@ -1466,6 +1505,20 @@ async function carregarDocumentos() {
   } catch (e) { console.error('Erro ao carregar documentos:', e); }
 }
 
+function docArquivoSelecionado(input) {
+  var drop = document.getElementById('docDrop');
+  var txt = document.getElementById('docDropText');
+  if (input.files && input.files[0]) {
+    var f = input.files[0];
+    var mb = (f.size / 1024 / 1024).toFixed(1);
+    drop.classList.add('has-file');
+    txt.textContent = f.name + ' (' + mb + ' MB)';
+  } else {
+    drop.classList.remove('has-file');
+    txt.textContent = 'Clique ou arraste o arquivo aqui';
+  }
+}
+
 async function enviarDocumento() {
   var fileInput = document.getElementById('docArquivo');
   if (!fileInput.files || !fileInput.files[0]) { alert('Selecione um arquivo.'); return; }
@@ -1479,6 +1532,7 @@ async function enviarDocumento() {
     if (d.sucesso) {
       document.getElementById('docNome').value = '';
       fileInput.value = '';
+      docArquivoSelecionado(fileInput);
       carregarDocumentos();
     } else { alert(d.erro || 'Erro ao enviar.'); }
   } catch (e) { console.error(e); alert('Erro ao enviar documento.'); }
@@ -3392,18 +3446,18 @@ document.addEventListener('DOMContentLoaded', function() {
       <button onclick="fecharModalConvenio()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;padding:4px 8px">&times;</button>
     </div>
     <div style="padding:24px">
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Nome do Convênio *</label>
-        <input type="text" id="convNome" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="Ex: Clínica Saúde Total">
+      <div class="field">
+        <label class="form-label" for="convNome">Nome do Convênio <span class="req">*</span></label>
+        <input type="text" id="convNome" class="input" placeholder="Ex: Clínica Saúde Total">
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Descrição</label>
-        <textarea id="convDescricao" rows="3" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;resize:vertical" placeholder="Descreva os benefícios do convênio..."></textarea>
+      <div class="field">
+        <label class="form-label" for="convDescricao">Descrição</label>
+        <textarea id="convDescricao" class="input" rows="3" placeholder="Descreva os benefícios do convênio..."></textarea>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Categoria</label>
-          <select id="convCategoria" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px">
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <label class="form-label" for="convCategoria">Categoria</label>
+          <select id="convCategoria" class="input">
             <option value="">Selecione...</option>
             <option value="Saúde">Saúde</option>
             <option value="Educação">Educação</option>
@@ -3413,46 +3467,46 @@ document.addEventListener('DOMContentLoaded', function() {
             <option value="Outros">Outros</option>
           </select>
         </div>
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Link (site/whats)</label>
-          <input type="text" id="convLink" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="https://...">
+        <div class="field">
+          <label class="form-label" for="convLink">Link (site/whats)</label>
+          <input type="text" id="convLink" class="input" placeholder="https://...">
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Nº do Convênio</label>
-          <input type="text" id="convNumero" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="Ex: 01/2026">
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <label class="form-label" for="convNumero">Nº do Convênio</label>
+          <input type="text" id="convNumero" class="input" placeholder="Ex: 01/2026">
         </div>
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Desconto</label>
-          <input type="text" id="convDesconto" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="Ex: 10% de desconto">
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">CNPJ</label>
-          <input type="text" id="convCnpj" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="00.000.000/0000-00">
-        </div>
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Telefone</label>
-          <input type="text" id="convTelefone" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="(91) 99999-9999">
+        <div class="field">
+          <label class="form-label" for="convDesconto">Desconto</label>
+          <input type="text" id="convDesconto" class="input" placeholder="Ex: 10% de desconto">
         </div>
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Endereço</label>
-        <input type="text" id="convEndereco" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="Rua, número, bairro, cidade">
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="field">
+          <label class="form-label" for="convCnpj">CNPJ</label>
+          <input type="text" id="convCnpj" class="input" placeholder="00.000.000/0000-00">
+        </div>
+        <div class="field">
+          <label class="form-label" for="convTelefone">Telefone</label>
+          <input type="text" id="convTelefone" class="input" placeholder="(91) 99999-9999">
+        </div>
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Vigência</label>
-        <input type="text" id="convVigencia" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" placeholder="Ex: Tempo indeterminado">
+      <div class="field">
+        <label class="form-label" for="convEndereco">Endereço</label>
+        <input type="text" id="convEndereco" class="input" placeholder="Rua, número, bairro, cidade">
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Como usar o benefício</label>
-        <textarea id="convComoUsar" rows="3" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;resize:vertical" placeholder="Ex: Apresente a carteirinha ASPGE no caixa..."></textarea>
+      <div class="field">
+        <label class="form-label" for="convVigencia">Vigência</label>
+        <input type="text" id="convVigencia" class="input" placeholder="Ex: Tempo indeterminado">
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Condições (uma por linha)</label>
-        <textarea id="convCondicoes" rows="4" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;resize:vertical" placeholder="Válido de segunda a sexta&#10;Não cumulativo com outras promoções"></textarea>
+      <div class="field">
+        <label class="form-label" for="convComoUsar">Como usar o benefício</label>
+        <textarea id="convComoUsar" class="input" rows="3" placeholder="Ex: Apresente a carteirinha ASPGE no caixa..."></textarea>
+      </div>
+      <div class="field">
+        <label class="form-label" for="convCondicoes">Condições (uma por linha)</label>
+        <textarea id="convCondicoes" class="input" rows="4" placeholder="Válido de segunda a sexta&#10;Não cumulativo com outras promoções"></textarea>
       </div>
       <div style="margin-bottom:24px;display:flex;align-items:center;gap:8px">
         <input type="checkbox" id="convVisivel" checked style="width:18px;height:18px;cursor:pointer">

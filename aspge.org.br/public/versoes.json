@@ -1,6 +1,26 @@
 {
-  "geradoEm": "2026-09-25T00:14:52.248Z",
+  "geradoEm": "2026-09-25T00:26:18.456Z",
   "versoes": [
+    {
+      "versao": "v2.17.1",
+      "data": "24 de set de 2026",
+      "hash": "07440b2",
+      "titulo": "chore: remove arquivo temporario de extracao",
+      "tipo": "changed",
+      "itens": [
+        "chore: remove arquivo temporario de extracao"
+      ]
+    },
+    {
+      "versao": "v2.17.0",
+      "data": "24 de set de 2026",
+      "hash": "a0a7699",
+      "titulo": "feat: pagina de detalhe de convenio (/convenios/:id) com informacoes completas e condicoes + seed dos 3 convenios",
+      "tipo": "added",
+      "itens": [
+        "feat: pagina de detalhe de convenio (/convenios/:id) com informacoes completas e condicoes + seed dos 3 convenios"
+      ]
+    },
     {
       "versao": "v2.16.3",
       "data": "24 de set de 2026",
