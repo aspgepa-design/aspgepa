@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T00:49:56.572Z",
+  "geradoEm": "2026-09-25T01:00:02.861Z",
   "versoes": [
+    {
+      "versao": "v2.18.1",
+      "data": "24 de set de 2026",
+      "hash": "a4fdb7f",
+      "titulo": "fix: corrige foto desformatada em Meu Cadastro - fallback cover e re-aplicacao ao abrir a aba",
+      "tipo": "fixed",
+      "itens": [
+        "fix: corrige foto desformatada em Meu Cadastro - fallback cover e re-aplicacao ao abrir a aba"
+      ]
+    },
     {
       "versao": "v2.18.0",
       "data": "24 de set de 2026",
