@@ -156,9 +156,118 @@
       text-decoration: none;
       font-weight: 600;
     }
+    /* ===== WIZARD ===== */
+    .wizard-progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+    }
+    .step-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all .25s;
+    }
+    .step-item span {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+    }
+    .step-item.active .step-num {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(102,126,234,.4);
+      transform: scale(1.1);
+    }
+    .step-item.active span { color: #667eea; }
+    .step-item.done .step-num { background: #d1fae5; color: #065f46; }
+    .step-item.done span { color: #065f46; }
+    .progress-bar {
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 99px;
+      transition: width .3s;
+    }
+    .wizard-step { display: none; animation: fadeIn .25s; }
+    .wizard-step.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    .wizard-nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .btn-secondary, .btn-next {
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      font-family: inherit;
+    }
+    .btn-secondary { background: #f3f4f6; color: #374151; }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-secondary:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-next {
+      flex: 1;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(102,126,234,.4); }
+    .wizard-nav .btn-submit { flex: 1; margin: 0; }
+    input.error, select.error {
+      border-color: #dc2626 !important;
+      background: #fef2f2;
+    }
+    .review-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 8px 20px;
+      margin-bottom: 20px;
+    }
+    .review-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid #eceff3;
+      font-size: 14px;
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-item .rl { color: #6b7280; font-weight: 600; }
+    .review-item .rv { color: #1f2937; font-weight: 600; text-align: right; }
+    .cep-hint { font-size: 11px; color: #9ca3af; margin-top: 5px; }
     @media (max-width: 600px) {
       .container { padding: 24px; }
       .form-grid { grid-template-columns: 1fr; }
+      .step-item span { display: none; }
     }
   </style>
   <link rel="manifest" href="/manifest.webmanifest">
@@ -178,7 +287,18 @@
       <p class="subtitle">Preencha seus dados para se associar à ASPGE-PA</p>
     </div>
     
-    <form id="formInscricao">
+    <div class="wizard-progress">
+      <div class="step-item active" data-step="1"><div class="step-num">1</div><span>Pessoais</span></div>
+      <div class="step-item" data-step="2"><div class="step-num">2</div><span>Contato</span></div>
+      <div class="step-item" data-step="3"><div class="step-num">3</div><span>Endereço</span></div>
+      <div class="step-item" data-step="4"><div class="step-num">4</div><span>Profissional</span></div>
+      <div class="step-item" data-step="5"><div class="step-num">5</div><span>Revisão</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <form id="formInscricao" novalidate>
+      <!-- Etapa 1: Dados Pessoais -->
+      <div class="wizard-step active" data-step="1">
       <div class="form-section">
         <h2 class="section-title">Dados Pessoais</h2>
         <div class="form-grid">
@@ -226,13 +346,16 @@
           </div>
         </div>
       </div>
-      
+      </div>
+
+      <!-- Etapa 2: Contato -->
+      <div class="wizard-step" data-step="2">
       <div class="form-section">
         <h2 class="section-title">Contato</h2>
         <div class="form-grid">
           <div class="form-group">
             <label>WhatsApp <span class="required">*</span></label>
-            <input type="text" id="whatsapp" name="whatsapp" placeholder="(00) 00000-0000" required>
+            <input type="text" id="whatsapp" name="whatsapp" placeholder="(00) 00000-0000" required inputmode="tel">
           </div>
           <div class="form-group">
             <label>Email <span class="required">*</span></label>
@@ -240,7 +363,58 @@
           </div>
         </div>
       </div>
-      
+      </div>
+
+      <!-- Etapa 3: Endereço -->
+      <div class="wizard-step" data-step="3">
+      <div class="form-section">
+        <h2 class="section-title">Endereço</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>CEP <span class="required">*</span></label>
+            <input type="text" id="cep" name="cep" placeholder="00000-000" required inputmode="numeric">
+            <div class="cep-hint">Digite o CEP para preencher o endereço automaticamente</div>
+          </div>
+          <div class="form-group">
+            <label>Tipo de Residência</label>
+            <select id="tipoResidencia" name="tipoResidencia">
+              <option value="">Selecione</option>
+              <option value="Propria">Própria</option>
+              <option value="Alugada">Alugada</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Endereço <span class="required">*</span></label>
+            <input type="text" id="endereco" name="endereco" placeholder="Rua, avenida, travessa..." required>
+          </div>
+          <div class="form-group">
+            <label>Número <span class="required">*</span></label>
+            <input type="text" id="numero" name="numero" required inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label>Complemento</label>
+            <input type="text" id="complemento" name="complemento" placeholder="Apto, bloco, casa...">
+          </div>
+          <div class="form-group">
+            <label>Bairro <span class="required">*</span></label>
+            <input type="text" id="bairro" name="bairro" required>
+          </div>
+          <div class="form-group">
+            <label>Cidade <span class="required">*</span></label>
+            <input type="text" id="cidade" name="cidade" required>
+          </div>
+          <div class="form-group">
+            <label>Estado (UF) <span class="required">*</span></label>
+            <select id="estado" name="estado" required>
+              <option value="">Selecione</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Etapa 4: Dados Profissionais -->
+      <div class="wizard-step" data-step="4">
       <div class="form-section">
         <h2 class="section-title">Dados Profissionais</h2>
         <div class="form-grid">
@@ -270,16 +444,26 @@
           </div>
         </div>
       </div>
-      
+      </div>
+
+      <!-- Etapa 5: Revisão e confirmação -->
+      <div class="wizard-step" data-step="5">
       <div class="form-section">
+        <h2 class="section-title">Revise seus dados</h2>
+        <div class="review-box" id="revisaoDados"></div>
         <div class="checkbox-group">
           <input type="checkbox" id="termos" name="termos" required>
           <label for="termos">Declaro que todas as informações fornecidas são verdadeiras e autorizo o uso dos meus dados para fins de cadastro na ASPGE-PA.</label>
         </div>
       </div>
-      
-      <button type="submit" class="btn-submit" id="btnSubmit">Enviar Inscrição</button>
-      
+      </div>
+
+      <div class="wizard-nav">
+        <button type="button" class="btn-secondary" id="btnVoltar" disabled>← Voltar</button>
+        <button type="button" class="btn-next" id="btnProximo">Próximo →</button>
+        <button type="submit" class="btn-submit" id="btnSubmit" style="display:none">Enviar Inscrição</button>
+      </div>
+
       <div id="statusMsg" class="status"></div>
     </form>
     
@@ -287,53 +471,172 @@
   </div>
 
   <script>
-    // Máscaras
+    var TOTAL_STEPS = 5;
+    var stepAtual = 1;
+    var form = document.getElementById('formInscricao');
+
+    // ===== Popular UF =====
+    var UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+    var selEstado = document.getElementById('estado');
+    UFS.forEach(function(uf) {
+      var op = document.createElement('option');
+      op.value = uf; op.textContent = uf;
+      if (uf === 'PA') op.selected = true;
+      selEstado.appendChild(op);
+    });
+
+    // ===== Máscaras =====
     document.getElementById('cpf').addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value.length <= 11) {
-        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        e.target.value = value;
+      var v = e.target.value.replace(/\D/g, '');
+      if (v.length <= 11) {
+        v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        e.target.value = v;
       }
     });
-    
     document.getElementById('whatsapp').addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value.length <= 11) {
-        value = value.replace(/(\d{2})(\d)/, '($1) $2');
-        value = value.replace(/(\d{5})(\d)/, '$1-$2');
-        e.target.value = value;
+      var v = e.target.value.replace(/\D/g, '');
+      if (v.length <= 11) {
+        v = v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = v;
       }
     });
-    
-    // Submit
-    document.getElementById('formInscricao').addEventListener('submit', async function(e) {
+    document.getElementById('cep').addEventListener('input', function(e) {
+      var v = e.target.value.replace(/\D/g, '');
+      if (v.length <= 8) {
+        v = v.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = v;
+      }
+      if (v.replace(/\D/g, '').length === 8) buscarCep(v.replace(/\D/g, ''));
+    });
+
+    // ===== Busca de CEP (ViaCEP) =====
+    function buscarCep(cep) {
+      fetch('https://viacep.com.br/ws/' + cep + '/json/')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.erro) return;
+          if (d.logradouro) setVal('endereco', d.logradouro);
+          if (d.bairro) setVal('bairro', d.bairro);
+          if (d.localidade) setVal('cidade', d.localidade);
+          if (d.uf) selEstado.value = d.uf;
+          document.getElementById('numero').focus();
+        })
+        .catch(function() {});
+    }
+    function setVal(id, v) { var el = document.getElementById(id); if (el) { el.value = v; el.classList.remove('error'); } }
+
+    // Limpa estado de erro ao digitar
+    form.querySelectorAll('input, select').forEach(function(el) {
+      el.addEventListener('input', function() { el.classList.remove('error'); });
+      el.addEventListener('change', function() { el.classList.remove('error'); });
+    });
+
+    // ===== Navegação do wizard =====
+    function mostrarEtapa(n) {
+      stepAtual = n;
+      form.querySelectorAll('.wizard-step').forEach(function(s) {
+        s.classList.toggle('active', parseInt(s.dataset.step) === n);
+      });
+      document.querySelectorAll('.step-item').forEach(function(it) {
+        var s = parseInt(it.dataset.step);
+        it.classList.toggle('active', s === n);
+        it.classList.toggle('done', s < n);
+      });
+      document.getElementById('progressFill').style.width = (n / TOTAL_STEPS * 100) + '%';
+      document.getElementById('btnVoltar').disabled = (n === 1);
+      document.getElementById('btnProximo').style.display = (n === TOTAL_STEPS) ? 'none' : '';
+      document.getElementById('btnSubmit').style.display = (n === TOTAL_STEPS) ? '' : 'none';
+      if (n === TOTAL_STEPS) montarRevisao();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function validarEtapa(n) {
+      var ok = true;
+      var stepEl = form.querySelector('.wizard-step[data-step="' + n + '"]');
+      if (!stepEl) return true;
+      stepEl.querySelectorAll('[required]').forEach(function(el) {
+        var valido;
+        if (el.type === 'checkbox') valido = el.checked;
+        else if (el.type === 'email') valido = !!el.value.trim() && /.+@.+\..+/.test(el.value);
+        else valido = !!el.value.trim();
+        el.classList.toggle('error', !valido);
+        if (!valido) ok = false;
+      });
+      // Validações específicas por etapa
+      if (n === 1) {
+        var cpf = document.getElementById('cpf');
+        if (cpf.value.replace(/\D/g, '').length !== 11) { cpf.classList.add('error'); ok = false; }
+      }
+      if (n === 2) {
+        var wa = document.getElementById('whatsapp');
+        if (wa.value.replace(/\D/g, '').length < 10) { wa.classList.add('error'); ok = false; }
+      }
+      if (n === 3) {
+        var cep = document.getElementById('cep');
+        if (cep.value.replace(/\D/g, '').length !== 8) { cep.classList.add('error'); ok = false; }
+      }
+      if (!ok) {
+        var status = document.getElementById('statusMsg');
+        status.className = 'status error';
+        status.textContent = 'Preencha os campos obrigatórios destacados.';
+        setTimeout(function() { status.className = 'status'; }, 3500);
+      }
+      return ok;
+    }
+
+    document.getElementById('btnProximo').addEventListener('click', function() {
+      if (validarEtapa(stepAtual)) mostrarEtapa(stepAtual + 1);
+    });
+    document.getElementById('btnVoltar').addEventListener('click', function() {
+      if (stepAtual > 1) mostrarEtapa(stepAtual - 1);
+    });
+
+    // ===== Revisão =====
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function montarRevisao() {
+      var rotulos = {
+        nomeCompleto:'Nome', cpf:'CPF', rg:'RG', expeditor:'Órgão Exp.', dataNascimento:'Nascimento',
+        sexo:'Sexo', naturalidade:'Naturalidade', estadoCivil:'Estado Civil',
+        whatsapp:'WhatsApp', email:'Email',
+        cep:'CEP', endereco:'Endereço', numero:'Número', complemento:'Complemento',
+        bairro:'Bairro', cidade:'Cidade', estado:'UF', tipoResidencia:'Residência',
+        matricula:'Matrícula', cargo:'Cargo/Função', lotacao:'Lotação',
+        graduacao:'Graduação', posGraduacao:'Pós-Graduação', areaAtuacao:'Área de Atuação'
+      };
+      var dados = Object.fromEntries(new FormData(form));
+      var html = '';
+      Object.keys(rotulos).forEach(function(k) {
+        if (dados[k]) html += '<div class="review-item"><span class="rl">' + rotulos[k] + '</span><span class="rv">' + esc(dados[k]) + '</span></div>';
+      });
+      document.getElementById('revisaoDados').innerHTML = html || '<p style="padding:12px;color:#6b7280">Nenhum dado preenchido.</p>';
+    }
+
+    // ===== Submit =====
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      
-      const btn = document.getElementById('btnSubmit');
-      const status = document.getElementById('statusMsg');
-      
+      if (!validarEtapa(stepAtual)) return;
+
+      var btn = document.getElementById('btnSubmit');
+      var status = document.getElementById('statusMsg');
       btn.disabled = true;
       btn.textContent = 'Enviando...';
       status.className = 'status';
-      
-      const formData = new FormData(this);
-      const data = Object.fromEntries(formData);
-      
+
+      var data = Object.fromEntries(new FormData(this));
+
       try {
-        const response = await fetch('/api/associados/inscricao', {
+        var response = await fetch('/api/associados/inscricao', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-        
-        const result = await response.json();
-        
+        var result = await response.json();
+
         if (result.sucesso) {
           status.className = 'status success';
           status.textContent = 'Inscrição enviada com sucesso! Aguarde a aprovação da diretoria.';
-          this.reset();
+          form.reset();
+          mostrarEtapa(1);
         } else {
           status.className = 'status error';
           status.textContent = result.erro || 'Erro ao enviar inscrição.';
@@ -342,10 +645,12 @@
         status.className = 'status error';
         status.textContent = 'Erro de conexão. Tente novamente.';
       }
-      
+
       btn.disabled = false;
       btn.textContent = 'Enviar Inscrição';
     });
+
+    mostrarEtapa(1);
   </script>
 <script>
 if ('serviceWorker' in navigator) {

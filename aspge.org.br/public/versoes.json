@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T01:37:43.533Z",
+  "geradoEm": "2026-09-25T01:40:17.198Z",
   "versoes": [
+    {
+      "versao": "v2.20.0",
+      "data": "24 de set de 2026",
+      "hash": "b1972a4",
+      "titulo": "docs: adiciona aplicativo mobile (Android + iOS) ao planejamento - ARQUITETURA.md e CHECKLIST.md",
+      "tipo": "added",
+      "itens": [
+        "docs: adiciona aplicativo mobile (Android + iOS) ao planejamento - ARQUITETURA.md e CHECKLIST.md"
+      ]
+    },
     {
       "versao": "v2.19.0",
       "data": "24 de set de 2026",
