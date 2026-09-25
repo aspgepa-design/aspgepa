@@ -244,7 +244,15 @@
     input.error, select.error {
       border-color: #dc2626 !important;
       background: #fef2f2;
+      animation: shake .3s;
     }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25%, 75% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+    }
+    .field-error { font-size: 11px; color: #dc2626; margin-top: 5px; font-weight: 600; }
+    .checkbox-group.error { border: 1.5px solid #dc2626; background: #fef2f2; }
     .review-box {
       background: #f9fafb;
       border: 1px solid #e5e7eb;
@@ -525,10 +533,35 @@
     }
     function setVal(id, v) { var el = document.getElementById(id); if (el) { el.value = v; el.classList.remove('error'); } }
 
-    // Limpa estado de erro ao digitar
+    // ===== Marcação/limpeza de erro por campo =====
+    function marcarErro(el, msg) {
+      if (el.type === 'checkbox') {
+        var grp = el.closest('.checkbox-group');
+        if (grp) grp.classList.add('error');
+        return;
+      }
+      el.classList.add('error');
+      var g = el.closest('.form-group');
+      if (!g) return;
+      var m = g.querySelector('.field-error');
+      if (!m) { m = document.createElement('div'); m.className = 'field-error'; g.appendChild(m); }
+      m.textContent = msg || 'Campo obrigatório';
+    }
+    function limparErro(el) {
+      if (el.type === 'checkbox') {
+        var grp = el.closest('.checkbox-group');
+        if (grp) grp.classList.remove('error');
+        return;
+      }
+      el.classList.remove('error');
+      var g = el.closest('.form-group');
+      var m = g && g.querySelector('.field-error');
+      if (m) m.remove();
+    }
+    // Limpa o erro assim que o usuário corrige o campo
     form.querySelectorAll('input, select').forEach(function(el) {
-      el.addEventListener('input', function() { el.classList.remove('error'); });
-      el.addEventListener('change', function() { el.classList.remove('error'); });
+      el.addEventListener('input', function() { limparErro(el); });
+      el.addEventListener('change', function() { limparErro(el); });
     });
 
     // ===== Navegação do wizard =====
@@ -551,35 +584,48 @@
     }
 
     function validarEtapa(n) {
-      var ok = true;
+      var ok = true, primeiro = null;
       var stepEl = form.querySelector('.wizard-step[data-step="' + n + '"]');
       if (!stepEl) return true;
+      // Campos obrigatórios da etapa atual
       stepEl.querySelectorAll('[required]').forEach(function(el) {
         var valido;
         if (el.type === 'checkbox') valido = el.checked;
         else if (el.type === 'email') valido = !!el.value.trim() && /.+@.+\..+/.test(el.value);
         else valido = !!el.value.trim();
-        el.classList.toggle('error', !valido);
-        if (!valido) ok = false;
+        if (valido) limparErro(el);
+        else { marcarErro(el); ok = false; if (!primeiro) primeiro = el; }
       });
-      // Validações específicas por etapa
+      // Validações específicas (campo preenchido mas inválido)
       if (n === 1) {
         var cpf = document.getElementById('cpf');
-        if (cpf.value.replace(/\D/g, '').length !== 11) { cpf.classList.add('error'); ok = false; }
+        if (cpf.value.trim() && cpf.value.replace(/\D/g, '').length !== 11) {
+          marcarErro(cpf, 'CPF incompleto'); ok = false; if (!primeiro) primeiro = cpf;
+        }
       }
       if (n === 2) {
         var wa = document.getElementById('whatsapp');
-        if (wa.value.replace(/\D/g, '').length < 10) { wa.classList.add('error'); ok = false; }
+        if (wa.value.trim() && wa.value.replace(/\D/g, '').length < 10) {
+          marcarErro(wa, 'WhatsApp incompleto'); ok = false; if (!primeiro) primeiro = wa;
+        }
       }
       if (n === 3) {
         var cep = document.getElementById('cep');
-        if (cep.value.replace(/\D/g, '').length !== 8) { cep.classList.add('error'); ok = false; }
+        if (cep.value.trim() && cep.value.replace(/\D/g, '').length !== 8) {
+          marcarErro(cep, 'CEP incompleto'); ok = false; if (!primeiro) primeiro = cep;
+        }
       }
       if (!ok) {
+        // Leva o usuário até o primeiro campo que faltou
+        if (primeiro) {
+          primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (primeiro.type !== 'checkbox') primeiro.focus();
+        }
         var status = document.getElementById('statusMsg');
         status.className = 'status error';
-        status.textContent = 'Preencha os campos obrigatórios destacados.';
-        setTimeout(function() { status.className = 'status'; }, 3500);
+        status.textContent = 'Preencha os campos obrigatórios destacados em vermelho.';
+        clearTimeout(status._t);
+        status._t = setTimeout(function() { status.className = 'status'; }, 4000);
       }
       return ok;
     }

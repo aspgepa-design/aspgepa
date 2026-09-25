@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T01:40:17.198Z",
+  "geradoEm": "2026-09-25T12:55:53.564Z",
   "versoes": [
+    {
+      "versao": "v2.21.0",
+      "data": "25 de set de 2026",
+      "hash": "c409ba0",
+      "titulo": "feat: ficha de inscricao em wizard de 5 etapas + endereco completo com ViaCEP",
+      "tipo": "added",
+      "itens": [
+        "feat: ficha de inscricao em wizard de 5 etapas + endereco completo com ViaCEP"
+      ]
+    },
     {
       "versao": "v2.20.0",
       "data": "24 de set de 2026",
