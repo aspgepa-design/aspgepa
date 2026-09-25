@@ -12,6 +12,9 @@
     "db:seed": "node prisma/seed.js",
     "db:deploy": "npx prisma migrate deploy",
     "versoes": "node scripts/gerar-versoes.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "test:local": "npm run db:migrate && npm run dev"
   },
   "keywords": [
@@ -43,7 +46,9 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.0.2",
-    "prisma": "^5.6.0"
+    "prisma": "^5.6.0",
+    "supertest": "^6.3.4"
   }
 }

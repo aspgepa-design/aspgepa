@@ -118,8 +118,8 @@
 ## 6. Testes & Qualidade
 
 - [x] Validação de sintaxe via hook (`.agents/hooks/validate-syntax.*`)
-- [ ] Testes unitários (Jest)
-- [ ] Testes de integração (Supertest)
+- [x] Testes unitários (Jest)
+- [x] Testes de integração (Supertest)
 - [ ] Testes E2E (Playwright/Cypress)
 - [x] Collection Postman (`postman/ASPGE-PA.postman_collection.json`)
 
@@ -134,7 +134,7 @@
 ## 8. Próximas Melhorias (ARQUITETURA.md §"Próximas Melhorias")
 
 - [x] Swagger/OpenAPI
-- [ ] Testing Suite (Jest + Supertest)
+- [x] Testing Suite (Jest + Supertest)
 - [ ] Redis cache
 - [x] Rate limiting
 - [ ] WebSocket

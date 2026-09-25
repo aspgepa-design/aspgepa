@@ -215,13 +215,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  logger.info(`========================================`);
-  logger.info(`Servidor ASPGE iniciado na porta ${PORT}`);
-  logger.info(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
-  logger.info(`========================================`);
-});
+// Start server — somente quando executado diretamente (node server.js).
+// Em testes, o Supertest importa `app` sem abrir porta.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logger.info(`========================================`);
+    logger.info(`Servidor ASPGE iniciado na porta ${PORT}`);
+    logger.info(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    logger.info(`========================================`);
+  });
+}
+
+module.exports = app;
 
 // Graceful shutdown
 process.on('SIGTERM', () => {

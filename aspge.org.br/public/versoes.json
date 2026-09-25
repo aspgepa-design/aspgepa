@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T01:00:02.861Z",
+  "geradoEm": "2026-09-25T01:11:04.095Z",
   "versoes": [
+    {
+      "versao": "v2.18.2",
+      "data": "24 de set de 2026",
+      "hash": "0aa0456",
+      "titulo": "refactor: remove titulos h2 redundantes das views do portal - header superior ja exibe o titulo da pagina",
+      "tipo": "changed",
+      "itens": [
+        "refactor: remove titulos h2 redundantes das views do portal - header superior ja exibe o titulo da pagina"
+      ]
+    },
     {
       "versao": "v2.18.1",
       "data": "24 de set de 2026",
