@@ -508,28 +508,43 @@
         e.target.value = v;
       }
     });
-    document.getElementById('cep').addEventListener('input', function(e) {
-      var v = e.target.value.replace(/\D/g, '');
-      if (v.length <= 8) {
-        v = v.replace(/(\d{5})(\d)/, '$1-$2');
-        e.target.value = v;
-      }
-      if (v.replace(/\D/g, '').length === 8) buscarCep(v.replace(/\D/g, ''));
+    var cepInput = document.getElementById('cep');
+    var cepHint = document.querySelector('.cep-hint');
+    var ultimoCep = '';
+
+    cepInput.addEventListener('input', function(e) {
+      var v = e.target.value.replace(/\D/g, '').slice(0, 8);
+      e.target.value = v.replace(/(\d{5})(\d)/, '$1-$2');
+      if (v.length < 8) { ultimoCep = ''; cepFeedback(); }
+      else if (v !== ultimoCep) buscarCep(v);
     });
+    cepInput.addEventListener('blur', function() {
+      var v = cepInput.value.replace(/\D/g, '');
+      if (v.length === 8 && v !== ultimoCep) buscarCep(v);
+    });
+
+    function cepFeedback(msg, cor) {
+      if (!cepHint) return;
+      cepHint.textContent = msg || 'Digite o CEP para preencher o endereço automaticamente';
+      cepHint.style.color = cor || '#9ca3af';
+    }
 
     // ===== Busca de CEP (ViaCEP) =====
     function buscarCep(cep) {
+      ultimoCep = cep;
+      cepFeedback('Buscando endereço...', '#667eea');
       fetch('https://viacep.com.br/ws/' + cep + '/json/')
         .then(function(r) { return r.json(); })
         .then(function(d) {
-          if (d.erro) return;
+          if (d.erro) { cepFeedback('CEP não encontrado. Preencha o endereço manualmente.', '#dc2626'); return; }
           if (d.logradouro) setVal('endereco', d.logradouro);
           if (d.bairro) setVal('bairro', d.bairro);
           if (d.localidade) setVal('cidade', d.localidade);
           if (d.uf) selEstado.value = d.uf;
-          document.getElementById('numero').focus();
+          cepFeedback('Endereço preenchido automaticamente — confira e informe o número.', '#065f46');
+          if (document.activeElement === cepInput) document.getElementById('numero').focus();
         })
-        .catch(function() {});
+        .catch(function() { cepFeedback('Não foi possível consultar o CEP. Preencha manualmente.', '#b45309'); });
     }
     function setVal(id, v) { var el = document.getElementById(id); if (el) { el.value = v; el.classList.remove('error'); } }
 

@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T12:55:53.564Z",
+  "geradoEm": "2026-09-25T13:10:33.168Z",
   "versoes": [
+    {
+      "versao": "v2.21.1",
+      "data": "25 de set de 2026",
+      "hash": "badf85f",
+      "titulo": "fix(inscricao): bloqueio por etapa com destaque inline, shake e foco no campo obrigatorio",
+      "tipo": "fixed",
+      "itens": [
+        "fix(inscricao): bloqueio por etapa com destaque inline, shake e foco no campo obrigatorio"
+      ]
+    },
     {
       "versao": "v2.21.0",
       "data": "25 de set de 2026",
