@@ -1248,6 +1248,7 @@ function navegarPara(tabId) {
     financeiro: 'Financeiro', atualizacao: 'Meu Cadastro', dependentes: 'Dependentes', documentos: 'Meus Documentos', seguranca: 'Segurança', associados_adm: 'Associados', inscricoes_adm: 'Inscrições', eventos_adm: 'Gerir Eventos', carteirinhas_adm: 'Carteirinhas', convenios_adm: 'Gerir Convênios', gestoes_adm: 'Gestões', logs_adm: 'Logs', site_config_adm: 'Configurar Site', noticias_adm: 'Notícias' };
   document.getElementById('headerTitle').textContent = labels[tabId] || tabId;
   if (tabId === 'inicio') dashCardFit();
+  if (tabId === 'atualizacao') myCardAplicarFoto();
   fecharMenu();
 }
 
@@ -3048,17 +3049,24 @@ function myCardAtualizarTextos() {
 function myCardAplicarFoto() {
   var img = document.getElementById('myPhotoImg');
   var frame = document.getElementById('myPhotoFrame');
-  if (!img || !frame || !img.naturalWidth) return;
+  if (!img || !frame || !img.src || img.style.display === 'none') return;
   var frameW = frame.offsetWidth, frameH = frame.offsetHeight;
-  if (!frameW || !frameH) return;
-  var zoom = myCardPhotoCfg.zoom || 1;
-  // Escala uniforme (mesma p/ largura e altura) preserva a proporção da foto
-  var ratio = frameW / (myCardPhotoCfg.frameW || frameW);
-  var imgW = img.naturalWidth * zoom * ratio;
-  var imgH = img.naturalHeight * zoom * ratio;
-  img.style.width = imgW + 'px'; img.style.height = imgH + 'px';
-  img.style.left = ((myCardPhotoCfg.x || 0) * ratio) + 'px';
-  img.style.top = ((myCardPhotoCfg.y || 0) * ratio) + 'px';
+  if (!frameW || !frameH) return; // aba oculta — reaplicado ao ativar "Meu Cadastro"
+  if (myCardPhotoCfg && myCardPhotoCfg.frameW && img.naturalWidth) {
+    var zoom = myCardPhotoCfg.zoom || 1;
+    // Escala uniforme (mesma p/ largura e altura) preserva a proporção da foto
+    var ratio = frameW / myCardPhotoCfg.frameW;
+    img.style.objectFit = '';
+    img.style.width = (img.naturalWidth * zoom * ratio) + 'px';
+    img.style.height = (img.naturalHeight * zoom * ratio) + 'px';
+    img.style.left = ((myCardPhotoCfg.x || 0) * ratio) + 'px';
+    img.style.top = ((myCardPhotoCfg.y || 0) * ratio) + 'px';
+  } else {
+    // Sem ajuste salvo: cobre o quadro preservando a proporção (sem esticar)
+    img.style.objectFit = 'cover';
+    img.style.width = '100%'; img.style.height = '100%';
+    img.style.left = '0'; img.style.top = '0';
+  }
 }
 
 function myCardOnFoto(input) {
@@ -3110,6 +3118,8 @@ function myCardSetZoom(val) {
   // Re-centralizar
   myCardPhotoCfg.x = (frameW - img.naturalWidth * z) / 2;
   myCardPhotoCfg.y = (frameH - img.naturalHeight * z) / 2;
+  myCardPhotoCfg.frameW = frameW; myCardPhotoCfg.frameH = frameH;
+  myCardPhotoCfg.naturalWidth = img.naturalWidth;
   img.style.left = myCardPhotoCfg.x + 'px';
   img.style.top = myCardPhotoCfg.y + 'px';
 }
@@ -3118,8 +3128,11 @@ function myCardAjustarZoom(delta) { myCardSetZoom(parseFloat(document.getElement
 function myCardMover(dx, dy) {
   var img = document.getElementById('myPhotoImg');
   if (!img || img.style.display === 'none') return;
+  var frame = document.getElementById('myPhotoFrame');
   myCardPhotoCfg.x = (myCardPhotoCfg.x || 0) + dx;
   myCardPhotoCfg.y = (myCardPhotoCfg.y || 0) + dy;
+  myCardPhotoCfg.frameW = frame.offsetWidth; myCardPhotoCfg.frameH = frame.offsetHeight;
+  myCardPhotoCfg.naturalWidth = img.naturalWidth;
   img.style.left = myCardPhotoCfg.x + 'px';
   img.style.top = myCardPhotoCfg.y + 'px';
 }

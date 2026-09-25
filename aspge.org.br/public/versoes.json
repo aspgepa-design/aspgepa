@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-25T00:26:18.456Z",
+  "geradoEm": "2026-09-25T00:49:56.572Z",
   "versoes": [
+    {
+      "versao": "v2.18.0",
+      "data": "24 de set de 2026",
+      "hash": "496a1eb",
+      "titulo": "feat: melhora aparencia dos formularios do portal (dependentes, documentos, seguranca, convenio) com sistema de form CSS",
+      "tipo": "added",
+      "itens": [
+        "feat: melhora aparencia dos formularios do portal (dependentes, documentos, seguranca, convenio) com sistema de form CSS"
+      ]
+    },
     {
       "versao": "v2.17.1",
       "data": "24 de set de 2026",
