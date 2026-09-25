@@ -1,6 +1,16 @@
 {
-  "geradoEm": "2026-09-24T23:25:56.827Z",
+  "geradoEm": "2026-09-24T23:53:52.699Z",
   "versoes": [
+    {
+      "versao": "v2.16.0",
+      "data": "24 de set de 2026",
+      "hash": "5d5575f",
+      "titulo": "feat: rate limiting, swagger, contato/redes sociais editaveis, PM2 cluster, docker, CI/CD, backup e docs",
+      "tipo": "added",
+      "itens": [
+        "feat: rate limiting, swagger, contato/redes sociais editaveis, PM2 cluster, docker, CI/CD, backup e docs"
+      ]
+    },
     {
       "versao": "v2.15.0",
       "data": "24 de set de 2026",

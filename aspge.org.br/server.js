@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
@@ -126,7 +126,7 @@ app.use('/api/noticias', noticiasRoutes);
 
 // Home (página pública)
 app.get('/', (req, res) => {
-  res.render('home', { title: 'ASPGE-PA - Associação dos Procuradores do Estado do Pará' });
+  res.render('home', { title: 'ASPGE-PA - Associação dos Servidores da Procuradoria-Geral do Estado do Pará' });
 });
 
 // Login
