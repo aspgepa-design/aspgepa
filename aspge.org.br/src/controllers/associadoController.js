@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const prisma = require('../config/database');
 const logger = require('../config/logger');
 const { getFileUrl } = require('../middleware/upload');
+const { notificarInscricao } = require('../services/emailService');
 
 // Campos obrigatórios para cadastro completo
 const CAMPOS_OBRIGATORIOS = [
@@ -654,6 +655,12 @@ async function inscricaoPublica(req, res) {
       }
     });
 
+    // LGPD — registra o consentimento dado no aceite da ficha
+    if (dados.termos) {
+      dadosCriacao.consentimentoLgpd = true;
+      dadosCriacao.consentimentoLgpdEm = new Date();
+    }
+
     dadosCriacao.cpf = cpfLimpo;
     dadosCriacao.perfil = 'Associado';
     dadosCriacao.situacao = 'Pendente';
@@ -681,6 +688,9 @@ async function inscricaoPublica(req, res) {
     }
 
     logger.info(`Inscrição pública recebida: ${associado.nomeCompleto} (${associado.cpf})`);
+
+    // Email de confirmação (fire-and-forget — não bloqueia a resposta)
+    notificarInscricao(associado);
 
     res.status(201).json({
       sucesso: true,
@@ -749,6 +759,67 @@ async function aprovar(req, res) {
 }
 
 /**
+ * Solicitar exclusão de dados (LGPD — direito ao esquecimento)
+ * Rota pública: requer CPF + senha do próprio associado.
+ * Não apaga na hora — marca a solicitação para a diretoria processar.
+ */
+async function solicitarExclusao(req, res) {
+  try {
+    const cpf = req.body.cpf ? String(req.body.cpf).replace(/\D/g, '') : null;
+    const senha = req.body.senha;
+
+    if (!cpf || !senha) {
+      return res.status(400).json({ erro: 'CPF e senha são obrigatórios' });
+    }
+
+    const associado = await prisma.associado.findFirst({
+      where: { OR: [{ cpf }, { cpf: req.body.cpf }] }
+    });
+
+    if (!associado) {
+      return res.status(404).json({ erro: 'Associado não encontrado' });
+    }
+    if (!associado.senha) {
+      return res.status(401).json({ erro: 'Senha não configurada. Contate a diretoria.' });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, associado.senha);
+    if (!senhaValida) {
+      return res.status(401).json({ erro: 'CPF ou senha inválidos' });
+    }
+
+    if (associado.solicitouExclusao) {
+      return res.json({ sucesso: true, mensagem: 'Solicitação de exclusão já registrada. A diretoria entrará em contato.' });
+    }
+
+    await prisma.associado.update({
+      where: { id: associado.id },
+      data: { solicitouExclusao: true, solicitouExclusaoEm: new Date() }
+    });
+
+    await prisma.log.create({
+      data: {
+        acao: 'Solicitou Exclusão (LGPD)',
+        detalhes: `Nome: ${associado.nomeCompleto}`,
+        associadoId: associado.id,
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      }
+    }).catch(() => {});
+
+    logger.info(`LGPD: exclusão solicitada por ${associado.nomeCompleto} (${cpf})`);
+
+    res.json({
+      sucesso: true,
+      mensagem: 'Solicitação registrada. A diretoria entrará em contato para confirmar a exclusão dos dados.'
+    });
+  } catch (error) {
+    logger.error('Erro ao solicitar exclusão:', error);
+    res.status(500).json({ erro: 'Erro interno no servidor' });
+  }
+}
+
+/**
  * Rejeitar inscrição — remove o cadastro pendente (diretoria)
  */
 async function rejeitar(req, res) {
@@ -793,6 +864,7 @@ module.exports = {
   listarPendentes,
   aprovar,
   rejeitar,
+  solicitarExclusao,
   excluir,
   uploadFoto
 };

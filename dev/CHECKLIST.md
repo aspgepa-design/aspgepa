@@ -15,7 +15,7 @@
 - [x] Versionamento automático via git log (`versoesService.js` + página `/versoes`)
 - [x] Camada de serviços (`src/services/` — versoesService)
 - [x] Rate limiting (`express-rate-limit` — geral + login)
-- [ ] CSRF protection — doc: "não implementado"
+- [x] CSRF protection (Origin/Referer check em mutações — `src/middleware/csrf.js`)
 - [ ] Redis (cache/sessões)
 - [ ] CDN para estáticos
 - [x] PM2 cluster mode / load balancing (`instances: 'max'`)
@@ -83,7 +83,8 @@
 - [x] Home mobile: header não-sticky + nav em linha rolável compacta
 - [x] `/login`
 - [x] `/portal` (menu lateral em categorias colapsáveis; versão dinâmica; aba Segurança c/ alterar senha)
-- [x] `/inscricao` (ficha de inscrição)
+- [x] `/inscricao` (ficha de inscrição — wizard 5 etapas, ViaCEP)
+- [x] `/privacidade` (LGPD — direitos do titular + solicitação de exclusão)
 - [x] `/atualizacao` (atualização cadastral)
 - [x] `/versoes` (histórico de versões)
 - [x] `/noticias` + `/noticias/:id` (público)
@@ -112,15 +113,15 @@
 - [x] Logs de auditoria no banco
 - [x] SSL/TLS + UFW + Fail2ban no VPS
 - [x] Rate limiting
-- [ ] CSRF protection
-- [~] LGPD (parcial — falta consentimento explícito, exclusão sob demanda, notificação de incidentes)
+- [x] CSRF protection (Origin/Referer — ver §1)
+- [~] LGPD (consentimento registrado na inscrição + `/privacidade` com solicitação de exclusão; falta notificação de incidentes/ANPD)
 
 ## 6. Testes & Qualidade
 
 - [x] Validação de sintaxe via hook (`.agents/hooks/validate-syntax.*`)
 - [x] Testes unitários (Jest)
 - [x] Testes de integração (Supertest)
-- [ ] Testes E2E (Playwright/Cypress)
+- [x] Testes E2E (Puppeteer + Jest — `npm run test:e2e`, `e2e/smoke.test.js`)
 - [x] Collection Postman (`postman/ASPGE-PA.postman_collection.json`)
 
 ## 7. Integrações Externas
@@ -128,7 +129,7 @@
 - [x] Google Drive (download de fotos — script)
 - [x] Google Sheets (migração de dados — script)
 - [ ] Gateway de pagamento (mensalidades)
-- [ ] Email service (notificações)
+- [x] Email service (nodemailer — `emailService.js`; configurar SMTP no .env, fallback log)
 - [ ] SMS/WhatsApp (notificações)
 
 ## 8. Próximas Melhorias (ARQUITETURA.md §"Próximas Melhorias")

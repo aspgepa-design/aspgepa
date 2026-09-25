@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .header { text-align: center; margin-bottom: 32px; }
+    .logo {
+      width: 64px; height: 64px; margin: 0 auto 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 30px; font-weight: 800;
+    }
+    h1 { font-size: 24px; color: #1f2937; }
+    .subtitle { color: #6b7280; font-size: 14px; margin-top: 6px; }
+    h2 {
+      font-size: 16px; color: #1f2937; margin: 26px 0 10px;
+      padding-bottom: 8px; border-bottom: 2px solid #eef0f4;
+    }
+    p, li { font-size: 14px; color: #4b5563; line-height: 1.7; }
+    ul { padding-left: 20px; margin: 8px 0; }
+    .form-section {
+      background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 12px; padding: 20px; margin-top: 12px;
+    }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px; }
+    input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb;
+      border-radius: 10px; font-size: 14px; font-family: inherit;
+      transition: border-color .2s;
+    }
+    input:focus { outline: none; border-color: #667eea; }
+    input.error { border-color: #dc2626; background: #fef2f2; }
+    .btn-submit {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: all .2s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(102,126,234,.4); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .status { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; display: none; }
+    .status.success { display: block; background: #d1fae5; color: #065f46; }
+    .status.error { display: block; background: #fee2e2; color: #991b1b; }
+    .back-link { display: block; text-align: center; margin-top: 24px; color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px; }
+    @media (max-width: 600px) { .container { padding: 24px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">A</div>
+      <h1>Privacidade e Proteção de Dados</h1>
+      <p class="subtitle">ASPGE-PA — Lei Geral de Proteção de Dados (Lei 13.709/2018)</p>
+    </div>
+
+    <h2>Quais dados coletamos</h2>
+    <p>No cadastro de associado coletamos dados pessoais (nome, CPF, RG, data de nascimento, estado civil), de contato (WhatsApp, email, endereço completo) e profissionais (matrícula, cargo, lotação, formação).</p>
+
+    <h2>Para que usamos</h2>
+    <ul>
+      <li>Gestão de associados e emissão da carteirinha digital</li>
+      <li>Comunicação institucional (eventos, votações, convênios e notícias)</li>
+      <li>Cumprimento de obrigações estatutárias e legais</li>
+    </ul>
+
+    <h2>Seus direitos</h2>
+    <p>Nos termos da LGPD, você pode, a qualquer momento:</p>
+    <ul>
+      <li><strong>Acessar e corrigir</strong> seus dados pela página de <a href="/atualizacao" style="color:#667eea">atualização cadastral</a> ou pelo portal do associado</li>
+      <li><strong>Revogar o consentimento</strong> e solicitar a exclusão dos seus dados</li>
+      <li><strong>Solicitar informações</strong> sobre o tratamento junto à diretoria</li>
+    </ul>
+
+    <h2>Solicitar exclusão dos meus dados</h2>
+    <p>Identifique-se com seu CPF e senha para registrar a solicitação. A diretoria confirmará a exclusão conforme os prazos legais (dados necessários a obrigações legais podem ser retidos).</p>
+    <div class="form-section">
+      <form id="formExclusao" novalidate>
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="senha" name="senha" required>
+        </div>
+        <button type="submit" class="btn-submit" id="btnExcluir">Solicitar exclusão dos meus dados</button>
+      </form>
+      <div id="statusMsg" class="status"></div>
+    </div>
+
+    <a href="/" class="back-link">← Voltar para a página inicial</a>
+  </div>
+
+  <script>
+    document.getElementById('cpf').addEventListener('input', function(e) {
+      var v = e.target.value.replace(/\D/g, '');
+      if (v.length <= 11) {
+        v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        e.target.value = v;
+      }
+    });
+
+    document.getElementById('formExclusao').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('btnExcluir');
+      var status = document.getElementById('statusMsg');
+      var cpf = document.getElementById('cpf');
+      var senha = document.getElementById('senha');
+
+      [cpf, senha].forEach(function(el) { el.classList.toggle('error', !el.value.trim()); });
+      if (!cpf.value.trim() || !senha.value.trim()) return;
+
+      if (!confirm('Confirmar a solicitação de exclusão dos seus dados?')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      status.className = 'status';
+
+      try {
+        var resp = await fetch('/api/associados/solicitar-exclusao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cpf: cpf.value, senha: senha.value })
+        });
+        var result = await resp.json();
+        status.className = 'status ' + (result.sucesso ? 'success' : 'error');
+        status.textContent = result.mensagem || result.erro || 'Erro ao processar solicitação.';
+        if (result.sucesso) this.reset();
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = 'Erro de conexão. Tente novamente.';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Solicitar exclusão dos meus dados';
+    });
+  </script>
+</body>
+</html>

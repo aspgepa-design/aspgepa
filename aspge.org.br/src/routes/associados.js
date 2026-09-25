@@ -27,6 +27,10 @@ router.post('/inscricao', publicLimiter, associadoController.inscricaoPublica);
 // Requer CPF e senha no body para autenticação
 router.post('/:id/atualizar-cadastro', cadastroLimiter, associadoController.atualizarCadastro);
 
+// Solicitação de exclusão de dados (LGPD — direito ao esquecimento)
+// Requer CPF e senha no body para autenticação
+router.post('/solicitar-exclusao', cadastroLimiter, associadoController.solicitarExclusao);
+
 // Todas as rotas abaixo são protegidas
 router.use(authMiddleware);
 

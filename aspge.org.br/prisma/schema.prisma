@@ -41,6 +41,11 @@ model Associado {
   fotoConfig         String?      // JSON com zoom/posição
   cadastroCompleto   Boolean      @default(false)
   camposPreenchidos  Int          @default(0)
+  // LGPD: consentimento registrado na inscrição e solicitação de exclusão
+  consentimentoLgpd    Boolean      @default(false)
+  consentimentoLgpdEm  DateTime?
+  solicitouExclusao    Boolean      @default(false)
+  solicitouExclusaoEm  DateTime?
   senhaAlterada      Boolean      @default(false)
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt

@@ -28,6 +28,7 @@ const documentoRoutes = require('./src/routes/documentos');
 const dependenteRoutes = require('./src/routes/dependentes');
 
 const { obterVersoes } = require('./src/services/versoesService');
+const { csrfProtection } = require('./src/middleware/csrf');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -69,6 +70,10 @@ const authLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
+
+// CSRF: bloqueia mutações vindas de origens externas (Origin/Referer)
+// Auth via JWT no header — sem cookies — então o vetor é post cross-site
+app.use('/api/', csrfProtection);
 
 // Parse JSON e URL encoded
 app.use(express.json({ limit: '10mb' }));
@@ -149,6 +154,11 @@ app.get('/inscricao', (req, res) => {
 // Atualização cadastral (público)
 app.get('/atualizacao', (req, res) => {
   res.render('atualizacao', { title: 'Atualização Cadastral - ASPGE-PA' });
+});
+
+// Privacidade / LGPD (público)
+app.get('/privacidade', (req, res) => {
+  res.render('privacidade', { title: 'Privacidade e Proteção de Dados - ASPGE-PA' });
 });
 
 // Versões (gerada a partir do git log — ver src/services/versoesService.js)
