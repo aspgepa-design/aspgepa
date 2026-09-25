@@ -363,3 +363,14 @@ O sistema ASPGE-PA segue uma arquitetura **MVC (Model-View-Controller)** com sep
 6. **Docker:** Containerização para deploy
 7. **CI/CD:** Automatização de deploy
 8. **Monitoring:** Prometheus + Grafana
+9. **Mobile App:** Aplicativo Android e iOS
+
+### Aplicativo Mobile (Android + iOS)
+
+O portal já é uma **PWA** (`manifest.webmanifest` + `sw.js` + "Adicionar à tela inicial"), o que cobre o caso de uso básico de app instalável. Para um app publicado nas lojas, as opções são:
+
+- **PWA → lojas** (menor esforço): empacotar a PWA existente via **PWABuilder**/**Bubblewrap** (Android). iOS tem suporte limitado a PWA na App Store.
+- **WebView wrapper** (esforço baixo): **Capacitor** ou **Cordova** envolvendo o portal responsivo — reutiliza 100% do front-end e da API REST.
+- **App nativo/híbrido** (esforço maior): **React Native** ou **Flutter** consumindo a API (`/api/*`), com login JWT, carteirinha digital e notificações push.
+
+**Recomendação:** começar pelo **Capacitor** (wrapper) para validar a demanda com baixo custo e publicar rápido; evoluir para React Native/Flutter apenas se surgir necessidade de recursos nativos (push, biometria, offline).

@@ -141,6 +141,7 @@
 - [x] Docker
 - [x] CI/CD
 - [ ] Prometheus + Grafana
+- [ ] Aplicativo mobile (Android + iOS) — ver `ARQUITETURA.md` §"Aplicativo Mobile"
 
 ---
 
