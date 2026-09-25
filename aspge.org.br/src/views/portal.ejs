@@ -107,6 +107,43 @@ select.input{appearance:none;-webkit-appearance:none;background-image:url("data:
 .dep-grid{grid-template-columns:2fr 1fr 1fr auto;align-items:end}
 @media(max-width:640px){.form-grid-2,.form-grid-3,.dep-grid{grid-template-columns:1fr}}
 
+/* ===== ASSOCIADOS ADMIN: STATS + LISTA/CARDS ===== */
+.assoc-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.assoc-stat{color:#fff;border-radius:12px;padding:24px;text-align:center;min-width:0;overflow:hidden}
+.assoc-stat-num{font-size:36px;font-weight:900;line-height:1.1}
+.assoc-stat-lbl{font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8;letter-spacing:.3px}
+.assoc-toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.assoc-view-toggle{display:flex;gap:4px;margin-left:auto}
+.assoc-view-toggle button{padding:8px 14px;border:1px solid #d1d5db;background:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;color:#6b7280}
+.assoc-view-toggle button.ativo{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+/* Modo lista */
+.assoc-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f3f4f6;gap:14px;transition:background .15s;flex-wrap:wrap}
+.assoc-row:hover{background:#f9fafb}
+.assoc-avatar{width:40px;height:40px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#6b7280;flex-shrink:0}
+.assoc-info{flex:1;min-width:160px}
+.assoc-nome{font-weight:700;font-size:14px;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.assoc-sub{font-size:12px;color:#6b7280;margin-top:2px;word-break:break-word}
+.assoc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.assoc-actions button{padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
+/* Modo cards */
+.assoc-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.assoc-card{border:1px solid #e5e7eb;border-radius:12px;padding:18px;background:#fff;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s}
+.assoc-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.assoc-card-top{display:flex;align-items:center;gap:12px;min-width:0}
+.assoc-card-top .assoc-avatar{width:48px;height:48px;font-size:15px}
+.assoc-card-actions{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #f3f4f6;padding-top:12px}
+.assoc-card-actions button{flex:1;min-width:70px;padding:8px 10px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+@media(max-width:640px){
+  .assoc-stats-grid{gap:8px;margin-bottom:16px}
+  .assoc-stat{padding:12px 6px;border-radius:10px}
+  .assoc-stat-num{font-size:20px}
+  .assoc-stat-lbl{font-size:8px}
+  .assoc-toolbar{gap:8px}
+  .assoc-cards-grid{grid-template-columns:1fr;gap:12px}
+  .assoc-row{gap:10px;padding:12px}
+  .assoc-actions{width:100%}
+}
+
 /* ===== COMPONENTS: TABLE ===== */
 .table-wrap{overflow-x:auto;width:100%}
 table{width:100%;text-align:left;font-size:13px;border-collapse:collapse}
@@ -641,23 +678,23 @@ tbody tr:hover{background:#f9fafb}
             <button class="btn btn-primary btn-sm" onclick="carregarAssociados()">↻ Atualizar Lista</button>
           </header>
           <!-- Stats Cards -->
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px" id="assocStats">
-            <div style="background:#1e3a5f;color:#fff;border-radius:12px;padding:24px;text-align:center">
-              <div style="font-size:36px;font-weight:900" id="statTotal">0</div>
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8">Total Associados</div>
+          <div class="assoc-stats-grid" id="assocStats">
+            <div class="assoc-stat" style="background:#1e3a5f">
+              <div class="assoc-stat-num" id="statTotal">0</div>
+              <div class="assoc-stat-lbl">Total Associados</div>
             </div>
-            <div style="background:#16a34a;color:#fff;border-radius:12px;padding:24px;text-align:center">
-              <div style="font-size:36px;font-weight:900" id="statCompleto">0</div>
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8">Cadastro Completo</div>
+            <div class="assoc-stat" style="background:#16a34a">
+              <div class="assoc-stat-num" id="statCompleto">0</div>
+              <div class="assoc-stat-lbl">Cadastro Completo</div>
             </div>
-            <div style="background:#ea580c;color:#fff;border-radius:12px;padding:24px;text-align:center">
-              <div style="font-size:36px;font-weight:900" id="statPendente">0</div>
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.8">Cadastro Pendente</div>
+            <div class="assoc-stat" style="background:#ea580c">
+              <div class="assoc-stat-num" id="statPendente">0</div>
+              <div class="assoc-stat-lbl">Cadastro Pendente</div>
             </div>
           </div>
-          <!-- Filtros -->
-          <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
-            <input type="text" id="assocBusca" placeholder="Buscar por nome, CPF ou cargo..." style="flex:1;min-width:200px;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" oninput="filtrarAssociados()">
+          <!-- Filtros + alternância de visualização -->
+          <div class="assoc-toolbar">
+            <input type="text" id="assocBusca" placeholder="Buscar por nome, CPF ou cargo..." style="flex:1;min-width:160px;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" oninput="filtrarAssociados()">
             <select id="assocFiltroPerfil" style="padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px" onchange="filtrarAssociados()">
               <option value="">Todos</option>
               <option value="presidente">Presidente</option>
@@ -668,6 +705,10 @@ tbody tr:hover{background:#f9fafb}
             <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#6b7280;cursor:pointer">
               <input type="checkbox" id="assocMostrarInativos" onchange="filtrarAssociados()"> Mostrar Inativos
             </label>
+            <div class="assoc-view-toggle" role="group" aria-label="Modo de visualização">
+              <button type="button" id="btnViewCards" onclick="alternarVisualizacaoAssociados('cards')" class="ativo">▦ Cards</button>
+              <button type="button" id="btnViewLista" onclick="alternarVisualizacaoAssociados('lista')">☰ Lista</button>
+            </div>
           </div>
           <!-- Lista -->
           <div id="assocLista">
@@ -1780,7 +1821,50 @@ function filtrarAssociados() {
     return matchBusca && matchPerfil && matchAtivo;
   });
 
+  // Sincroniza o toggle com o modo ativo (inclui preferência salva)
+  var bc = document.getElementById('btnViewCards');
+  var bl = document.getElementById('btnViewLista');
+  if (bc) bc.classList.toggle('ativo', assocViewMode === 'cards');
+  if (bl) bl.classList.toggle('ativo', assocViewMode === 'lista');
+
   renderizarAssociados(lista);
+}
+
+// Modo de visualização da gestão de associados: 'cards' (padrão) ou 'lista'
+var assocViewMode = localStorage.getItem('assocViewMode') || 'cards';
+
+function alternarVisualizacaoAssociados(modo) {
+  assocViewMode = modo === 'lista' ? 'lista' : 'cards';
+  localStorage.setItem('assocViewMode', assocViewMode);
+  document.getElementById('btnViewCards').classList.toggle('ativo', assocViewMode === 'cards');
+  document.getElementById('btnViewLista').classList.toggle('ativo', assocViewMode === 'lista');
+  filtrarAssociados();
+}
+
+function badgeStatusAssociado(a) {
+  if (a.cadastroCompleto) {
+    return '<span style="background:#dcfce7;color:#16a34a;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">✓ Completo</span>';
+  }
+  var campos = a.camposPreenchidos || 0;
+  return '<span style="background:#fef3c7;color:#d97706;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">⚠ Pendente (' + campos + '/6)</span>';
+}
+
+function acoesAssociado(a) {
+  var whatsBtn = a.cpf
+    ? '<button onclick="abrirWhatsAssociado(\'' + a.id + '\')" style="background:#25d366;color:#fff">Zap</button>' : '';
+  // Redefinir senha — apenas diretoria (endpoint exige presidente/diretor)
+  var senhaBtn = (usuarioAtual && (usuarioAtual.role === 'presidente' || usuarioAtual.role === 'diretor'))
+    ? '<button onclick="abrirModalResetSenha(' + a.id + ')" title="Redefinir senha" style="background:#7c3aed;color:#fff">🔑 Senha</button>' : '';
+  var editarBtn = '<button onclick="editarAssociado(' + a.id + ')" style="background:#1e3a5f;color:#fff">Editar</button>';
+  return whatsBtn + senhaBtn + editarBtn;
+}
+
+function dadosAssociado(a) {
+  var nome = a.nome || a.nomeCompleto || '';
+  var ini = nome ? nome.split(' ').filter(function(n){return n.length>0;}).map(function(n){return n[0];}).join('').substring(0,2).toUpperCase() : '??';
+  var cpfFormatado = a.cpf ? a.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '';
+  var cargoInfo = a.cargo ? a.cargo : '';
+  return { nome: nome, ini: ini, subInfo: cpfFormatado + (cargoInfo ? ' • ' + cargoInfo : '') };
 }
 
 function renderizarAssociados(lista) {
@@ -1788,40 +1872,38 @@ function renderizarAssociados(lista) {
     document.getElementById('assocLista').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:32px">Nenhum associado encontrado.</p>';
     return;
   }
+  if (assocViewMode === 'lista') renderizarListaAssociados(lista);
+  else renderizarCardsAssociados(lista);
+}
+
+function renderizarListaAssociados(lista) {
   var html = '';
   lista.forEach(function(a) {
-    var nome = a.nome || a.nomeCompleto || '';
-    var ini = nome ? nome.split(' ').filter(function(n){return n.length>0;}).map(function(n){return n[0];}).join('').substring(0,2).toUpperCase() : '??';
-    var cpfFormatado = a.cpf ? a.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '';
-    var cargoInfo = a.cargo ? a.cargo : '';
-    var subInfo = cpfFormatado + (cargoInfo ? ' • ' + cargoInfo : '');
-    
-    var statusBadge = '';
-    if (a.cadastroCompleto) {
-      statusBadge = '<span style="background:#dcfce7;color:#16a34a;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">✓ Completo</span>';
-    } else {
-      var campos = a.camposPreenchidos || 0;
-      statusBadge = '<span style="background:#fef3c7;color:#d97706;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">⚠ Pendente (' + campos + '/6)</span>';
-    }
-
-    var whatsBtn = '';
-    if (a.cpf) {
-      whatsBtn = '<button onclick="abrirWhatsAssociado(\'' + a.id + '\')" style="background:#25d366;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Zap</button>';
-    }
-
-    // Redefinir senha — apenas diretoria (endpoint exige presidente/diretor)
-    var senhaBtn = '';
-    if (usuarioAtual && (usuarioAtual.role === 'presidente' || usuarioAtual.role === 'diretor')) {
-      senhaBtn = '<button onclick="abrirModalResetSenha(' + a.id + ')" title="Redefinir senha" style="background:#7c3aed;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔑 Senha</button>';
-    }
-
-    html += '<div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f3f4f6;gap:14px;transition:background .15s" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'transparent\'">';
-    html += '<div style="width:40px;height:40px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#6b7280;flex-shrink:0">' + ini + '</div>';
-    html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + nome + '</div><div style="font-size:12px;color:#6b7280;margin-top:2px">' + subInfo + '</div></div>';
-    html += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">' + statusBadge + whatsBtn + senhaBtn + '<button onclick="editarAssociado(' + a.id + ')" style="background:#1e3a5f;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Editar</button></div>';
+    var d = dadosAssociado(a);
+    html += '<div class="assoc-row">';
+    html += '<div class="assoc-avatar">' + d.ini + '</div>';
+    html += '<div class="assoc-info"><div class="assoc-nome">' + d.nome + '</div><div class="assoc-sub">' + d.subInfo + '</div></div>';
+    html += '<div class="assoc-actions">' + badgeStatusAssociado(a) + acoesAssociado(a) + '</div>';
     html += '</div>';
   });
   document.getElementById('assocLista').innerHTML = '<div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff">' + html + '</div>';
+}
+
+function renderizarCardsAssociados(lista) {
+  var html = '<div class="assoc-cards-grid">';
+  lista.forEach(function(a) {
+    var d = dadosAssociado(a);
+    html += '<div class="assoc-card">';
+    html += '<div class="assoc-card-top">';
+    html += '<div class="assoc-avatar">' + d.ini + '</div>';
+    html += '<div class="assoc-info"><div class="assoc-nome">' + d.nome + '</div><div class="assoc-sub">' + d.subInfo + '</div></div>';
+    html += '</div>';
+    html += '<div>' + badgeStatusAssociado(a) + '</div>';
+    html += '<div class="assoc-card-actions">' + acoesAssociado(a) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('assocLista').innerHTML = html;
 }
 
 function abrirWhatsAssociado(id) {
