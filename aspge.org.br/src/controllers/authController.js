@@ -138,10 +138,10 @@ async function alterarSenha(req, res) {
     // Hash da nova senha
     const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
 
-    // Atualizar senha
+    // Atualizar senha e marcar como alterada (sem troca obrigatória)
     await prisma.associado.update({
       where: { id: associadoId },
-      data: { senha: novaSenhaHash }
+      data: { senha: novaSenhaHash, senhaAlterada: true }
     });
 
     // Registrar log
@@ -175,11 +175,13 @@ async function definirSenha(req, res) {
       return res.status(400).json({ erro: 'Dados inválidos', detalhes: errors.array() });
     }
 
-    const { cpf, novaSenha } = req.body;
+    const { cpf, exigirTroca } = req.body;
     const cpfLimpo = cpf.replace(/\D/g, '');
+    // Senha vazia = CPF (senha temporária)
+    const novaSenha = (req.body.novaSenha || '').trim() || cpfLimpo;
 
-    // Apenas admin pode definir senha sem autenticação
-    if (!req.user || req.user.role !== 'presidente') {
+    // Apenas admin pode definir senha de outro associado
+    if (!req.user || !['presidente', 'diretor'].includes(req.user.role)) {
       return res.status(403).json({ erro: 'Acesso negado' });
     }
 
@@ -198,16 +200,18 @@ async function definirSenha(req, res) {
 
     const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
 
+    // exigirTroca=true → senhaAlterada=false → próximo login é redirecionado
+    // para /atualizacao, que exige nova senha quando senhaAlterada=false
     await prisma.associado.update({
       where: { id: associado.id },
-      data: { senha: novaSenhaHash }
+      data: { senha: novaSenhaHash, senhaAlterada: !exigirTroca }
     });
 
     try {
       await prisma.log.create({
         data: {
           acao: 'Definiu senha (admin)',
-          detalhes: `CPF: ${cpf}`,
+          detalhes: `CPF: ${cpf}${exigirTroca ? ' (troca exigida no próximo login)' : ''}`,
           associadoId: associado.id,
           ip: req.ip,
           userAgent: req.headers['user-agent']
@@ -217,7 +221,12 @@ async function definirSenha(req, res) {
       logger.error('Erro ao criar log:', logError);
     }
 
-    res.json({ sucesso: true, mensagem: 'Senha definida com sucesso' });
+    res.json({
+      sucesso: true,
+      mensagem: exigirTroca
+        ? 'Senha redefinida. O associado deverá criar uma nova senha no próximo login.'
+        : 'Senha definida com sucesso'
+    });
   } catch (error) {
     logger.error('Erro ao definir senha:', error);
     res.status(500).json({ erro: 'Erro interno no servidor' });

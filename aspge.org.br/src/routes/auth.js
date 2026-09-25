@@ -27,9 +27,11 @@ const alterarSenhaValidation = [
 
 const definirSenhaValidation = [
   body('cpf').notEmpty().withMessage('CPF é obrigatório'),
+  // Opcional: se vazia, a senha temporária é o CPF
   body('novaSenha')
-    .notEmpty().withMessage('Nova senha é obrigatória')
-    .isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
+    .optional()
+    .isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres'),
+  body('exigirTroca').optional().isBoolean().withMessage('exigirTroca deve ser booleano')
 ];
 
 // Recuperação de senha — rate limit agressivo (verificação de identidade)
@@ -50,6 +52,6 @@ router.post('/recuperar-senha', recuperarLimiter, recuperarSenhaValidation, auth
 router.get('/perfil', authMiddleware, authController.obterPerfil);
 router.post('/logout', authMiddleware, authController.logout);
 router.post('/alterar-senha', authMiddleware, alterarSenhaValidation, authController.alterarSenha);
-router.post('/definir-senha', authMiddleware, authorize('presidente'), definirSenhaValidation, authController.definirSenha);
+router.post('/definir-senha', authMiddleware, authorize('presidente', 'diretor'), definirSenhaValidation, authController.definirSenha);
 
 module.exports = router;
