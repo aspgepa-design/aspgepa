@@ -9,7 +9,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0075bf 0%, #1e3a5f 100%);
       min-height: 100vh;
       padding: 40px 20px;
     }
@@ -28,7 +28,7 @@
     .logo {
       width: 80px;
       height: 80px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0075bf, #1e3a5f);
       border-radius: 20px;
       display: flex;
       align-items: center;
@@ -90,8 +90,8 @@
     }
     input:focus, select:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+      border-color: #0075bf;
+      box-shadow: 0 0 0 4px rgba(0,117,191,0.1);
     }
     .checkbox-group {
       display: flex;
@@ -112,7 +112,7 @@
     .btn-submit {
       width: 100%;
       padding: 18px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0075bf, #1e3a5f);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -123,7 +123,7 @@
     }
     .btn-submit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(102,126,234,0.4);
+      box-shadow: 0 8px 24px rgba(0,117,191,0.4);
     }
     .btn-submit:disabled {
       opacity: 0.7;
@@ -152,7 +152,7 @@
       display: block;
       text-align: center;
       margin-top: 24px;
-      color: #667eea;
+      color: #0075bf;
       text-decoration: none;
       font-weight: 600;
     }
@@ -188,12 +188,12 @@
       color: #9ca3af;
     }
     .step-item.active .step-num {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0075bf, #1e3a5f);
       color: #fff;
-      box-shadow: 0 4px 12px rgba(102,126,234,.4);
+      box-shadow: 0 4px 12px rgba(0,117,191,.4);
       transform: scale(1.1);
     }
-    .step-item.active span { color: #667eea; }
+    .step-item.active span { color: #0075bf; }
     .step-item.done .step-num { background: #d1fae5; color: #065f46; }
     .step-item.done span { color: #065f46; }
     .progress-bar {
@@ -206,7 +206,7 @@
     .progress-fill {
       height: 100%;
       width: 20%;
-      background: linear-gradient(90deg, #667eea, #764ba2);
+      background: linear-gradient(90deg, #0075bf, #1e3a5f);
       border-radius: 99px;
       transition: width .3s;
     }
@@ -236,10 +236,10 @@
     .btn-secondary:disabled { opacity: .4; cursor: not-allowed; }
     .btn-next {
       flex: 1;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0075bf, #1e3a5f);
       color: #fff;
     }
-    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(102,126,234,.4); }
+    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,117,191,.4); }
     .wizard-nav .btn-submit { flex: 1; margin: 0; }
     input.error, select.error {
       border-color: #dc2626 !important;
@@ -461,7 +461,7 @@
         <div class="review-box" id="revisaoDados"></div>
         <div class="checkbox-group">
           <input type="checkbox" id="termos" name="termos" required>
-          <label for="termos">Declaro que todas as informações fornecidas são verdadeiras e autorizo o uso dos meus dados para fins de cadastro na ASPGE-PA, conforme a <a href="/privacidade" target="_blank" style="color:#667eea;font-weight:600">Política de Privacidade (LGPD)</a>.</label>
+          <label for="termos">Declaro que todas as informações fornecidas são verdadeiras e autorizo o uso dos meus dados para fins de cadastro na ASPGE-PA, conforme a <a href="/privacidade" target="_blank" style="color:#0075bf;font-weight:600">Política de Privacidade (LGPD)</a>.</label>
         </div>
       </div>
       </div>
@@ -532,7 +532,7 @@
     // ===== Busca de CEP (ViaCEP) =====
     function buscarCep(cep) {
       ultimoCep = cep;
-      cepFeedback('Buscando endereço...', '#667eea');
+      cepFeedback('Buscando endereço...', '#0075bf');
       fetch('https://viacep.com.br/ws/' + cep + '/json/')
         .then(function(r) { return r.json(); })
         .then(function(d) {
