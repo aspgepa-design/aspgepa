@@ -404,6 +404,18 @@ async function obterDadosExport(req, res) {
       }
     }
 
+    // Marca emissão física das carteirinhas exportadas
+    if (resultados.length > 0) {
+      try {
+        await prisma.associado.updateMany({
+          where: { id: { in: resultados.map(r => r.dados.id) } },
+          data: { carteirinhaEmitidaEm: new Date() }
+        });
+      } catch (e) {
+        logger.warn('Falha ao marcar carteirinhas emitidas:', e.message);
+      }
+    }
+
     await prisma.log.create({
       data: {
         acao: 'Exportou Carteirinhas',
@@ -561,6 +573,12 @@ async function gerarPdf(req, res) {
         }
       }
     }
+
+    // Marca emissão física das carteirinhas exportadas
+    await prisma.associado.updateMany({
+      where: { id: { in: associados.map(a => a.id) } },
+      data: { carteirinhaEmitidaEm: new Date() }
+    }).catch(e => logger.warn('Falha ao marcar carteirinhas emitidas:', e.message));
 
     await prisma.log.create({
       data: {

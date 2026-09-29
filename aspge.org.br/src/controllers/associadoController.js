@@ -30,7 +30,8 @@ async function listarTodos(req, res) {
         fotoUrl: true,
         fotoCarteirinhaUrl: true,
         cadastroCompleto: true,
-        camposPreenchidos: true
+        camposPreenchidos: true,
+        carteirinhaEmitidaEm: true
       },
       orderBy: {
         nomeCompleto: 'asc'
@@ -49,7 +50,8 @@ async function listarTodos(req, res) {
       whatsapp: a.whatsapp || '',
       temFoto: !!(a.fotoUrl || a.fotoCarteirinhaUrl),
       cadastroCompleto: a.cadastroCompleto,
-      camposPreenchidos: a.camposPreenchidos
+      camposPreenchidos: a.camposPreenchidos,
+      carteirinhaEmitidaEm: a.carteirinhaEmitidaEm
     }));
 
     res.json({

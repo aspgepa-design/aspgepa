@@ -1,6 +1,36 @@
 {
-  "geradoEm": "2026-09-25T17:34:26.074Z",
+  "geradoEm": "2026-09-25T18:51:02.651Z",
   "versoes": [
+    {
+      "versao": "v2.26.2",
+      "data": "25 de set de 2026",
+      "hash": "40471ba",
+      "titulo": "style: alinha cores do wizard de inscricao a identidade do site (azul #0075bf/navy #1e3a5f)",
+      "tipo": "changed",
+      "itens": [
+        "style: alinha cores do wizard de inscricao a identidade do site (azul #0075bf/navy #1e3a5f)"
+      ]
+    },
+    {
+      "versao": "v2.26.1",
+      "data": "25 de set de 2026",
+      "hash": "77ca672",
+      "titulo": "fix(mobile): gestao de associados com visualizacao em cards (padrao) + toggle lista e layout responsivo",
+      "tipo": "fixed",
+      "itens": [
+        "fix(mobile): gestao de associados com visualizacao em cards (padrao) + toggle lista e layout responsivo"
+      ]
+    },
+    {
+      "versao": "v2.26.0",
+      "data": "25 de set de 2026",
+      "hash": "a03f8cb",
+      "titulo": "feat: registro de incidentes LGPD com comunicado ANPD e notificacao a titulares (art. 48)",
+      "tipo": "added",
+      "itens": [
+        "feat: registro de incidentes LGPD com comunicado ANPD e notificacao a titulares (art. 48)"
+      ]
+    },
     {
       "versao": "v2.25.0",
       "data": "25 de set de 2026",

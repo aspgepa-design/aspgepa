@@ -928,6 +928,11 @@ tbody tr:hover{background:#f9fafb}
                   <option value="comFoto">Com foto 📷</option>
                   <option value="semFoto">Sem foto ❌</option>
                 </select>
+                <select id="crtFiltroEmitida" onchange="crtFiltrar()" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px">
+                  <option value="">Emitidas + pendentes</option>
+                  <option value="pendentes">Ainda não emitidas</option>
+                  <option value="emitidas">Já emitidas</option>
+                </select>
                 <button class="btn btn-primary btn-sm" onclick="crtSelTodos(true)">Selecionar Visíveis</button>
                 <button class="btn btn-outline btn-sm" onclick="crtSelTodos(false)">Limpar</button>
               </div>
@@ -2734,7 +2739,7 @@ async function crtCarregarLista() {
     var data = await resp.json();
     if (data.sucesso && data.associados) {
       crtListaAssoc = data.associados.map(function(a) {
-        return { cpf: a.cpf, nome: a.nome || a.nomeCompleto, cargo: a.cargo, temFoto: a.temFoto };
+        return { cpf: a.cpf, nome: a.nome || a.nomeCompleto, cargo: a.cargo, temFoto: a.temFoto, emitidaEm: a.carteirinhaEmitidaEm };
       });
       crtRenderLista(crtListaAssoc);
       crtPopularPreviewSel();
@@ -2760,15 +2765,20 @@ function crtRenderLista(lista) {
   var h = '<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="background:#f3f4f6;position:sticky;top:0;z-index:1">';
   h += '<th style="padding:8px 12px;text-align:left;width:36px"><input type="checkbox" id="crtCheckAll" onchange="crtSelTodos(this.checked)"></th>';
   h += '<th style="padding:8px 12px;text-align:left">Nome</th><th style="padding:8px 12px;text-align:left">CPF</th>';
-  h += '<th style="padding:8px 12px;text-align:left">Cargo</th><th style="padding:8px 12px;text-align:center;width:36px">📷</th></tr></thead><tbody>';
+  h += '<th style="padding:8px 12px;text-align:left">Cargo</th><th style="padding:8px 12px;text-align:center;width:36px">📷</th>';
+  h += '<th style="padding:8px 12px;text-align:left;white-space:nowrap">Emitida</th></tr></thead><tbody>';
   for (var i = 0; i < lista.length; i++) {
     var a = lista[i];
-    h += '<tr class="crt-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" data-foto="' + (a.temFoto?'1':'0') + '" data-cargo="' + ((a.cargo||'').toLowerCase()) + '" style="border-bottom:1px solid #f3f4f6">';
+    var emitidaBadge = a.emitidaEm
+      ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap">✓ ' + crtFormatarData(new Date(a.emitidaEm)) + '</span>'
+      : '<span style="color:#9ca3af;font-size:11px">—</span>';
+    h += '<tr class="crt-row" data-cpf="' + a.cpf + '" data-nome="' + (a.nome||'').toLowerCase() + '" data-foto="' + (a.temFoto?'1':'0') + '" data-cargo="' + ((a.cargo||'').toLowerCase()) + '" data-emitida="' + (a.emitidaEm?'1':'0') + '" style="border-bottom:1px solid #f3f4f6">';
     h += '<td style="padding:6px 12px"><input type="checkbox" class="crt-check" value="' + a.cpf + '" onchange="crtContador()"></td>';
     h += '<td style="padding:6px 12px;font-weight:600">' + a.nome + '</td>';
     h += '<td style="padding:6px 12px;color:#6b7280">' + a.cpf + '</td>';
     h += '<td style="padding:6px 12px;color:#6b7280">' + (a.cargo||'—') + '</td>';
-    h += '<td style="padding:6px 12px;text-align:center">' + (a.temFoto ? '✅' : '❌') + '</td></tr>';
+    h += '<td style="padding:6px 12px;text-align:center">' + (a.temFoto ? '✅' : '❌') + '</td>';
+    h += '<td style="padding:6px 12px">' + emitidaBadge + '</td></tr>';
   }
   h += '</tbody></table>'; el.innerHTML = h; crtContador();
 }
@@ -2776,14 +2786,18 @@ function crtRenderLista(lista) {
 function crtFiltrar() {
   var b = (document.getElementById('crtBusca').value || '').toLowerCase().trim();
   var ff = document.getElementById('crtFiltroFoto').value;
+  var fe = (document.getElementById('crtFiltroEmitida') || {}).value || '';
   var rows = document.querySelectorAll('.crt-row');
   for (var i = 0; i < rows.length; i++) {
     var n = rows[i].getAttribute('data-nome')||'', c = rows[i].getAttribute('data-cpf')||'';
     var foto = rows[i].getAttribute('data-foto')||'';
+    var emitida = rows[i].getAttribute('data-emitida')||'';
     var show = true;
     if (b && n.indexOf(b) === -1 && c.indexOf(b) === -1) show = false;
     if (ff === 'comFoto' && foto !== '1') show = false;
     if (ff === 'semFoto' && foto !== '0') show = false;
+    if (fe === 'emitidas' && emitida !== '1') show = false;
+    if (fe === 'pendentes' && emitida !== '0') show = false;
     rows[i].style.display = show ? '' : 'none';
   }
   crtContador();
