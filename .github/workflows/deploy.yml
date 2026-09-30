@@ -14,7 +14,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
+      # O VPS NÃO é clone git — deploy espelha o fluxo manual (scp de arquivos)
+      - name: Empacotar app
+        run: |
+          cd aspge.org.br
+          tar --exclude='node_modules' --exclude='.env' --exclude='public/uploads' \
+              --exclude='coverage' --exclude='.git' -czf ../aspge-app.tar.gz .
+          cd .. && ls -la aspge-app.tar.gz
+
+      - name: Enviar pacote ao VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "aspge-app.tar.gz"
+          target: "/tmp/"
+
+      - name: Extrair, migrar e recarregar
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -24,8 +42,8 @@ jobs:
           script: |
             set -e
             cd /var/www/aspge/app
-            git fetch origin main
-            git reset --hard origin/main
+            tar -xzf /tmp/aspge-app.tar.gz
+            rm /tmp/aspge-app.tar.gz
             npm ci --omit=dev || npm install --omit=dev
             npx prisma generate
             npx prisma migrate deploy
