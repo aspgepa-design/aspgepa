@@ -483,7 +483,7 @@ async function gerarPdf(req, res) {
     for (const cpf of cpfs.slice(0, 50)) {
       const cpfLimpo = String(cpf).replace(/\D/g, '');
       const a = await prisma.associado.findFirst({ where: { OR: [{ cpf: cpfLimpo }, { cpf }] } });
-      if (a) associados.push(a);
+      if (a && (a.situacao || '').toLowerCase() !== 'inativo') associados.push(a);
     }
     if (associados.length === 0) {
       return res.status(404).json({ erro: 'Nenhum associado encontrado' });

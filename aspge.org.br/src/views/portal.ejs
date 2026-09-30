@@ -2738,7 +2738,9 @@ async function crtCarregarLista() {
     var resp = await fetch('/api/associados', { headers: { 'Authorization': 'Bearer ' + token } });
     var data = await resp.json();
     if (data.sucesso && data.associados) {
-      crtListaAssoc = data.associados.map(function(a) {
+      crtListaAssoc = data.associados.filter(function(a) {
+        return !a.situacao || a.situacao.toLowerCase() !== 'inativo';
+      }).map(function(a) {
         return { cpf: a.cpf, nome: a.nome || a.nomeCompleto, cargo: a.cargo, temFoto: a.temFoto, emitidaEm: a.carteirinhaEmitidaEm };
       });
       crtRenderLista(crtListaAssoc);
