@@ -3562,6 +3562,140 @@ async function excluirNoticia(id) {
   }
 }
 
+// ===== INCIDENTES LGPD (art. 48) =====
+async function carregarIncidentes() {
+  var el = document.getElementById('incidentesLista');
+  if (!el) return;
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/incidentes', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    var lista = (data.dados || []);
+    if (!data.sucesso || !lista.length) {
+      el.innerHTML = '<p style="color:#9ca3af;text-align:center;padding:16px">Nenhum incidente registrado.</p>';
+      return;
+    }
+    var h = '';
+    lista.forEach(function(i) {
+      var dataOc = i.dataOcorrencia ? new Date(i.dataOcorrencia).toLocaleDateString('pt-BR') : '—';
+      var badgeAnpd = i.comunicadoAnpdEm
+        ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">ANPD ✓ ' + new Date(i.comunicadoAnpdEm).toLocaleDateString('pt-BR') + '</span>'
+        : '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">ANPD pendente</span>';
+      var badgeTit = i.notificadoTitularesEm
+        ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Titulares ✓ (' + (i.emailsEnviados||0) + '/' + (i.emailsFalhados||0) + ')</span>'
+        : '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Titulares pendente</span>';
+      h += '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:12px;background:#fff">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
+        '<div><strong style="font-size:14px">' + i.titulo + '</strong>' +
+        '<div style="font-size:12px;color:#6b7280;margin-top:2px">Ocorrência: ' + dataOc + (i.registradoPor ? ' · por ' + i.registradoPor : '') + '</div></div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">' + badgeAnpd + badgeTit + '</div></div>' +
+        '<p style="font-size:13px;color:#374151;margin:8px 0 4px">' + i.descricao + '</p>' +
+        (i.dadosAfetados ? '<p style="font-size:12px;color:#6b7280;margin:2px 0"><strong>Dados:</strong> ' + i.dadosAfetados + '</p>' : '') +
+        (i.titularesAfetados ? '<p style="font-size:12px;color:#6b7280;margin:2px 0"><strong>Titulares:</strong> ' + i.titularesAfetados + '</p>' : '') +
+        (i.medidasTomadas ? '<p style="font-size:12px;color:#6b7280;margin:2px 0"><strong>Medidas:</strong> ' + i.medidasTomadas + '</p>' : '') +
+        '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
+        '<button onclick="incGerarComunicado(' + i.id + ')" class="btn btn-outline btn-sm">📋 Comunicado ANPD</button>' +
+        '<button onclick="incNotificarTitulares(' + i.id + ')" class="btn btn-outline btn-sm">📧 Notificar titulares</button>' +
+        '</div></div>';
+    });
+    el.innerHTML = h;
+  } catch (e) {
+    el.innerHTML = '<p style="color:#dc2626;text-align:center;padding:16px">Erro ao carregar incidentes.</p>';
+  }
+}
+
+async function criarIncidente(e) {
+  e.preventDefault();
+  var msg = document.getElementById('incMsg');
+  var btn = document.getElementById('incBtnSalvar');
+  btn.disabled = true;
+  msg.innerHTML = '<span style="color:#2563eb">Registrando...</span>';
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/incidentes', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titulo: document.getElementById('incTitulo').value,
+        descricao: document.getElementById('incDescricao').value,
+        dataOcorrencia: document.getElementById('incData').value,
+        dadosAfetados: document.getElementById('incDados').value || null,
+        titularesAfetados: document.getElementById('incTitulares').value || null,
+        medidasTomadas: document.getElementById('incMedidas').value || null
+      })
+    });
+    var data = await resp.json();
+    btn.disabled = false;
+    if (data.sucesso) {
+      msg.innerHTML = '<span style="color:#16a34a">Incidente registrado!</span>';
+      document.getElementById('incidenteForm').reset();
+      carregarIncidentes();
+    } else {
+      msg.innerHTML = '<span style="color:#dc2626">' + (data.erro || 'Erro ao registrar') + '</span>';
+    }
+  } catch (err) {
+    btn.disabled = false;
+    msg.innerHTML = '<span style="color:#dc2626">Erro: ' + err.message + '</span>';
+  }
+}
+
+async function incGerarComunicado(id) {
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/incidentes/' + id + '/comunicado-anpd', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var data = await resp.json();
+    if (data.sucesso && data.dados && data.dados.texto) {
+      document.getElementById('anpdTexto').textContent = data.dados.texto;
+      document.getElementById('modalAnpd').style.display = 'flex';
+      carregarIncidentes();
+    } else {
+      alert('Erro: ' + (data.erro || 'Não foi possível gerar o comunicado'));
+    }
+  } catch (e) {
+    alert('Erro: ' + e.message);
+  }
+}
+
+function fecharModalAnpd() {
+  document.getElementById('modalAnpd').style.display = 'none';
+}
+
+function copiarAnpd() {
+  var texto = document.getElementById('anpdTexto').textContent;
+  navigator.clipboard.writeText(texto).then(function() {
+    alert('Texto copiado!');
+  }).catch(function() {
+    var r = document.createRange(); r.selectNodeContents(document.getElementById('anpdTexto'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    document.execCommand('copy'); s.removeAllRanges();
+    alert('Texto copiado!');
+  });
+}
+
+async function incNotificarTitulares(id) {
+  if (!confirm('Enviar e-mail de notificação a TODOS os associados com e-mail cadastrado?\n\nPara restringir a titulares específicos, ajuste o escopo na descrição do incidente.')) return;
+  try {
+    var token = localStorage.getItem('token');
+    var resp = await fetch('/api/incidentes/' + id + '/notificar-titulares', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    var data = await resp.json();
+    if (data.sucesso && data.dados) {
+      alert('Notificações: ' + data.dados.enviados + ' enviada(s), ' + data.dados.falhados + ' falha(s).');
+      carregarIncidentes();
+    } else {
+      alert('Erro: ' + (data.erro || 'Falha ao notificar'));
+    }
+  } catch (e) {
+    alert('Erro: ' + e.message);
+  }
+}
+
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
   carregarDadosUsuario();
