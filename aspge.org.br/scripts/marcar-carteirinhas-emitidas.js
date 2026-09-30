@@ -23,6 +23,18 @@ function normalizar(s) {
     .toUpperCase().replace(/\s+/g, ' ').trim();
 }
 
+/** Retorna o associado com maior sobreposição de tokens do nome (para sugerir casamento manual). */
+function maisProximo(nomeArquivo, associados) {
+  const alvo = new Set(normalizar(nomeArquivo).split(' '));
+  let melhor = null, melhorScore = 0;
+  for (const a of associados) {
+    const tokens = normalizar(a.nomeCompleto).split(' ');
+    const score = tokens.filter(t => alvo.has(t)).length / Math.max(alvo.size, tokens.length);
+    if (score > melhorScore) { melhorScore = score; melhor = a; }
+  }
+  return melhorScore >= 0.6 ? melhor : null;
+}
+
 async function main() {
   const linhas = fs.readFileSync(ARQUIVO, 'utf8')
     .split(/\r?\n/).map(l => l.trim()).filter(Boolean);
@@ -55,7 +67,10 @@ async function main() {
 
   if (naoEncontrados.length) {
     console.log('\n--- SEM CORRESPONDÊNCIA (revisar nome no cadastro) ---');
-    naoEncontrados.forEach(n => console.log('  ' + n));
+    naoEncontrados.forEach(n => {
+      const sugestao = maisProximo(n, associados);
+      console.log(`  ${n}${sugestao ? `   → parecido: "${sugestao.nomeCompleto}" (id ${sugestao.id})` : ''}`);
+    });
   }
   if (jaEmitidos.length) {
     console.log('\n--- JÁ MARCADOS ---');
