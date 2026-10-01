@@ -1,0 +1,31 @@
+{
+  "appId": "br.org.aspgepa.app",
+  "appName": "ASPGE-PA",
+  "webDir": "www",
+  "server": {
+    "url": "https://aspgepa.org.br",
+    "cleartext": false
+  },
+  "android": {
+    "backgroundColor": "#0f172a",
+    "allowMixedContent": false
+  },
+  "ios": {
+    "backgroundColor": "#0f172a",
+    "contentInset": "automatic",
+    "preferredContentMode": "mobile"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#0f172a",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0f172a"
+    }
+  }
+}

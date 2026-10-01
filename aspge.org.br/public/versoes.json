@@ -1,6 +1,56 @@
 {
-  "geradoEm": "2026-09-25T18:51:02.651Z",
+  "geradoEm": "2026-09-30T13:49:29.626Z",
   "versoes": [
+    {
+      "versao": "v2.29.0",
+      "data": "30 de set de 2026",
+      "hash": "b048c37",
+      "titulo": "feat: exclui associados inativos da exportacao de carteirinhas (lista + export/pdf)",
+      "tipo": "added",
+      "itens": [
+        "feat: exclui associados inativos da exportacao de carteirinhas (lista + export/pdf)"
+      ]
+    },
+    {
+      "versao": "v2.28.2",
+      "data": "30 de set de 2026",
+      "hash": "9353c43",
+      "titulo": "fix(ci): deploy via tar+scp+extract - VPS nao e clone git, git fetch falhava",
+      "tipo": "fixed",
+      "itens": [
+        "fix(ci): deploy via tar+scp+extract - VPS nao e clone git, git fetch falhava"
+      ]
+    },
+    {
+      "versao": "v2.28.1",
+      "data": "30 de set de 2026",
+      "hash": "ae8e1db",
+      "titulo": "fix: recria funcoes JS de Incidentes LGPD ausentes - quebrava carregarDadosAsync e preview de carteirinhas",
+      "tipo": "fixed",
+      "itens": [
+        "fix: recria funcoes JS de Incidentes LGPD ausentes - quebrava carregarDadosAsync e preview de carteirinhas"
+      ]
+    },
+    {
+      "versao": "v2.28.0",
+      "data": "30 de set de 2026",
+      "hash": "5b87621",
+      "titulo": "chore: corrige typo em nome (OLIEVIRA->OLIVEIRA) e adiciona sugestao por similaridade no backfill",
+      "tipo": "added",
+      "itens": [
+        "chore: corrige typo em nome (OLIEVIRA->OLIVEIRA) e adiciona sugestao por similaridade no backfill"
+      ]
+    },
+    {
+      "versao": "v2.27.0",
+      "data": "29 de set de 2026",
+      "hash": "dd16b0c",
+      "titulo": "feat: rastreia emissao de carteirinha fisica (carteirinhaEmitidaEm) + badge/filtro na selecao de PDF",
+      "tipo": "added",
+      "itens": [
+        "feat: rastreia emissao de carteirinha fisica (carteirinhaEmitidaEm) + badge/filtro na selecao de PDF"
+      ]
+    },
     {
       "versao": "v2.26.2",
       "data": "25 de set de 2026",
