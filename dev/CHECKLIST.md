@@ -142,7 +142,10 @@
 - [x] Docker
 - [x] CI/CD
 - [ ] Prometheus + Grafana
-- [ ] Aplicativo mobile (Android + iOS) — ver `ARQUITETURA.md` §"Aplicativo Mobile"
+- [~] Aplicativo mobile (Android + iOS) — scaffold Capacitor em `mobile/` (shell p/ aspgepa.org.br); ver `mobile/README.md`
+  - [ ] **Push notifications** (`@capacitor/push-notifications`) — pendente ANTES de submeter à App Store: mitiga rejeição por guideline 4.2 (wrapper puro). Justificativa nativa: avisos de notícias, votações e eventos
+  - [ ] Build `.aab` assinado + upload Play Console (US$ 25 único)
+  - [ ] Build iOS no Xcode (requer macOS) + Apple Developer (US$ 99/ano) + Privacy Manifest (LGPD)
 
 ---
 
